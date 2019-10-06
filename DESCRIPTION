@@ -1,0 +1,11 @@
+Package: flipscores
+Version: 0.1.0
+Date: 2019-XX-XX
+Title: GLM estimate with customized flip tests 
+Author: Jesse Hemerik, Jelle Goeman, Vittorio Giatti and Livio Finos
+Maintainer: Livio Finos <livio.finos@unipd.it>
+Description: Provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables. See Hemerik, Goeman and Finos (2019) <https://arxiv.org/abs/1909.03796>.
+Encoding: UTF-8
+License: GPL-2
+RoxygenNote: 6.1.1
+ 

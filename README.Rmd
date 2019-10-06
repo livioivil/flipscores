@@ -1,0 +1,69 @@
+---
+output:
+  md_document:
+    variant: markdown_github
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+# Welcome to the dev-version of the 
+
+#[library flip on CRAN](http://cran.r-project.org/web/packages/flipscores/index.html)
+
+
+* * *
+
+## Set up
+
+To **install** this github version type (in R):
+
+    #if devtools is not installed yet: 
+    # install.packages("devtools") 
+    library(devtools)
+    install_github("livioivil/flipscores")
+
+
+* * *
+
+## Some examples
+
+```{r,  message = FALSE}
+library(flipscores)
+
+set.seed(1)
+x=(rep(0:1,20))
+D=data.frame(y=rbinom(40,1,.25+x*.5),x=x,
+             z=rnorm(40),id=rep(1:20,each=2))
+
+mod_par=glm(y~x*z,data=D,family = binomial)
+summary(mod_par)
+mod_par
+
+mod=glm_flipscores(y~x*z,data=D,family = binomial,score_type = "ortho")
+summary(mod)
+
+print(mod)
+
+
+mod=glm_flipscores(y~x*z,data=D,family = binomial,score_type = "ortho",
+                   id=D$id)
+summary(mod)
+```
+
+
+* * *
+
+## References
+
+
+## Bug reports
+If you encounter a bug, please file a
+[reprex](https://github.com/tidyverse/reprex) (minimal reproducible example)
+on [github](https://github.com/livioivil/flipscores/issues).
