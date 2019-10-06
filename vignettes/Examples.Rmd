@@ -1,0 +1,44 @@
+---
+title: "Vignette for flipscores"
+author: "All of us"
+date: "`r Sys.Date()`"
+output: 
+  html_document: 
+    toc: yes
+---
+
+# Introduction
+
+short description here
+
+
+## Sintax and parameters
+
+
+The main input parameters of `flipscores()` are:   
+
+- `blabla`:  
+- `blabla`: 
+
+
+# Examples
+
+## Logistic 
+ 
+```{r}
+
+data(Titanic)
+Titanic=dplyr::as_tibble(Titanic)
+
+# Get the row indices to replicate
+idx <- rep(1:nrow(Titanic),Titanic$n)
+# Drop count column n
+Titanic$n <- NULL
+# replicate each row n-times
+Titanic=Titanic[idx, ]
+Titanic$Survived=as.factor(Titanic$Survived)
+  
+mod=flipscores::glm_flipscores(Survived~.+Class*Sex,data=Titanic,family = binomial,score_type = "basic")
+summary(mod)
+```
+
