@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 # Welcome to the dev-version of the 
 
-#[library flip on CRAN](http://cran.r-project.org/web/packages/flipscores/index.html)
+#[library flipscores on CRAN](http://cran.r-project.org/web/packages/flipscores/index.html)
 
 
 * * *

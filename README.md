@@ -2,8 +2,8 @@
 Welcome to the dev-version of the
 =================================
 
-[library flip on CRAN](http://cran.r-project.org/web/packages/flip/index.html)
-==============================================================================
+[library flipscores on CRAN](http://cran.r-project.org/web/packages/flipscores/index.html)
+==========================================================================================
 
 ------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ To **install** this github version type (in R):
     #if devtools is not installed yet: 
     # install.packages("devtools") 
     library(devtools)
-    install_github("livioivil/flip")
+    install_github("livioivil/flipscores")
 
 ------------------------------------------------------------------------
 
