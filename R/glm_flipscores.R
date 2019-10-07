@@ -58,7 +58,7 @@
 #'
 #' @docType package
 #'
-#' @author Livio Finos, Vittorio Giatti \email{livio.finos@unipd.it}
+#' @author Vittorio Giatti, Livio Finos \email{livio.finos@unipd.it}
 #'
 #' @seealso flip
 #'

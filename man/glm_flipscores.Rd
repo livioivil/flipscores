@@ -78,5 +78,5 @@ m1
 flip
 }
 \author{
-Livio Finos, Vittorio Giatti \email{livio.finos@unipd.it}
+Vittorio Giatti, Livio Finos \email{livio.finos@unipd.it}
 }
