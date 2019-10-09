@@ -1,12 +1,18 @@
 #' compute_scores
+#'
 #' @examples
+#'
 #' Z=rnorm(20)
 #' X=Z+rnorm(20)
 #' Y=rpois(n=20,lambda=exp(Z+X))
 #' mod0=glm(Y~Z,family="poisson")
+#' scr0=compute_scores(fit0 = mod0, X = X, score_type = "basic")
+#' flip:::flip(scr0)
+#'
 #' mod1=glm(Y~Z+X,family="poisson")
-#' (scr=compute_scores(fit0 = mod0,))
-#' flip:::flip(scr)
+#' scr1=compute_scores(fit0 = mod1, X = X, score_type = "basic")
+#' flip:::flip(scr1)
+#'
 #' @export
 
 compute_scores <- function(fit0, X,score_type="orthogonalized"){
