@@ -1,4 +1,4 @@
-### in glm_flipscores
+### in flipscores_glm
 
 compute_scores_glm <- function(mf,score_type){
   mf$x=TRUE
