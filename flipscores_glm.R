@@ -7,66 +7,56 @@
 #' but p-value is calculated accounting to new preferencies.
 #'
 #' @param formula an object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted.
-#' @param X1 X1 is the covariate tested under the alternative hypotesis (H1).
 #' @param data an optional data frame, list or environment (or object coercible by as.data.frame to a data frame)
 #' containing the variables in the model. If not found in data, the variables are taken from environment(formula),
 #' typically the environment from which glm is called.
 #' @param family a description of the error distribution and link function to be used in the model.
 #' For glm this can be a character string naming a family function, a family function or the result of a call to a family function.
 #' For glm.fit only the third option is supported.
-#' @param alternative Should be "greater", "less" or "two.sided"
-#' @param scoreType The type of score that is computed, either "basic" or "effective".
-#' Using "effective" takes into account nuisance estimation.
-#' @param statTest Choose a test statistic from flip.statTest. See "flip" package.
-#' @param testType by default testType="permutation". The use of option "combination" is more efficient when
+#' @param score_type The type of score that is computed, either "basic", "effective" or "orthogonalized". Using "effective" takes into account nuisance estimation. ORTHO?? Default is "orthogonalized".
+#' 
+#' @param alternative Should be "greater", "less" or "two.sided". By default is "two.sided"
+#' 
+#' @param statTest C'� ANCORA?? Choose a test statistic from flip.statTest. See "flip" package.
+#' 
+#' @param testType C'� ANCORA?? by default testType="permutation". The use of option "combination" is more efficient when
 #'   X is indicator of groups (i.e. C>1 samples testing). When the total number of possible combinations exceeds 10 thousand,
 #'   "permutation" is performed. As an alternative, if you choose "rotation", resampling is performed through random linear
 #'   combinations (i.e. a rotation test is performed). This option is useful when only few permutations are available, that is,
 #'   minimum reachable significance is hight. See also the details section for the algorithm used. The old syntax rotationTest=TRUE
 #'   is maintained for compatibility but is deprecated, use testType="rotation" instead.
-#' @param nperms Number of resamples performed. Note: the maximum number of possible permutation is n!^p.
+
+#' @param n_perms The number of times that the scores are randomly sign-flipped. Note: the maximum number of possible permutation is n!^p.
 #' Where n indicates the number of observations (rows) and p indicates the number of
 #' covariates (columns). R typing: factorial(n)^p. Default is 1000..
 #'
-#' @usage glm_flipscores = function(formula, family, data, alternative = 0, scoreType = "basic", statTest = "t",
-#' testType = "permutation", nperms=1000, weights, subset, na.action, start = NULL,
-#' etastart, mustart, offset, control = list(...), model = TRUE, method = "glm.fit",
-#' x = FALSE, y = TRUE,  singular.ok = TRUE, contrasts = NULL, ...)
+#' @usage flipscores_glm(formula, family, data, score_type = "orthogonalized", n_flips=1000, ...)
 #'
-#' @return summary.glm with customized p-values
+#' @return flipscores_glm returns an object of class inheriting from "glm" which inherits from the class "lm". See also glm package.  
+#' The functions related (summary.flipscores, plot.flipscores, print.flipscores) can be used to obtain or print a summary of the results, whose include customized p.values. 
 #'
 #' @examples
 #' data(iris)
 #' data=iris[iris$Species!="setosa",]
 #' data$Species=factor(data$Species)
-#' data$Petal.Width=data$Petal.Width>median(data$Petal.Width)
-#' scoreType = "basic"
-#' m1 = glm_flipscores(formula=Species~.+Petal.Width*Petal.Length, 
-#' family=binomial, data=data, alternative=0,n_flips=1000)
+#' m1 = flipscores_glm(Species~.+Petal.Width*Petal.Length, family=binomial(link = "logit"), data=data, score_type="orthogonalized", n_flips=1000)
 #' summary(m1)
-#' summary(glm(formula, family, data, alternative, scoreType, statTest, testType, B))
+#' 
 #' data = as.data.frame(Titanic)
-#' formula = Freq~.
-#' family = poisson(link = "log")
-#' scoreType = "basic"
-#' statTest = "t"
-#' alternative = 0
-#' testType = "permutation"
-#' nperms = 1000
-#' m1 = glm_flipscores(formula, family, data, alternative, scoreType, statTest, testType, nperms)
-#' m1
+#' m1 = flipscores_glm(Freq~., family=poisson(link = "log"), data=data, score_type="orthogonalized", n_flips=1000)
+#' summary(m1)
 #'
 #' @docType package
 #'
-#' @author Vittorio Giatti, Livio Finos \email{livio.finos@unipd.it}
+#' @author Jesse Hemerik, Jelle Goeman and Livio Finos, with contribution by Vittorio Giatti and Angela Andreella
 #'
 #' @seealso flip
 #'
-#' @name glm_flipscores
+#' @name flipscores_glm
 #'
 #' @export
 
-glm_flipscores<-function(formula, family, data,
+flipscores_glm<-function(formula, family, data,
                          score_type = "orthogonalized",
                          n_flips=1000, 
                          ...){
