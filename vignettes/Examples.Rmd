@@ -9,17 +9,37 @@ output:
 
 # Introduction
 
-short description here
-
+both fit generalized linear models and perform many tests on coefficients.
+All of them based on flipped likelihood scores. Referring to canonical glm function options,
+it is expanded with testing ways on coefficients: test statistic type, score type,
+resampling type and test direction. The resulting output is same as classical glms,
+but p-value is calculated accounting to new preferencies.
 
 ## Sintax and parameters
 
-
 The main input parameters of `flipscores()` are:   
 
-- `blabla`:  
-- `blabla`: 
+- formula: an object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted.
+- data: an optional data frame, list or environment (or object coercible by as.data.frame to a data frame)
+containing the variables in the model. If not found in data, the variables are taken from environment(formula),
+typically the environment from which glm is called.
+- family: a description of the error distribution and link function to be used in the model.
+For glm this can be a character string naming a family function, a family function or the result of a call to a family function.
+For glm.fit only the third option is supported.
+- score_type: The type of score that is computed, either "basic", "effective" or "orthogonalized". Using "effective" takes into account nuisance estimation. ORTHO?? Default is "orthogonalized".
+- alternative: Should be "greater", "less" or "two.sided". By default is "two.sided"
 
+- statTest: C'� ANCORA?? Choose a test statistic from flip.statTest. See "flip" package.
+- testType: C'� ANCORA?? by default testType="permutation". The use of option "combination" is more efficient when
+X is indicator of groups (i.e. C>1 samples testing). When the total number of possible combinations exceeds 10 thousand,
+"permutation" is performed. As an alternative, if you choose "rotation", resampling is performed through random linear
+combinations (i.e. a rotation test is performed). This option is useful when only few permutations are available, that is,
+minimum reachable significance is hight. See also the details section for the algorithm used. The old syntax rotationTest=TRUE
+is maintained for compatibility but is deprecated, use testType="rotation" instead.
+
+- n_perms: The number of times that the scores are randomly sign-flipped. Note: the maximum number of possible permutation is n!^p.
+#' Where n indicates the number of observations (rows) and p indicates the number of
+#' covariates (columns). R typing: factorial(n)^p. Default is 1000..
 
 # Examples
 
@@ -42,3 +62,33 @@ mod=flipscores::glm_flipscores(Survived~.+Class*Sex,data=Titanic,family = binomi
 summary(mod)
 ```
 
+## Poisson 
+ 
+```{r}
+
+Titanic=as.data.frame(datasets::Titanic)
+
+mod=flipscores::flipscores_glm(Survived~.+Class*Sex, data=Titanic, family = poisson, score_type = "basic")
+summary(mod)
+```
+
+## Linear model 
+ 
+```{r}
+
+trees=as.data.frame(datasets::trees)
+
+mod=flipscores::flipscores_glm(Volume~Girth*Height, data=trees, family = gaussian, score_type = "basic")
+summary(mod)
+```
+
+## Gamma model 
+ 
+```{r}
+
+library(GLMsData)
+
+data("motorins1")
+mod=flipscores::flipscores_glm(Insured~., data=motorins1, family = Gamma, score_type = "basic")
+summary(mod)
+```
