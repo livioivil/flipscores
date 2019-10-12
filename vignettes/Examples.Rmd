@@ -38,8 +38,8 @@ minimum reachable significance is hight. See also the details section for the al
 is maintained for compatibility but is deprecated, use testType="rotation" instead.
 
 - n_perms: The number of times that the scores are randomly sign-flipped. Note: the maximum number of possible permutation is n!^p.
-#' Where n indicates the number of observations (rows) and p indicates the number of
-#' covariates (columns). R typing: factorial(n)^p. Default is 1000..
+Where n indicates the number of observations (rows) and p indicates the number of
+covariates (columns). R typing: factorial(n)^p. Default is 1000..
 
 # Examples
 
