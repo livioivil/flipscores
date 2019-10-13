@@ -58,7 +58,7 @@ Titanic$n <- NULL
 Titanic=Titanic[idx, ]
 Titanic$Survived=as.factor(Titanic$Survived)
   
-mod=flipscores::glm_flipscores(Survived~.+Class*Sex,data=Titanic,family = binomial,score_type = "basic")
+mod=flipscores::flipscores_glm(Survived~.+Class*Sex,data=Titanic,family = binomial,score_type = "basic")
 summary(mod)
 ```
 
