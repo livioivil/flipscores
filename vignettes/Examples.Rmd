@@ -29,8 +29,8 @@ For glm.fit only the third option is supported.
 - score_type: The type of score that is computed, either "basic", "effective" or "orthogonalized". Using "effective" takes into account nuisance estimation. ORTHO?? Default is "orthogonalized".
 - alternative: Should be "greater", "less" or "two.sided". By default is "two.sided"
 
-- statTest: C'� ANCORA?? Choose a test statistic from flip.statTest. See "flip" package.
-- testType: C'� ANCORA?? by default testType="permutation". The use of option "combination" is more efficient when
+- statTest: C'e ANCORA?? Choose a test statistic from flip.statTest. See "flip" package.
+- testType: C'e ANCORA?? by default testType="permutation". The use of option "combination" is more efficient when
 X is indicator of groups (i.e. C>1 samples testing). When the total number of possible combinations exceeds 10 thousand,
 "permutation" is performed. As an alternative, if you choose "rotation", resampling is performed through random linear
 combinations (i.e. a rotation test is performed). This option is useful when only few permutations are available, that is,
@@ -86,9 +86,8 @@ summary(mod)
  
 ```{r}
 
-library(GLMsData)
+cars=datasets::cars
 
-data("motorins1")
-mod=flipscores::flipscores_glm(Insured~., data=motorins1, family = Gamma, score_type = "basic")
+mod=flipscores::flipscores_glm(speed~dist, data=cars, family = Gamma, score_type = "ortho")
 summary(mod)
 ```
