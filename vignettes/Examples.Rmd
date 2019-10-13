@@ -68,7 +68,7 @@ summary(mod)
 
 Titanic=as.data.frame(datasets::Titanic)
 
-mod=flipscores::flipscores_glm(Survived~.+Class*Sex, data=Titanic, family = poisson, score_type = "basic")
+mod=flipscores::flipscores_glm(Freq~.+Class*Sex, data=Titanic, family = poisson, score_type = "basic")
 summary(mod)
 ```
 
