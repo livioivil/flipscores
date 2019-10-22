@@ -36,13 +36,18 @@ plot.flipscores <- function (x, ...) {
   # do.call(plotting, args = args)
 }
 
-
 get_head_flip_out <- function(x){
-  paste("
-Flip Score Test: 
-  score_type =",x$score_type,"
-  n_flips=",x$n_flips,"\n")
+  if(stringr::word(x$family$family, 1)!="Negative")
+  {paste("Flip Score Test: 
+         score_type =",x$score_type,
+         "n_flips=",x$n_flips,"\n")}
+  else 
+    paste("Flip Score Test: 
+          score_type =",x$score_type,
+          "n_flips=",x$n_flips,
+          "theta",round(x$theta,digits=5),"\n")
 }
+
 #' @export
 print.flipscores <- function(x, ...) {
   cat(get_head_flip_out(x))
