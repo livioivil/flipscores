@@ -12,7 +12,7 @@
 #' typically the environment from which glm is called.
 #' @param family a description of the error distribution and link function to be used in the model.
 #' For glm this can be a character string naming a family function, a family function or the result of a call to a family function.
-#' For glm.fit only the third option is supported.
+#' For glm.fit only the third option is supported. OK?--> Note: to use Negative Binomial family, family string reference must have quotes.
 #' @param score_type The type of score that is computed, either "basic", "effective" or "orthogonalized". Using "effective" takes into account nuisance estimation. ORTHO?? Default is "orthogonalized".
 #' 
 #' @param alternative Should be "greater", "less" or "two.sided". By default is "two.sided"
@@ -25,7 +25,7 @@
 #'   combinations (i.e. a rotation test is performed). This option is useful when only few permutations are available, that is,
 #'   minimum reachable significance is hight. See also the details section for the algorithm used. The old syntax rotationTest=TRUE
 #'   is maintained for compatibility but is deprecated, use testType="rotation" instead.
-
+#'
 #' @param n_perms The number of times that the scores are randomly sign-flipped. Note: the maximum number of possible permutation is n!^p.
 #' Where n indicates the number of observations (rows) and p indicates the number of
 #' covariates (columns). R typing: factorial(n)^p. Default is 1000..
@@ -84,7 +84,12 @@ flipscores_glm<-function(formula, family, data,
   # mi tengo solo quelli buoni per glm
   if(length(m)>0) mf <- mf[-m]
   #rinomino la funzione da chiamare:
-  mf[[1L]]=quote(glm)
+  if(mf$family=="negbinom"){
+    mf[[1L]]=quote(MASS::glm.nb)
+    mf$family=NULL
+  } else{mf[[1L]]=quote(glm)}
+  
+  param_x_ORIGINAL=mf$x
   param_x_ORIGINAL=mf$x
   
   ############### fit the H1 model and append the scores
