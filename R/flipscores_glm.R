@@ -17,9 +17,9 @@
 #' 
 #' @param alternative Should be "greater", "less" or "two.sided". By default is "two.sided"
 #' 
-#' @param statTest C'� ANCORA?? Choose a test statistic from flip.statTest. See "flip" package.
+#' @param statTest C'e ANCORA?? Choose a test statistic from flip.statTest. See "flip" package.
 #' 
-#' @param testType C'� ANCORA?? by default testType="permutation". The use of option "combination" is more efficient when
+#' @param testType C'e ANCORA?? by default testType="permutation". The use of option "combination" is more efficient when
 #'   X is indicator of groups (i.e. C>1 samples testing). When the total number of possible combinations exceeds 10 thousand,
 #'   "permutation" is performed. As an alternative, if you choose "rotation", resampling is performed through random linear
 #'   combinations (i.e. a rotation test is performed). This option is useful when only few permutations are available, that is,
