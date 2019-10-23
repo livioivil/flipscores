@@ -1,25 +1,37 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 Welcome to the dev-version of the
 =================================
+
 [library flipscores on CRAN](http://cran.r-project.org/web/packages/flipscores/index.html)
 ==========================================================================================
+
 ------------------------------------------------------------------------
+
 Set up
 ------
+
 To **install** this github version type (in R):
-    #if devtools is not installed yet: 
-    # install.packages("devtools") 
+
+    ##if devtools is not installed yet: 
+    ## install.packages("devtools") 
     library(devtools)
     install_github("livioivil/flipscores")
+
 ------------------------------------------------------------------------
+
 Some examples
 -------------
+
+Binomial
+--------
+
 ``` r
 library(flipscores)
-###Binomial
+
 set.seed(1)
 x=(rep(0:1,20))
 D=data.frame(y=rbinom(40,1,.25+x*.5), x=x,z=rnorm(40),id=rep(1:20,each=2))
+
 mod_par=glm(y~x*z,data=D,family = binomial)
 summary(mod_par)
 #> 
@@ -71,7 +83,8 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error z value Pr(>|z|)   
-#> (Intercept) -0.70008 -0.06760    0.05194  -1.301    0.202   #> x            2.15567  0.10335    0.04041   2.557    0.008 **
+#> (Intercept) -0.70008 -0.06760    0.05194  -1.301    0.202   
+#> x            2.15567  0.10335    0.04041   2.557    0.008 **
 #> z           -1.13197 -0.05254    0.04660  -1.127    0.302   
 #> x:z          1.50703  0.04013    0.03397   1.181    0.258   
 #> ---
@@ -120,11 +133,17 @@ summary(mod)
 #> AIC: 49.83
 #> 
 #> Number of Fisher Scoring iterations: 4
-###Poisson
+```
+
+Poisson
+-------
+
+``` r
 set.seed(2)
 y=(sample(1:200,20))
 x=(rep(0:1,20))
 D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40),id=rep(1:20,each=2))
+
 mod_par=glm(y~x*z,data=D, family = poisson)
 summary(mod_par)
 #> 
@@ -152,7 +171,8 @@ summary(mod_par)
 #> 
 #> Number of Fisher Scoring iterations: 5
 mod=flipscores_glm(y~x*z, data=D, family = poisson, score_type = "ortho")
-summary(mod)#> Flip Score Test: 
+summary(mod)
+#> Flip Score Test: 
 #>          score_type = orthogonalized , n_flips= 1000
 #> 
 #> Call:
@@ -206,11 +226,17 @@ summary(mod)
 #> AIC: 1759.5
 #> 
 #> Number of Fisher Scoring iterations: 5
-###Linear model
+```
+
+Linear model
+------------
+
+``` r
 set.seed(3)
 y=rnorm(40)
 x=(rep(0:1,20))
 D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40),id=rep(1:20,each=2))
+
 mod_par=glm(y~x*z,data=D, family = gaussian)
 summary(mod_par)
 #> 
@@ -233,7 +259,8 @@ summary(mod_par)
 #>     Null deviance: 27.063  on 39  degrees of freedom
 #> Residual deviance: 24.291  on 36  degrees of freedom
 #> AIC: 103.56
-#> #> Number of Fisher Scoring iterations: 2
+#> 
+#> Number of Fisher Scoring iterations: 2
 mod=flipscores_glm(y~x*z, data=D, family = gaussian, score_type = "ortho")
 summary(mod)
 #> Flip Score Test: 
@@ -290,11 +317,16 @@ summary(mod)
 #> AIC: 103.56
 #> 
 #> Number of Fisher Scoring iterations: 2
-###Gamma
+```
+
+### Gamma
+
+``` r
 set.seed(4)
 y=rgamma(40, shape=9, scale = 0.5)
 x=(rep(0:1,20))
 D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40), x2=rpois(40, lambda = 4) ,id=rep(1:20,each=2))
+
 mod_par=glm(y~x*z+x2,data=D, family = Gamma)
 summary(mod_par)
 #> 
@@ -314,7 +346,8 @@ summary(mod_par)
 #> x:z          0.032547   0.023328   1.395   0.1717    
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-#> #> (Dispersion parameter for Gamma family taken to be 0.09268343)
+#> 
+#> (Dispersion parameter for Gamma family taken to be 0.09268343)
 #> 
 #>     Null deviance: 3.4693  on 39  degrees of freedom
 #> Residual deviance: 3.1289  on 35  degrees of freedom
@@ -380,10 +413,60 @@ summary(mod)
 #> 
 #> Number of Fisher Scoring iterations: 5
 ```
+
+### Negative Binomial
+
+``` r
+set.seed(2)
+y=(sample(1:200,20))
+x=(rep(0:1,20))
+D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40),id=rep(1:20,each=2))
+
+mod_par=MASS::glm.nb(y~x*z,data=D, link="log")
+summary(mod_par)
+#> 
+#> Call:
+#> MASS::glm.nb(formula = y ~ x * z, data = D, link = "log", init.theta = 2.450862935)
+#> 
+#> Deviance Residuals: 
+#>      Min        1Q    Median        3Q       Max  
+#> -2.26290  -1.14663   0.02337   0.64921   1.07088  
+#> 
+#> Coefficients:
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)  4.78302    0.15342  31.176   <2e-16 ***
+#> x           -0.16008    0.20662  -0.775    0.439    
+#> z           -0.06200    0.14045  -0.441    0.659    
+#> x:z          0.08336    0.18310   0.455    0.649    
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for Negative Binomial(2.4509) family taken to be 1)
+#> 
+#>     Null deviance: 43.679  on 39  degrees of freedom
+#> Residual deviance: 42.706  on 36  degrees of freedom
+#> AIC: 452.34
+#> 
+#> Number of Fisher Scoring iterations: 1
+#> 
+#> 
+#>               Theta:  2.451 
+#>           Std. Err.:  0.533 
+#> 
+#>  2 x log-likelihood:  -442.339
+#>mod=flipscores::flipscores_glm(y~x*z, data=D, family = "negbinom", score_type = "ortho") 
+#>summary(mod)
+#>mod=flipscores::flipscores_glm(y~x*z, data=D, family = "negbinom", score_type = "ortho", id=D$id)
+#>summary(mod)
+```
+
 ------------------------------------------------------------------------
+
 References
 ----------
+
 Bug reports
 -----------
-If you encounter a bug, please file a [reprex](https://github.com/tidyverse/reprex) (minimal reproducible example) on 
-[github](https://github.com/livioivil/flipscores/issues).
+
+If you encounter a bug, please file a [reprex](https://github.com/tidyverse/reprex) (minimal reproducible example) on [github](https://github.com/livioivil/flipscores/issues).
+
