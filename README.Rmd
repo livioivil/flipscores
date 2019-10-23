@@ -38,11 +38,9 @@ To **install** this github version type (in R):
 
 ```{r,  message = FALSE}
 library(flipscores)
-
 set.seed(1)
 x=(rep(0:1,20))
 D=data.frame(y=rbinom(40,1,.25+x*.5), x=x,z=rnorm(40),id=rep(1:20,each=2))
-
 mod_par=glm(y~x*z,data=D,family = binomial)
 summary(mod_par)
 mod_par
@@ -59,7 +57,6 @@ set.seed(2)
 y=(sample(1:200,20))
 x=(rep(0:1,20))
 D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40),id=rep(1:20,each=2))
-
 mod_par=glm(y~x*z,data=D, family = poisson)
 summary(mod_par)
 mod=flipscores_glm(y~x*z, data=D, family = poisson, score_type = "ortho")
@@ -74,7 +71,6 @@ set.seed(3)
 y=rnorm(40)
 x=(rep(0:1,20))
 D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40),id=rep(1:20,each=2))
-
 mod_par=glm(y~x*z,data=D, family = gaussian)
 summary(mod_par)
 mod=flipscores_glm(y~x*z, data=D, family = gaussian, score_type = "ortho")
@@ -90,7 +86,6 @@ set.seed(4)
 y=rgamma(40, shape=9, scale = 0.5)
 x=(rep(0:1,20))
 D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40), x2=rpois(40, lambda = 4) ,id=rep(1:20,each=2))
-
 mod_par=glm(y~x*z+x2,data=D, family = Gamma)
 summary(mod_par)
 mod=flipscores_glm(y~x*z+x2, data=D, family = Gamma, score_type = "ortho") #> senza +x2 non va?
@@ -106,7 +101,6 @@ set.seed(2)
 y=(sample(1:200,20))
 x=(rep(0:1,20))
 D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40),id=rep(1:20,each=2))
-
 mod_par=MASS::glm.nb(y~x*z,data=D, link="log")
 summary(mod_par)
 #>mod=flipscores::flipscores_glm(y~x*z, data=D, family = "negbinom", score_type = "ortho") 
@@ -125,4 +119,17 @@ summary(mod_par)
 If you encounter a bug, please file a
 [reprex](https://github.com/tidyverse/reprex) (minimal reproducible example)
 on [github](https://github.com/livioivil/flipscores/issues).
+
+
+
+* * *
+
+## References
+
+
+## Bug reports
+If you encounter a bug, please file a
+[reprex](https://github.com/tidyverse/reprex) (minimal reproducible example)
+on [github](https://github.com/livioivil/flipscores/issues).
+
 
