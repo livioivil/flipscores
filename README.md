@@ -319,7 +319,8 @@ summary(mod)
 #> Number of Fisher Scoring iterations: 2
 ```
 
-### Gamma
+Gamma
+-----
 
 ``` r
 set.seed(4)
@@ -414,7 +415,8 @@ summary(mod)
 #> Number of Fisher Scoring iterations: 5
 ```
 
-### Negative Binomial
+Negative Binomial
+-----------------
 
 ``` r
 set.seed(2)
