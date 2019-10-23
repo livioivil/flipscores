@@ -83,7 +83,7 @@ mod=flipscores_glm(y~x*z, data=D, family = gaussian, score_type = "ortho", id=D$
 summary(mod)
 ```
 
-###Gamma
+## Gamma
 
 ```{r,  message = FALSE}
 set.seed(4)
@@ -99,7 +99,7 @@ mod=flipscores_glm(y~x*z+x2, data=D, family = Gamma, score_type = "ortho", id=D$
 summary(mod)
 ```
 
-###Negative Binomial
+## Negative Binomial
 
 ```{r,  message = FALSE}
 set.seed(2)
