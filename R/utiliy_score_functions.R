@@ -33,28 +33,26 @@ get_a_expo_fam <- function(model0){
   if(class(model0)[1]=="lm"){
     a <- 1
   } else{
-
+    
     #The following lines for obtaining 'a' are taken from the mdscore package on CRAN
     #by Antonio Hermes M. da Silva-Junior, Damiao N. da Silva and Silvia L. P. Ferrari
-
+    
     # in response scale:
     mu.est <- model0$fitted.values
     # mu.est <- model0$fitted.values
     eta.est <- model0$family$linkfun(mu.est)
-
-    V <- if(model0$family[[1]] == "gaussian") quote(1) 
-         else
-            if(stringr::word(model0$family$family,1)=="Negative"){.Theta=Theta}  
-            else as.list(model0$family$variance)[[2]]
-
+    
+    V <- if(model0$family[[1]] == "gaussian") quote(1) else
+      as.list(model0$family$variance)[[2]]
+    
     if(model0$family[[2]] %in% c("log", "cloglog", "logit")){
       mu <- switch(model0$family[[2]],
                    log     = quote(exp(eta)),
                    cloglog = quote(1 - exp(-exp(eta))),
                    logit   = quote(exp(eta)/(1 + exp(eta))))
     }else mu <- as.list(model0$family$linkinv)[[2]]
-
-    if(stringr::word(model0$family$family,1)=="Negative"){Theta=model0$theta}  
+    
+    #if(stringr::word(model0$family$family,1)=="Negative"){.Theta=model0$theta}  
     
     Dmu <- D(mu,"eta")
     a <- eval(V, list(mu= mu.est)) / eval(Dmu, list(eta= eta.est))
