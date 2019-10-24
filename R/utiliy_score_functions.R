@@ -42,9 +42,10 @@ get_a_expo_fam <- function(model0){
     # mu.est <- model0$fitted.values
     eta.est <- model0$family$linkfun(mu.est)
 
-    V <- if(model0$family[[1]] == "gaussian") quote(1) else
-      as.list(model0$family$variance)[[2]]
-
+    V <- if(model0$family[[1]] == "gaussian") quote(1) 
+         else
+            if(stringr::word(model0$family$family,1)=="Negative"){.Theta=Theta}  
+            else as.list(model0$family$variance)[[2]]
 
     if(model0$family[[2]] %in% c("log", "cloglog", "logit")){
       mu <- switch(model0$family[[2]],
@@ -53,7 +54,7 @@ get_a_expo_fam <- function(model0){
                    logit   = quote(exp(eta)/(1 + exp(eta))))
     }else mu <- as.list(model0$family$linkinv)[[2]]
 
-    #if(stringr::word(model0$family$family,1)=="Negative"){.Theta=model0$theta}  
+    if(stringr::word(model0$family$family,1)=="Negative"){Theta=model0$theta}  
     
     Dmu <- D(mu,"eta")
     a <- eval(V, list(mu= mu.est)) / eval(Dmu, list(eta= eta.est))
