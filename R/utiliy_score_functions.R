@@ -53,7 +53,7 @@ get_a_expo_fam <- function(model0){
                    logit   = quote(exp(eta)/(1 + exp(eta))))
     }else mu <- as.list(model0$family$linkinv)[[2]]
 
-    if(stringr::word(model0$family$family,1)=="Negative"){.Theta=model0$theta}  
+    #if(stringr::word(model0$family$family,1)=="Negative"){.Theta=model0$theta}  
     
     Dmu <- D(mu,"eta")
     a <- eval(V, list(mu= mu.est)) / eval(Dmu, list(eta= eta.est))
