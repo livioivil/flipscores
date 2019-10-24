@@ -23,9 +23,7 @@ The main input parameters of `flipscores()` are:
 - data: an optional data frame, list or environment (or object coercible by as.data.frame to a data frame)
 containing the variables in the model. If not found in data, the variables are taken from environment(formula),
 typically the environment from which glm is called.
-- family: a description of the error distribution and link function to be used in the model.
-For glm this can be a character string naming a family function, a family function or the result of a call to a family function.
-For glm.fit only the third option is supported.
+- family: a description of the error distribution and link function to be used in the model. Specifing Negative binomial family quotes has to be used.
 - score_type: The type of score that is computed, either "basic", "effective" or "orthogonalized". Using "effective" takes into account nuisance estimation. ORTHO?? Default is "orthogonalized".
 - alternative: Should be "greater", "less" or "two.sided". By default is "two.sided"
 
@@ -89,5 +87,13 @@ summary(mod)
 cars=datasets::cars
 
 mod=flipscores::flipscores_glm(speed~dist, data=cars, family = Gamma, score_type = "ortho")
+summary(mod)
+```
+
+## Negative Binomial 
+ 
+```{r}
+Titanic=as.data.frame(datasets::Titanic)
+mod=flipscores::flipscores_glm(Freq~.+Class*Sex, data=Titanic, family = "negbinom", score_type = "basic")
 summary(mod)
 ```
