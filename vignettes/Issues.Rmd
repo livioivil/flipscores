@@ -1,0 +1,313 @@
+---
+title: "Issues"
+author: "..."
+date: "`r Sys.Date()`"
+output: 
+  html_document: 
+    toc: yes
+---
+
+```{r}
+rm(list = ls(all.names = T))
+
+set.seed(2)
+y=(sample(1:200,20))
+x=(rep(0:1,20))
+D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40),id=rep(1:20,each=2))
+
+mod=flipscores::flipscores_glm(y~x*z, data=D, family = "negbinom", score_type = "basic") 
+#non funziona. non trova theta
+
+#ma se 
+model0=MASS::glm.nb(y~x*z,data=D, link="log")
+.Theta=model0$theta
+
+mod=flipscores::flipscores_glm(y~x*z, data=D, family = "negbinom", score_type = "basic") 
+#funziona
+
+rm(list = ls(all.names = T))
+
+#controllo il problema
+set.seed(2)
+y=(sample(1:200,20))
+x=(rep(0:1,20))
+D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40),id=rep(1:20,each=2))
+model0=MASS::glm.nb(y~x*z,data=D, link="log")
+
+mu.est <- model0$fitted.values
+eta.est <- model0$family$linkfun(mu.est)
+V =as.list(model0$family$variance)[[2]]
+mu <- quote(exp(eta))
+Dmu <- D(mu,"eta")
+a <- eval(V, list(mu= mu.est)) / eval(Dmu, list(eta= eta.est))
+a
+
+#aggiungo .Theta
+mu.est <- model0$fitted.values
+eta.est <- model0$family$linkfun(mu.est)
+V =as.list(model0$family$variance)[[2]]
+mu <- quote(exp(eta))
+.Theta=model0$theta
+Dmu <- D(mu,"eta")
+a <- eval(V, list(mu= mu.est)) / eval(Dmu, list(eta= eta.est))
+a
+
+#controllo per la prima osservazione
+eval(V, list(mu= mu.est[1]))
+(exp(model0$coefficients[1]+0.73893860*model0$coefficients[3])+(exp(model0$coefficients[1]+0.73893860*model0$coefficients[3]))^2/model0$theta)  
+
+rm(list = ls(all.names = T))
+
+#richiamo get_a_expo_fam senza .Theta
+get_a_expo_fam <- function(model0){
+  if(class(model0)[1]=="lm"){
+    a <- 1
+  } else{
+    
+    #The following lines for obtaining 'a' are taken from the mdscore package on CRAN
+    #by Antonio Hermes M. da Silva-Junior, Damiao N. da Silva and Silvia L. P. Ferrari
+    
+    # in response scale:
+    mu.est <- model0$fitted.values
+    # mu.est <- model0$fitted.values
+    eta.est <- model0$family$linkfun(mu.est)
+    
+    V <- if(model0$family[[1]] == "gaussian") quote(1) else
+      as.list(model0$family$variance)[[2]]
+    
+    if(model0$family[[2]] %in% c("log", "cloglog", "logit")){
+      mu <- switch(model0$family[[2]],
+                   log     = quote(exp(eta)),
+                   cloglog = quote(1 - exp(-exp(eta))),
+                   logit   = quote(exp(eta)/(1 + exp(eta))))
+    }else mu <- as.list(model0$family$linkinv)[[2]]
+    
+    #if(stringr::word(model0$family$family,1)=="Negative"){.Theta=model0$theta}  
+    
+    Dmu <- D(mu,"eta")
+    a <- eval(V, list(mu= mu.est)) / eval(Dmu, list(eta= eta.est))
+  }
+  a
+}
+
+set.seed(2)
+y=(sample(1:200,20))
+x=(rep(0:1,20))
+D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40),id=rep(1:20,each=2))
+model0=MASS::glm.nb(y~x*z,data=D, link="log")
+
+get_a_expo_fam(model0)
+
+#aggiungo .Theta
+get_a_expo_fam <- function(model0){
+  if(class(model0)[1]=="lm"){
+    a <- 1
+  } else{
+    
+    #The following lines for obtaining 'a' are taken from the mdscore package on CRAN
+    #by Antonio Hermes M. da Silva-Junior, Damiao N. da Silva and Silvia L. P. Ferrari
+    
+    # in response scale:
+    mu.est <- model0$fitted.values
+    # mu.est <- model0$fitted.values
+    eta.est <- model0$family$linkfun(mu.est)
+    
+    V <- if(model0$family[[1]] == "gaussian") quote(1) else
+      as.list(model0$family$variance)[[2]]
+    
+    if(model0$family[[2]] %in% c("log", "cloglog", "logit")){
+      mu <- switch(model0$family[[2]],
+                   log     = quote(exp(eta)),
+                   cloglog = quote(1 - exp(-exp(eta))),
+                   logit   = quote(exp(eta)/(1 + exp(eta))))
+    }else mu <- as.list(model0$family$linkinv)[[2]]
+    
+    if(stringr::word(model0$family$family,1)=="Negative"){.Theta=model0$theta}  
+    
+    Dmu <- D(mu,"eta")
+    a <- eval(V, list(mu= mu.est)) / eval(Dmu, list(eta= eta.est))
+  }
+  a
+}
+
+get_a_expo_fam(model0)
+
+#richiamo tutte le funzioni da sole 
+
+compute_scores_glm <- function(mf,score_type){
+  mf$x=TRUE
+  model <- eval(mf, parent.frame())
+  
+  # compute scores
+  mustart <- model.extract(mf, "mustart")
+  etastart <- model.extract(mf, "etastart")
+  singular.ok <- model.extract(mf, "singular.ok")
+  if(is.null(singular.ok)) singular.ok = TRUE
+  start <- model.extract(mf, "start")
+  
+  
+  socket_compute_scores <- function(i,model){
+    fit <- eval(call(model$method,
+                     x = model$x[,-i,drop=FALSE], y = model$y, weights = as.vector(model.weights(mf)), start = start, etastart = etastart,
+                     mustart = model$mustart, offset = model$offset, family = model$family,
+                     control = model$control, intercept = FALSE, singular.ok = singular.ok))
+    fit$x=model$x[,-i,drop=FALSE]
+    compute_scores(fit0 = fit,X = model$x[,i,drop=FALSE],score_type=score_type)
+  }
+  
+  model$scores=sapply(1:ncol(model$x),socket_compute_scores,model)
+  colnames(model$scores)=colnames(model$x)
+  model
+}
+
+compute_scores <- function(fit0, X,score_type="orthogonalized"){
+  
+  a <- get_a_expo_fam(fit0)
+  ###############
+  Z=fit0$x
+  residuals=(fit0$y-fit0$fitted.values)/a
+  W=diag(as.numeric(fit0$weights))
+  
+  
+  #BASIC SCORE
+  if(score_type=="basic"){
+    return(as.vector(X*(residuals)))
+  } else
+    ##  EFFECTIVE SCORE
+    if(score_type=="effective"){
+      OneMinusH=(nrow(Z)-W%*%Z%*%solve(t(Z*diag(W))%*%Z)%*%t(Z))
+      return(as.vector(
+        (t(X)%*%OneMinusH*(residuals))))
+    } else
+      #ORTHO EFFECTIVE SCORE
+      if(score_type=="orthogonalized"){
+        sqrtW=diag(sqrt(diag(W)))
+        # OneMinusHtilde_0=(diag(n)-sqrtW%*%Z%*%solve(t(Z*diag(W))%*%Z)%*%t(Z)%*%sqrtW)
+        OneMinusH=(diag(nrow(Z))-W%*%Z%*%solve(t(Z*diag(W))%*%Z)%*%t(Z))
+        OneMinusHtilde=(sqrt(1/diag(W))) * OneMinusH * matrix(diag(sqrtW),dim(OneMinusH)[1],dim(OneMinusH)[1],byrow = TRUE)
+        #equivalent to:
+        # sqrtWinv=diag(sqrt(1/diag(W)))
+        # OneMinusHtilde=sqrtWinv%*% OneMinusH%*%sqrtW
+        OneMinusHtilde=(OneMinusHtilde+t(OneMinusHtilde))/2
+        
+        deco=svd(OneMinusHtilde* matrix(diag(sqrtW),dim(OneMinusH)[1],dim(OneMinusH)[1],byrow = TRUE))
+        # equivalent to:
+        # deco=svd(OneMinusHtilde%*%sqrtW)
+        
+        deco$d[deco$d<1E-12]=0
+        return(as.vector(
+          (t(X)%*%(deco$v)%*%diag(deco$d))*
+            t(diag(deco$d)%*%t(deco$v)%*%diag(diag(W)^-1)%*%(residuals))))
+      }
+}
+
+plot.flipscores <- function (x, ...) {
+  summary.flipscores(x, ...)
+}
+
+get_head_flip_out <- function(x){
+  if(stringr::word(x$family$family, 1)!="Negative")
+  {paste("Flip Score Test: 
+         score_type =",x$score_type,
+         ", n_flips=",x$n_flips,"\n")}
+  else 
+    paste("Flip Score Test: 
+          score_type =",x$score_type,
+          ", n_flips=",x$n_flips,
+          ", theta",round(x$theta,digits=5),"\n")
+}
+
+print.flipscores <- function(x, ...) {
+  cat(get_head_flip_out(x))
+  cat("Call: ")
+  print(x$call)
+  cat("\nCoefficients:\n")
+  print(x$coefficients)
+  # print.default(x)
+}
+
+summary.flipscores <- function (object, ...) {
+  sum_model=summary.glm(object = object)
+  sum_model$coefficients=sum_model$coefficients[,c(1,1:4)]
+  sum_model$coefficients[,5]=object$p.values
+  sum_model$coefficients[,2]=object$Tspace[1,]
+  sum_model$coefficients[,3]=apply(object$scores,2,sd)/sqrt(nrow(object$scores))
+  sum_model$coefficients[,4]=sum_model$coefficients[,2]/sum_model$coefficients[,3]
+  # sum_model$coefficients=sum_model$coefficients[,c(1,4)]
+  colnames(sum_model$coefficients)[c(2,4)]=c("Score","z value")
+  cat(get_head_flip_out(object))
+  
+  sum_model
+}
+
+flipscores_glm<-function(formula, family, data,
+                         score_type = "orthogonalized",
+                         n_flips=1000, 
+                         ...){
+  # catturo la call,
+  mf <- match.call()
+  
+  if(match(c("alternative"), names(call), 0L)){
+    if (alternative == "less" | alternative == "smaller") {alternative = -1}
+    if (alternative == "two.sided") {alternative = 0}
+    if (alternative == "greater" | alternative == "larger") {alternative = 1}}
+  else alternative=0
+  
+  score_type=match.arg(score_type,c("orthogonalized","effective","basic"))
+  if(missing(score_type))
+    stop("test type is not specified or recognized")
+  
+  # individuo i parametri specifici di flip score
+  m <- match(c("score_type","n_flips","alternative","id"), names(mf), 0L)
+  m <- m[m>0]
+  flip_param_call= mf[c(1L,m)]
+  #rinomino la funzione da chiamare:
+  flip_param_call[[1L]]=quote(flip::flip)
+  names(flip_param_call)[names(flip_param_call)=="alternative"]="tail"
+  
+  # mi tengo solo quelli buoni per glm
+  if(length(m)>0) mf <- mf[-m]
+  #rinomino la funzione da chiamare:
+  if(mf$family=="negbinom"){
+    mf[[1L]]=quote(MASS::glm.nb)
+    mf$family=NULL
+  } else{mf[[1L]]=quote(glm)}
+  
+  param_x_ORIGINAL=mf$x
+  param_x_ORIGINAL=mf$x
+  
+  ############### fit the H1 model and append the scores
+  model <- compute_scores_glm(mf,score_type)
+  
+  ###############################
+  ## compute flips
+  
+  ### RENDERE PI§ AGILE INPUT DI ID + quality check
+  # id <- model.extract(mf, id)
+  if(!is.null(flip_param_call$id))
+    model$scores=rowsum(model$scores,eval(flip_param_call$id))
+  
+  # ## qui usi direttamente eval:                                                              flip_param_call                                                              scoreType = scoreType)})
+  flip_param_call$Y=model$scores
+  flip_param_call$statTest = "sum"
+  results=eval(flip_param_call, parent.frame())
+  
+  ### output
+  model$Tspace=results@permT/nrow(model$scores)
+  model$p.values=flip:::p.value(results)
+  model$score_type=score_type
+  model$n_flips=n_flips
+  
+  
+  if(is.null(param_x_ORIGINAL)||(!param_x_ORIGINAL)) model$x=NULL
+  # class(model) <- 
+  class(model) <- c("flipscores", c("glm", "lm"))
+  return(model)
+}
+
+mod=flipscores_glm(y~x*z, data=D, family = "negbinom", score_type = "basic") 
+```
+
+
+  
+  
