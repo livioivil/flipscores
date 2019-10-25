@@ -39,26 +39,30 @@ is maintained for compatibility but is deprecated, use testType="rotation" inste
 Where n indicates the number of observations (rows) and p indicates the number of
 covariates (columns). R typing: factorial(n)^p. Default is 1000..
 
+```{r}
+library(flipscores)
+```
+
 # Examples
 
-## Logistic 
- 
-```{r}
+<!-- ## Logistic  -->
 
-data(Titanic)
-Titanic=dplyr::as_tibble(Titanic)
+<!-- ```{r} -->
 
-# Get the row indices to replicate
-idx <- rep(1:nrow(Titanic),Titanic$n)
-# Drop count column n
-Titanic$n <- NULL
-# replicate each row n-times
-Titanic=Titanic[idx, ]
-Titanic$Survived=as.factor(Titanic$Survived)
-  
-mod=flipscores::flipscores_glm(Survived~.+Class*Sex,data=Titanic,family = binomial, score_type = "ortho")
-summary(mod)
-```
+<!-- data(Titanic) -->
+<!-- Titanic=dplyr::as_tibble(Titanic) -->
+
+<!-- # Get the row indices to replicate -->
+<!-- idx <- rep(1:nrow(Titanic),Titanic$n) -->
+<!-- # Drop count column n -->
+<!-- Titanic$n <- NULL -->
+<!-- # replicate each row n-times -->
+<!-- Titanic=Titanic[idx, ] -->
+<!-- Titanic$Survived=as.factor(Titanic$Survived) -->
+
+<!-- mod=flipscores_glm(Survived~.+Class*Sex,data=Titanic,family = binomial, score_type = "ortho") -->
+<!-- summary(mod) -->
+<!-- ``` -->
 
 ## Poisson 
  
@@ -66,7 +70,7 @@ summary(mod)
 
 Titanic=as.data.frame(datasets::Titanic)
 
-mod=flipscores::flipscores_glm(Freq~.+Class*Sex, data=Titanic, family = poisson)
+mod=flipscores_glm(Freq~.+Class*Sex, data=Titanic, family = poisson)
 summary(mod)
 ```
 
@@ -76,7 +80,7 @@ summary(mod)
 
 trees=as.data.frame(datasets::trees)
 
-mod=flipscores::flipscores_glm(Volume~Girth*Height, data=trees, family = gaussian)
+mod=flipscores_glm(Volume~Girth*Height, data=trees, family = gaussian)
 summary(mod)
 ```
 
@@ -86,31 +90,23 @@ summary(mod)
 
 cars=datasets::cars
 
-mod=flipscores::flipscores_glm(speed~dist, data=cars, family = Gamma, score_type = "ortho")
+mod=flipscores_glm(speed~dist, data=cars, family = Gamma, score_type = "ortho")
 summary(mod)
 ```
 
 ## Negative Binomial 
  
 ```{r}
-Titanic=as.data.frame(datasets::Titanic)
+# Titanic=as.data.frame(datasets::Titanic)
 
-mod=flipscores::flipscores_glm(Freq~.+Class*Sex, data=Titanic, family = "negbinom")
-summary(mod)
+# mod=flipscores_glm(Freq~.+Class*Sex, data=Titanic, family = "negbinom")
+# summary(mod)
 ```
 
 
 # Other examples, simulated data
 
 ```{r}
-rm(list=ls())
-setwd("C:\\Users\\livio\\Documents\\github")
-
-# library(devtools)
-# document("flipscores")
-# 
-# install("flipscores")
-library(flipscores)
 
 set.seed(1)
 x=(rep(0:1,20))
