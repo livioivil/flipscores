@@ -1,30 +1,47 @@
+---
+title: "Issue "
+author: "Giatti, V."
+date: "25 ottobre 2019"
+output:
+  md_document:
+    variant: markdown_github
 
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+```{r}
 rm(list = ls(all.names = T))
-
 set.seed(2)
 y=(sample(1:200,20))
 x=(rep(0:1,20))
 D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40),id=rep(1:20,each=2))
+mod=flipscores::flipscores_glm(y~x*z, data=D, family = "negbinom", score_type = "basic")
+```
 
-mod=flipscores::flipscores_glm(y~x*z, data=D, family = "negbinom", score_type = "basic") 
+```{r}
 #non funziona. non trova theta
-
 #ma se 
 model0=MASS::glm.nb(y~x*z,data=D, link="log")
 .Theta=model0$theta
-
 mod=flipscores::flipscores_glm(y~x*z, data=D, family = "negbinom", score_type = "basic") 
 #funziona
+```
 
+```{r}
 rm(list = ls(all.names = T))
-
 #controllo il problema
 set.seed(2)
 y=(sample(1:200,20))
 x=(rep(0:1,20))
 D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40),id=rep(1:20,each=2))
 model0=MASS::glm.nb(y~x*z,data=D, link="log")
-
 mu.est <- model0$fitted.values
 eta.est <- model0$family$linkfun(mu.est)
 V =as.list(model0$family$variance)[[2]]
@@ -32,7 +49,8 @@ mu <- quote(exp(eta))
 Dmu <- D(mu,"eta")
 a <- eval(V, list(mu= mu.est)) / eval(Dmu, list(eta= eta.est))
 a
-
+```
+```{r}
 #aggiungo .Theta
 mu.est <- model0$fitted.values
 eta.est <- model0$family$linkfun(mu.est)
@@ -42,13 +60,13 @@ mu <- quote(exp(eta))
 Dmu <- D(mu,"eta")
 a <- eval(V, list(mu= mu.est)) / eval(Dmu, list(eta= eta.est))
 a
-
 #controllo per la prima osservazione
 eval(V, list(mu= mu.est[1]))
 (exp(model0$coefficients[1]+0.73893860*model0$coefficients[3])+(exp(model0$coefficients[1]+0.73893860*model0$coefficients[3]))^2/model0$theta)  
-
 rm(list = ls(all.names = T))
 
+```
+```{r}
 #richiamo get_a_expo_fam senza .Theta
 get_a_expo_fam <- function(model0){
   if(class(model0)[1]=="lm"){
@@ -80,15 +98,14 @@ get_a_expo_fam <- function(model0){
   }
   a
 }
-
 set.seed(2)
 y=(sample(1:200,20))
 x=(rep(0:1,20))
 D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40),id=rep(1:20,each=2))
 model0=MASS::glm.nb(y~x*z,data=D, link="log")
-
 get_a_expo_fam(model0)
-
+```
+```{r}
 #aggiungo .Theta
 get_a_expo_fam <- function(model0){
   if(class(model0)[1]=="lm"){
@@ -120,11 +137,10 @@ get_a_expo_fam <- function(model0){
   }
   a
 }
-
 get_a_expo_fam(model0)
-
+```
+```{r}
 #richiamo tutte le funzioni da sole 
-
 compute_scores_glm <- function(mf,score_type){
   mf$x=TRUE
   model <- eval(mf, parent.frame())
@@ -150,7 +166,6 @@ compute_scores_glm <- function(mf,score_type){
   colnames(model$scores)=colnames(model$x)
   model
 }
-
 compute_scores <- function(fit0, X,score_type="orthogonalized"){
   
   a <- get_a_expo_fam(fit0)
@@ -191,11 +206,9 @@ compute_scores <- function(fit0, X,score_type="orthogonalized"){
             t(diag(deco$d)%*%t(deco$v)%*%diag(diag(W)^-1)%*%(residuals))))
       }
 }
-
 plot.flipscores <- function (x, ...) {
   summary.flipscores(x, ...)
 }
-
 get_head_flip_out <- function(x){
   if(stringr::word(x$family$family, 1)!="Negative")
   {paste("Flip Score Test: 
@@ -207,7 +220,6 @@ get_head_flip_out <- function(x){
           ", n_flips=",x$n_flips,
           ", theta",round(x$theta,digits=5),"\n")
 }
-
 print.flipscores <- function(x, ...) {
   cat(get_head_flip_out(x))
   cat("Call: ")
@@ -216,7 +228,6 @@ print.flipscores <- function(x, ...) {
   print(x$coefficients)
   # print.default(x)
 }
-
 summary.flipscores <- function (object, ...) {
   sum_model=summary.glm(object = object)
   sum_model$coefficients=sum_model$coefficients[,c(1,1:4)]
@@ -230,7 +241,6 @@ summary.flipscores <- function (object, ...) {
   
   sum_model
 }
-
 flipscores_glm<-function(formula, family, data,
                          score_type = "orthogonalized",
                          n_flips=1000, 
@@ -295,8 +305,11 @@ flipscores_glm<-function(formula, family, data,
   class(model) <- c("flipscores", c("glm", "lm"))
   return(model)
 }
-
+```
+```{r}
 mod=flipscores_glm(y~x*z, data=D, family = "negbinom", score_type = "basic") 
+```
+
 
 
 
