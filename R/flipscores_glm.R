@@ -83,27 +83,41 @@ flipscores_glm<-function(formula, family, data,
 
   # mi tengo solo quelli buoni per glm
   if(length(m)>0) mf <- mf[-m]
-  #rinomino la funzione da chiamare:
+  
+  param_x_ORIGINAL=mf$x
+  #set the model to fit
   if(mf$family=="negbinom"){
     mf[[1L]]=quote(MASS::glm.nb)
     mf$family=NULL
-  } else{mf[[1L]]=quote(glm)}
+    } else{
+      mf[[1L]]=quote(glm)
+    }
   
-  param_x_ORIGINAL=mf$x
-  param_x_ORIGINAL=mf$x
+  #compute H1 model
+  mf$x=TRUE
+  model <- eval(mf, parent.frame())
   
-  ############### fit the H1 model and append the scores
-  model <- compute_scores_glm(mf,score_type)
+  #compute H0s models
+  socket_compute_scores <- function(i,model){
+    mf$formula=as.formula(paste("model$y~0+model$x[,-",i,"]"))
+    model_i <- eval(mf, parent.frame())
+    compute_scores(fit0 = model_i,X = model$x[,i,drop=FALSE],score_type=score_type)
+  }
+  model$scores=sapply(1:ncol(model$x),socket_compute_scores,model)
+  colnames(model$scores)=colnames(model$x)
+  
+  ############### fit the H1 model and append the scores (refitted under H0s)
   
   ###############################
   ## compute flips
   
-  ### RENDERE PI§ AGILE INPUT DI ID + quality check
-  # id <- model.extract(mf, id)
+  ### TODO RENDERE PIù AGILE INPUT DI ID (es formula se possibile?) 
+  # + quality check
+  # TODO: cambiare il nome del parametro da id a cluster
   if(!is.null(flip_param_call$id))
     model$scores=rowsum(model$scores,eval(flip_param_call$id))
   
-  # ## qui usi direttamente eval:                                                              flip_param_call                                                              scoreType = scoreType)})
+  #  call to flip::flip()
   flip_param_call$Y=model$scores
   flip_param_call$statTest = "sum"
   results=eval(flip_param_call, parent.frame())
@@ -117,6 +131,6 @@ flipscores_glm<-function(formula, family, data,
   
   if(is.null(param_x_ORIGINAL)||(!param_x_ORIGINAL)) model$x=NULL
   # class(model) <- 
-  class(model) <- c("flipscores", c("glm", "lm"))
+  class(model) <- c("flipscores", class(model))
   return(model)
 }

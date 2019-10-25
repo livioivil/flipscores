@@ -40,12 +40,12 @@ get_head_flip_out <- function(x){
   if(stringr::word(x$family$family, 1)!="Negative")
   {paste("Flip Score Test: 
          score_type =",x$score_type,
-         ", n_flips=",x$n_flips,"\n")}
+         ", n_flips =",x$n_flips,"\n")}
   else 
     paste("Flip Score Test: 
           score_type =",x$score_type,
-          ", n_flips=",x$n_flips,
-          ", theta",round(x$theta,digits=5),"\n")
+          ", n_flips =",x$n_flips,
+          ", theta =",round(x$theta,digits=5),"\n")
 }
 
 #' @export

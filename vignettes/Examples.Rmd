@@ -56,7 +56,7 @@ Titanic$n <- NULL
 Titanic=Titanic[idx, ]
 Titanic$Survived=as.factor(Titanic$Survived)
   
-mod=flipscores::flipscores_glm(Survived~.+Class*Sex,data=Titanic,family = binomial,score_type = "basic")
+mod=flipscores::flipscores_glm(Survived~.+Class*Sex,data=Titanic,family = binomial, score_type = "ortho")
 summary(mod)
 ```
 
@@ -66,7 +66,7 @@ summary(mod)
 
 Titanic=as.data.frame(datasets::Titanic)
 
-mod=flipscores::flipscores_glm(Freq~.+Class*Sex, data=Titanic, family = poisson, score_type = "basic")
+mod=flipscores::flipscores_glm(Freq~.+Class*Sex, data=Titanic, family = poisson)
 summary(mod)
 ```
 
@@ -76,7 +76,7 @@ summary(mod)
 
 trees=as.data.frame(datasets::trees)
 
-mod=flipscores::flipscores_glm(Volume~Girth*Height, data=trees, family = gaussian, score_type = "basic")
+mod=flipscores::flipscores_glm(Volume~Girth*Height, data=trees, family = gaussian)
 summary(mod)
 ```
 
@@ -95,6 +95,52 @@ summary(mod)
 ```{r}
 Titanic=as.data.frame(datasets::Titanic)
 
-mod=flipscores::flipscores_glm(Freq~.+Class*Sex, data=Titanic, family = "negbinom", score_type = "basic")
+mod=flipscores::flipscores_glm(Freq~.+Class*Sex, data=Titanic, family = "negbinom")
 summary(mod)
 ```
+
+
+# Other examples, simulated data
+
+```{r}
+rm(list=ls())
+setwd("C:\\Users\\livio\\Documents\\github")
+
+# library(devtools)
+# document("flipscores")
+# 
+# install("flipscores")
+library(flipscores)
+
+set.seed(1)
+x=(rep(0:1,20))
+D=data.frame(y=rbinom(40,1,.25+x*.5),x=x,
+             z=rnorm(40),id=rep(1:20,each=2))
+
+mod_par=glm(y~x*z,data=D,family = binomial)
+summary(mod_par)
+mod_par
+
+mod=flipscores_glm(y~x*z,data=D,family = binomial,score_type = "ortho")
+summary(mod)
+
+print(mod)
+
+## clustered units
+mod=flipscores_glm(y~x*z,data=D,family = binomial,id=D$id)
+summary(mod)
+
+
+##### poisson
+D$y=rpois(40,exp(1+.25*x))
+summary(glm(y~x*z,data=D,family = poisson))
+mod=flipscores_glm(y~x*z,data=D,family = poisson)
+summary(mod)
+
+#### negative binomial
+summary(MASS::glm.nb(y~x*z,data=D))
+mod=flipscores_glm(y~x*z,data=D,family="negbinom")
+summary(mod)
+
+```
+
