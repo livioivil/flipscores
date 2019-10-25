@@ -1,13 +1,4 @@
----
-title: "Issues"
-author: "..."
-date: "`r Sys.Date()`"
-output: 
-  html_document: 
-    toc: yes
----
 
-```{r}
 rm(list = ls(all.names = T))
 
 set.seed(2)
@@ -306,7 +297,7 @@ flipscores_glm<-function(formula, family, data,
 }
 
 mod=flipscores_glm(y~x*z, data=D, family = "negbinom", score_type = "basic") 
-```
+
 
 
   
