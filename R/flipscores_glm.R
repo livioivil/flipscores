@@ -98,7 +98,7 @@ flipscores_glm<-function(formula, family, data,
   model <- eval(mf, parent.frame())
   
   yname=as.character(model$call$formula[[2]])
-
+  
   #compute H0s models
   socket_compute_scores <- function(i,model){
     model$call$data=data.frame(model$y,model$x[,-i])
@@ -109,15 +109,6 @@ flipscores_glm<-function(formula, family, data,
   }
   model$scores=sapply(1:ncol(model$x),socket_compute_scores,model)
   colnames(model$scores)=colnames(model$x)
-
-  # #compute H0s models
-  # socket_compute_scores <- function(i,model){
-  #   mf$formula=as.formula(paste("model$y~0+model$x[,-",i,"]"))
-  #   model_i <- eval(mf, parent.frame())
-  #   compute_scores(fit0 = model_i,X = model$x[,i,drop=FALSE],score_type=score_type)
-  # }
-  # model$scores=sapply(1:ncol(model$x),socket_compute_scores,model)
-  # colnames(model$scores)=colnames(model$x)
   
   ############### fit the H1 model and append the scores (refitted under H0s)
   
