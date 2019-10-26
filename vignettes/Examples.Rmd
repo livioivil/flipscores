@@ -45,24 +45,26 @@ library(flipscores)
 
 # Examples
 
-<!-- ## Logistic  -->
+## Logistic
 
-<!-- ```{r} -->
+```{r}
 
-<!-- data(Titanic) -->
-<!-- Titanic=dplyr::as_tibble(Titanic) -->
+data(Titanic)
+Titanic=dplyr::as_tibble(Titanic)
 
-<!-- # Get the row indices to replicate -->
-<!-- idx <- rep(1:nrow(Titanic),Titanic$n) -->
-<!-- # Drop count column n -->
-<!-- Titanic$n <- NULL -->
-<!-- # replicate each row n-times -->
-<!-- Titanic=Titanic[idx, ] -->
-<!-- Titanic$Survived=as.factor(Titanic$Survived) -->
+# Get the row indices to replicate
+idx <- rep(1:nrow(Titanic),Titanic$n)
+# Drop count column n
+Titanic$n <- NULL
+# replicate each row n-times
+Titanic=Titanic[idx, ]
+Titanic$Survived=as.factor(Titanic$Survived)
 
-<!-- mod=flipscores_glm(Survived~.+Class*Sex,data=Titanic,family = binomial, score_type = "ortho") -->
-<!-- summary(mod) -->
-<!-- ``` -->
+summary(glm(Survived~.+Class*Sex,data=Titanic,family = binomial))
+
+mod=flipscores_glm(Survived~.+Class*Sex,data=Titanic,family = binomial, score_type = "effective")
+summary(mod)
+```
 
 ## Poisson 
  
