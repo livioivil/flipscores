@@ -30,7 +30,7 @@ compute_scores <- function(fit0, X,score_type="orthogonalized"){
   } else
     ##  EFFECTIVE SCORE
     if(score_type=="effective"){
-      OneMinusH=(nrow(Z)-W%*%Z%*%solve(t(Z*diag(W))%*%Z)%*%t(Z))
+      OneMinusH=(diag(nrow(Z))-W%*%Z%*%solve(t(Z*diag(W))%*%Z)%*%t(Z))
       return(as.vector(
         (t(X)%*%OneMinusH*(residuals))))
     } else

@@ -62,7 +62,7 @@ Titanic$Survived=as.factor(Titanic$Survived)
 
 summary(glm(Survived~.+Class*Sex,data=Titanic,family = binomial))
 
-mod=flipscores_glm(Survived~.+Class*Sex,data=Titanic,family = binomial, score_type = "effective")
+mod=flipscores_glm(Survived~Class*Sex+Age,data=Titanic,family = binomial, score_type = "effective")
 summary(mod)
 ```
 
