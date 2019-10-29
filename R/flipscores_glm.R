@@ -13,6 +13,9 @@
 #' @param family a description of the error distribution and link function to be used in the model.
 #' For glm this can be a character string naming a family function, a family function or the result of a call to a family function.
 #' For glm.fit only the third option is supported. OK?--> Note: to use Negative Binomial family, family string reference must have quotes.
+#' 
+#' @param cluster ....
+#' 
 #' @param score_type The type of score that is computed, either "basic", "effective" or "orthogonalized". Using "effective" takes into account nuisance estimation. ORTHO?? Default is "orthogonalized".
 #' 
 #' @param alternative Should be "greater", "less" or "two.sided". By default is "two.sided"
@@ -74,7 +77,7 @@ flipscores_glm<-function(formula, family, data,
     stop("test type is not specified or recognized")
 
   # individuo i parametri specifici di flip score
-  m <- match(c("score_type","n_flips","alternative","id"), names(mf), 0L)
+  m <- match(c("score_type","n_flips","alternative","cluster"), names(mf), 0L)
   m <- m[m>0]
   flip_param_call= mf[c(1L,m)]
   #rinomino la funzione da chiamare:
@@ -115,11 +118,10 @@ flipscores_glm<-function(formula, family, data,
   ###############################
   ## compute flips
   
-  ### TODO RENDERE PIù AGILE INPUT DI ID (es formula se possibile?) 
+  ### TODO RENDERE PIù AGILE INPUT DI cluster (es formula se possibile?) 
   # + quality check
-  # TODO: cambiare il nome del parametro da id a cluster
-  if(!is.null(flip_param_call$id))
-    model$scores=rowsum(model$scores,eval(flip_param_call$id))
+  if(!is.null(flip_param_call$cluster))
+    model$scores=rowsum(model$scores,eval(flip_param_call$cluster))
   
   #  call to flip::flip()
   flip_param_call$Y=model$scores
