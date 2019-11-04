@@ -16,9 +16,9 @@
 #' 
 #' @param alternative Should be "greater", "less" or "two.sided". By default is "two.sided"
 #'
-#' @param n_perms The number of times that the scores are randomly sign-flipped. Note: the maximum number of possible permutation is n!^p.
+#' @param n_perms The number of times that the scores are randomly sign-flipped. Note: the maximum number of possible permutations is n!^p.
 #' Where n indicates the number of observations (rows) and p indicates the number of
-#' covariates (columns). R typing: factorial(n)^p. Default is 1000..
+#' covariates (columns). R typing: factorial(n)^p. Default is 1000.
 #'
 #' @usage flipscores_glm(formula, family, data, score_type = "orthogonalized", n_flips=1000, ...)
 #'
