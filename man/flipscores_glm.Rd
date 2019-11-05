@@ -4,48 +4,35 @@
 \name{flipscores_glm}
 \alias{flipscores_glm}
 \alias{flipscores_glm-package}
-\title{Performing customized testing with GLM's estimation}
+\title{Performing robust testing with GLM's estimation}
 \usage{
 flipscores_glm(formula, family, data, score_type = "orthogonalized", n_flips=1000, ...)
 }
 \arguments{
-\item{formula}{an object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted.}
+\item{formula}{an object of class "formula" of the model to be fitted.}
 
-\item{family}{a description of the error distribution and link function to be used in the model.
-For glm this can be a character string naming a family function, a family function or the result of a call to a family function.
-For glm.fit only the third option is supported. OK?--> Note: to use Negative Binomial family, family string reference must have quotes.}
+\item{family}{distribution of the response variable. Note: in order to use Negative Binomial family, family reference must have quotes (family="negbinom").}
 
-\item{data}{an optional data frame, list or environment (or object coercible by as.data.frame to a data frame)
-containing the variables in the model. If not found in data, the variables are taken from environment(formula),
-typically the environment from which glm is called.}
+\item{data}{data frame used. A list or environment (or object coercible by as.data.frame to a data frame)
+containing the variables in the model.}
 
-\item{score_type}{The type of score that is computed, either "basic", "effective" or "orthogonalized". Using "effective" takes into account nuisance estimation. ORTHO?? Default is "orthogonalized".}
+\item{score_type}{The type of score that is computed, either "basic", "effective" or "orthogonalized". By default is "orthogonalized". 
+#' Using "effective" and "orthogonalized" takes into account nuisance estimation.}
+
+\item{n_flips}{The number of random flips of the scores contributions
+When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed. 
+Default is 5000.}
+
+\item{cluster}{identifies subgrouped observations. Note: must be a vector.}
 
 \item{alternative}{Should be "greater", "less" or "two.sided". By default is "two.sided"}
-
-\item{statTest}{C'e ANCORA?? Choose a test statistic from flip.statTest. See "flip" package.}
-
-\item{testType}{C'e ANCORA?? by default testType="permutation". The use of option "combination" is more efficient when
-X is indicator of groups (i.e. C>1 samples testing). When the total number of possible combinations exceeds 10 thousand,
-"permutation" is performed. As an alternative, if you choose "rotation", resampling is performed through random linear
-combinations (i.e. a rotation test is performed). This option is useful when only few permutations are available, that is,
-minimum reachable significance is hight. See also the details section for the algorithm used. The old syntax rotationTest=TRUE
-is maintained for compatibility but is deprecated, use testType="rotation" instead.}
-
-\item{n_perms}{The number of times that the scores are randomly sign-flipped. Note: the maximum number of possible permutation is n!^p.
-Where n indicates the number of observations (rows) and p indicates the number of
-covariates (columns). R typing: factorial(n)^p. Default is 1000..}
 }
 \value{
-flipscores_glm returns an object of class inheriting from "glm" which inherits from the class "lm". See also glm package.  
-The functions related (summary.flipscores, plot.flipscores, print.flipscores) can be used to obtain or print a summary of the results, whose include customized p.values.
+glm class object with sign-flip score test.
+See also the related functions (summary.flipscores, plot.flipscores, print.flipscores).
 }
 \description{
-Used to both fit generalized linear models and perform many tests on coefficients.
-All of them based on flipped likelihood scores. Referring to canonical glm function options,
-this one integrates that with more coefficient testing ways: test statistic type, score type,
-resampling type and test direction. The resulting output is same as the late,
-but p-value is calculated accounting to new preferencies.
+Used to both fit generalized linear models and perform a sign-flip score test on coefficients.
 }
 \examples{
 data(iris)
@@ -59,9 +46,12 @@ m1 = flipscores_glm(Freq~., family=poisson(link = "log"), data=data, score_type=
 summary(m1)
 
 }
+\references{
+"Robust testing in generalized linear models by sign-flipping score contributions" by J.Hemerik, J.Goeman and L.Finos.
+}
 \seealso{
 flip
 }
 \author{
-Jesse Hemerik, Jelle Goeman and Livio Finos, with contribution by Vittorio Giatti and Angela Andreella
+Livio Finos and Vittorio Giatti
 }

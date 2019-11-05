@@ -16,9 +16,9 @@
 #' 
 #' @param alternative Should be "greater", "less" or "two.sided". By default is "two.sided"
 #'
-#' @param n_perms The number of times that the scores are randomly sign-flipped. Note: the maximum number of possible permutations is n!^p.
-#' Where n indicates the number of observations (rows) and p indicates the number of
-#' covariates (columns). R typing: factorial(n)^p. Default is 1000.
+#' @param n_flips The number of random flips of the scores contributions
+#' When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed. 
+#' Default is 5000.
 #'
 #' @usage flipscores_glm(formula, family, data, score_type = "orthogonalized", n_flips=1000, ...)
 #'
@@ -50,8 +50,8 @@
 
 flipscores_glm<-function(formula, family, data,
                          score_type = "orthogonalized",
-                         n_flips=1000, 
-                         cluster,
+                         n_flips=5000, 
+                         cluster = NULL, 
                          ...){
   # catturo la call,
   mf <- match.call()
@@ -79,7 +79,7 @@ flipscores_glm<-function(formula, family, data,
   
   param_x_ORIGINAL=mf$x
   #set the model to fit
-  if(mf$family=="negbinom"){
+  if(!is.null(mf$family)&&(mf$family=="negbinom")){
     mf[[1L]]=quote(MASS::glm.nb)
     mf$family=NULL
     } else{
