@@ -19,6 +19,7 @@ compute_scores <- function(fit0, X,score_type="orthogonalized"){
 
   a <- get_a_expo_fam(fit0)
   ###############
+  if(is.null(fit0$x)) fit0=update(fit0,x=TRUE)
   Z=fit0$x
   residuals=(fit0$y-fit0$fitted.values)/a
   W=diag(as.numeric(fit0$weights))
@@ -50,9 +51,11 @@ compute_scores <- function(fit0, X,score_type="orthogonalized"){
         # deco=svd(OneMinusHtilde%*%sqrtW)
         
         deco$d[deco$d<1E-12]=0
-        return(as.vector(
-          (t(X)%*%(deco$v)%*%diag(deco$d))*
-            t(diag(deco$d)%*%t(deco$v)%*%diag(diag(W)^-1)%*%(residuals))))
+        return(
+          t(t(X)%*%(deco$v)%*%diag(deco$d))*
+            as.vector(diag(deco$d)%*%t(deco$v)%*%diag(diag(W)^-1)%*%(residuals))
+          )
+        
       }
 }
 # OLD: 
