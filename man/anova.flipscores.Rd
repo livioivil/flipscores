@@ -5,7 +5,8 @@
 \title{anova.flipscores}
 \usage{
 \method{anova}{flipscores}(model0, model1 = NULL,
-  score_type = "orthogonalized", n_flips = 5000, type = 3, ...)
+  score_type = "orthogonalized", n_flips = 5000, type = 3,
+  id = NULL, ...)
 }
 \arguments{
 \item{model0}{a \code{glm} (or \code{flipscores}) object with the model under the null hypothesis (i.e. the covariates, the nuisances parameters).}
@@ -21,6 +22,8 @@ When \code{n_flips} is equal or larger than the maximum number of possible flips
 Default is 5000.}
 
 \item{type}{type of test, "I", "III", 1, or 3. Roman numerals are equivalent to the corresponding Arabic numerals.}
+
+\item{id}{a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. NOTE: if \code{model0} is a \code{flipscores} and \code{model$id} not \code{NULL}, this is considered in the inference.}
 }
 \description{
 anova.flipscores
