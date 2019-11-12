@@ -1,3 +1,24 @@
+# i and exclude are indices of the columns of model.frame x
+socket_compute_scores <- function(i,model,exclude=NULL,score_type){
+  model$call$data=data.frame(model$y,model$x[,-c(i,exclude),drop=FALSE])
+  yname=as.character(model$call$formula[[2]])
+  model$call$formula=as.formula(paste(yname,"~0+."))
+  names(model$call$data)[1]=yname
+  model_i <-update(model)
+  compute_scores(model0 = model_i,model1 = model$x[,i,drop=FALSE],score_type=score_type)
+}
+
+get_X <- function(model0,model1){
+  if(is(model1,"glm")){
+    mm=model.matrix(model1)
+    vars1=colnames(mm)
+    vars0=colnames(model.matrix(model0))
+    model1=mm[,setdiff(vars1,vars0),drop=FALSE]
+  } else if(!is.matrix(model1)) 
+    model1=as.matrix(model1)
+  # else is already a matrix
+  model1
+}
 ######### get the a scaling value of glm model (for compute_scores)
 
 get_a_expo_fam <- function(model0){

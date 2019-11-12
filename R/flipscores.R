@@ -1,49 +1,132 @@
-#' #' @title Robust testing in GLMs
-#' #'
-#' #' @description Provides two robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables.
-#' #'
-#' #' @param formula A glm or lm object representing the fit under H0.
-#' #' @param data A glm or lm object representing the fit under H1. It contains one covariate in addition to those in model0. If that covariate is a factor, it should have at most 2 levels. Either model1 or X1 should be specified.
-#' #' @param family Vector with the values of the covariate of interest. If X1 is a factor, it should have at most 2 levels. Either model1 or X1 should be specified.
-#' #' @param score_type The type of score that is computed, either "basic", "effective" or "orthogonalized". Using "effective" takes into account nuisance estimation. ORTHO?? Default is "orthogonalized".
-#' #' @param alternative Should be "greater", "less" or "two.sided". DEFAULT IS??
-#' #' @param w The number of times that the scores are randomly sign-flipped.Note: the maximum number of possible permutation is n!^p.
-#' #' Where n indicates the number of observations (rows) and p indicates the number of
-#' #' covariates (columns). R typing: factorial(n)^p. Default is 1000.
-#' #' @param scoretype The type of score that is computed, either "basic" or "effective". Using "effective" takes into account nuisance estimation.
-#' #'
-#' #' @usage flipscores(model0, model1, X1, alternative = "two.sided",  w=1E5, scoretype="basic")
-#' #'
-#' #' @return A p-value.
-#' #' 
-#' #' @examples
-#' #' set.seed(8153)
-#' #' n <-50
-#' #' beta <- 2  #coeffient of interest (H0: beta=0)
-#' #' gamma <- 1   #nuisance coefficient
-#' #' 
-#' #' dataset <- data.frame(x=NULL,z=NULL,y=NULL)
-#' #' dataset[n,] <- NA
-#' #' dataset[,1:2] <- data.frame(matrix(rnorm(n*2),n,2))  #generate covariates
-#' #' colnames(dataset) <- c("x","z")
-#' #' dataset$y <- rnbinom(n, mu = exp(dataset[,1]*beta + dataset[,2]*gamma), size=1 )
-#' #' 
-#' #' #Y has a negative binomial distribution but we assume a Poisson model:
-#' #' modelz <- glm(y~z, family=poisson,data=dataset,x=TRUE)
-#' #' 
-#' #' 
-#' #' ## Basic test:
-#' #' pv1 <- flipscores(model0=modelz, X1=dataset[,1], alternative = "two.sided", scoretype="basic")
-#' #' pv1  #p-value
-#' #' 
-#' #' ## Test that takes into account nuisance estimation:
-#' #' pv2 <- flipscores(model0=modelz, X1=dataset[,1], alternative = "two.sided", scoretype="eff")
-#' #' pv2  #p-value
-#' #'
-#' #' @docType package
-#' #'
-#' #' @name flipscores
-#' #'
-#' #' @export
+#' @title Robust testing in GLMs
+#'
+#' @description Provides two robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables.
+#'
+#' @param alternative Should be "greater", "less" or "two.sided". DEFAULT IS??
+#'
+#' @usage flipscores(model0, model1, X1, alternative = "two.sided",  w=1E5, scoretype="basic")
+
+#' @title Performing robust testing with GLM's estimation
+#'
+#' @description Used to both fit generalized linear models and perform a sign-flip score test on coefficients.
+#'
+#'  
+#' @param id a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. 
 #' 
-#' flipscores= 
+#' @param score_type The type of score that is computed, either "orthogonalized", "effective" or "basic". 
+#' By default is "orthogonalized". 
+#' "effective" and "orthogonalized" takes into account nuisance estimation.
+#' 
+#' @param alternative Should be "greater", "less" or "two.sided". By default is "two.sided"
+#'
+#' @param n_flips The number of random flips of the scores contributions
+#' When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed. 
+#' Default is 5000.
+#'
+#' @usage flipscores(formula, family, data, score_type = "orthogonalized", n_flips=1000, ...)
+#'
+#' @return glm class object with sign-flip score test.
+#' See also the related functions (summary.flipscores, plot.flipscores, print.flipscores). 
+#'
+#' @details \code{flipscores} borrow the same parameters from function \code{glm} (and \code{glm.nb}). See these helps for more datail about parameters such as \code{formula}
+#' \code{data},\code{family}. Note: in order to use Negative Binomial family, \code{family} reference must have quotes (i.e. \code{family="negbinom"}). 
+#' 
+#' @examples
+#' data(iris)
+#' data=iris[iris$Species!="setosa",]
+#' data$Species=factor(data$Species)
+#' m1 = flipscores(Species~.+Petal.Width*Petal.Length, family=binomial(link = "logit"), data=data, score_type="orthogonalized", n_flips=1000)
+#' summary(m1)
+#' 
+#' data = as.data.frame(Titanic)
+#' m1 = flipscores(Freq~., family=poisson(link = "log"), data=data, score_type="orthogonalized", n_flips=1000)
+#' summary(m1)
+#'
+#' @docType package
+#'
+#' @author Livio Finos and Vittorio Giatti
+#'
+#' @seealso flip
+#'
+#' @name flipscores
+#' 
+#' @references "Robust testing in generalized linear models by sign-flipping score contributions" by J.Hemerik, J.Goeman and L.Finos.
+#'
+#' @export
+
+flipscores<-function(formula, family, data,
+                         score_type = "orthogonalized",
+                         n_flips=5000, 
+                         id = NULL, 
+                         ...){
+  # catturo la call,
+  fs_call <- mf <- match.call()
+
+  if(match(c("alternative"), names(call), 0L)){
+    if (alternative == "less" | alternative == "smaller") {alternative = -1}
+    if (alternative == "two.sided") {alternative = 0}
+    if (alternative == "greater" | alternative == "larger") {alternative = 1}}
+  else alternative=0
+
+  score_type=match.arg(score_type,c("orthogonalized","effective","basic"))
+  if(missing(score_type))
+    stop("test type is not specified or recognized")
+
+  # individuo i parametri specifici di flip score
+  m <- match(c("score_type","n_flips","alternative","id"), names(mf), 0L)
+  m <- m[m>0]
+  flip_param_call= mf[c(1L,m)]
+  #rinomino la funzione da chiamare:
+  flip_param_call[[1L]]=quote(flip::flip)
+  names(flip_param_call)[names(flip_param_call)=="alternative"]="tail"
+
+  # mi tengo solo quelli buoni per glm
+  if(length(m)>0) mf <- mf[-m]
+  
+  param_x_ORIGINAL=mf$x
+  #set the model to fit
+  if(!is.null(mf$family)&&(mf$family=="negbinom")){
+    mf[[1L]]=quote(MASS::glm.nb)
+    mf$family=NULL
+    } else{
+      mf[[1L]]=quote(glm)
+    }
+  
+  #compute H1 model
+  mf$x=TRUE
+  model <- eval(mf, parent.frame())
+  
+  
+  #compute H0s models
+  model$scores=sapply(1:ncol(model$x),socket_compute_scores,model,score_type=score_type)
+  colnames(model$scores)=colnames(model$x)
+  
+  ############### fit the H1 model and append the scores (refitted under H0s)
+  
+  ###############################
+  ## compute flips
+  
+  ### TODO RENDERE PIù AGILE INPUT DI id (es formula se possibile?) 
+  # + quality check
+  if(!is.null(flip_param_call$id))
+    model$scores=rowsum(model$scores,eval(flip_param_call$id))
+  
+  #  call to flip::flip()
+  flip_param_call$Y=model$scores
+  flip_param_call$statTest = "sum"
+  results=eval(flip_param_call, parent.frame())
+  
+  ### output
+  model$call=fs_call
+  model$id=flip_param_call$id
+  model$Tspace=results@permT
+  model$p.values=flip:::p.value(results)
+  model$score_type=score_type
+  model$n_flips=n_flips
+
+  
+  if(is.null(param_x_ORIGINAL)||(!param_x_ORIGINAL)) model$x=NULL
+  # class(model) <- 
+  class(model) <- c("flipscores", class(model))
+  return(model)
+}

@@ -62,7 +62,7 @@ Titanic$Survived=as.factor(Titanic$Survived)
 
 summary(glm(Survived~.+Class*Sex,data=Titanic,family = binomial))
 
-mod=flipscores_glm(Survived~Class*Sex+Age,data=Titanic,family = binomial, score_type = "effective")
+mod=flipscores(Survived~Class*Sex+Age,data=Titanic,family = binomial, score_type = "effective")
 summary(mod)
 ```
 
@@ -72,7 +72,7 @@ summary(mod)
 
 Titanic=as.data.frame(datasets::Titanic)
 
-mod=flipscores_glm(Freq~.+Class*Sex, data=Titanic, family = poisson)
+mod=flipscores(Freq~.+Class*Sex, data=Titanic, family = poisson)
 summary(mod)
 ```
 
@@ -82,7 +82,7 @@ summary(mod)
 
 trees=as.data.frame(datasets::trees)
 
-mod=flipscores_glm(Volume~Girth*Height, data=trees, family = gaussian)
+mod=flipscores(Volume~Girth*Height, data=trees, family = gaussian)
 summary(mod)
 ```
 
@@ -92,7 +92,7 @@ summary(mod)
 
 cars=datasets::cars
 
-mod=flipscores_glm(speed~dist, data=cars, family = Gamma, score_type = "ortho")
+mod=flipscores(speed~dist, data=cars, family = Gamma, score_type = "ortho")
 summary(mod)
 ```
 
@@ -101,7 +101,7 @@ summary(mod)
 ```{r}
 # Titanic=as.data.frame(datasets::Titanic)
 
-# mod=flipscores_glm(Freq~.+Class*Sex, data=Titanic, family = "negbinom")
+# mod=flipscores(Freq~.+Class*Sex, data=Titanic, family = "negbinom")
 # summary(mod)
 ```
 
@@ -119,25 +119,25 @@ mod_par=glm(y~x*z,data=D,family = binomial)
 summary(mod_par)
 mod_par
 
-mod=flipscores_glm(y~x*z,data=D,family = binomial,score_type = "ortho")
+mod=flipscores(y~x*z,data=D,family = binomial,score_type = "ortho")
 summary(mod)
 
 print(mod)
 
 ## clustered units
-mod=flipscores_glm(y~x*z,data=D,family = binomial,id=D$id)
+mod=flipscores(y~x*z,data=D,family = binomial,id=D$id)
 summary(mod)
 
 
 ##### poisson
 D$y=rpois(40,exp(1+.25*x))
 summary(glm(y~x*z,data=D,family = poisson))
-mod=flipscores_glm(y~x*z,data=D,family = poisson)
+mod=flipscores(y~x*z,data=D,family = poisson)
 summary(mod)
 
 #### negative binomial
 summary(MASS::glm.nb(y~x*z,data=D))
-mod=flipscores_glm(y~x*z,data=D,family="negbinom")
+mod=flipscores(y~x*z,data=D,family="negbinom")
 summary(mod)
 
 ```

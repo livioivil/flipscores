@@ -4,7 +4,16 @@
 \alias{compute_scores}
 \title{compute_scores}
 \usage{
-compute_scores(fit0, X, score_type = "orthogonalized")
+compute_scores(model0, model1, score_type = "orthogonalized")
+}
+\arguments{
+\item{model0}{a \code{glm} object with the model under the null hypothesis (i.e. the covariates, the nuisances parameters).}
+
+\item{model1}{a \code{glm} or a \code{matrix} (or \code{vector}). If it is a \code{glm} object, it has the model under the alternative hypothesis. The variables in \code{model1} are the same variables in \code{model0} plus one or more variables to be tested.  Alternatively, if
+\code{model1} is a \code{matrix}, it contains the tested variables column-wise.}
+
+\item{score_type}{The type of score that is computed, either "orthogonalized", "effective" or "basic". 
+By default is "orthogonalized". "effective" and "orthogonalized" takes into account nuisance estimation.}
 }
 \description{
 compute_scores
@@ -15,11 +24,11 @@ Z=rnorm(20)
 X=Z+rnorm(20)
 Y=rpois(n=20,lambda=exp(Z+X))
 mod0=glm(Y~Z,family="poisson")
-scr0=compute_scores(fit0 = mod0, X = X, score_type = "basic")
+scr0=compute_scores(model0 = mod0, X = X, score_type = "basic")
 flip:::flip(scr0)
 
 mod1=glm(Y~Z+X,family="poisson")
-scr1=compute_scores(fit0 = mod1, X = X, score_type = "basic")
+scr1=compute_scores(model0 = mod1, X = X, score_type = "basic")
 flip:::flip(scr1)
 
 }
