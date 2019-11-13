@@ -14,13 +14,11 @@
 #' Z=rnorm(20)
 #' X=Z+rnorm(20)
 #' Y=rpois(n=20,lambda=exp(Z+X))
-#' mod0=glm(Y~Z,family="poisson")
-#' scr0=compute_scores(model0 = mod0, X = X, score_type = "basic")
-#' flip:::flip(scr0)
+#' mod0=flipscores(Y~Z,family="poisson")
+#' anova(model0 = mod0)
 #'
-#' mod1=glm(Y~Z+X,family="poisson")
-#' scr1=compute_scores(model0 = mod1, X = X, score_type = "basic")
-#' flip:::flip(scr1)
+#' mod1=flipscores(Y~Z+X,family="poisson")
+#' anova(model0 = mod1)
 #'
 #' @export
 
@@ -61,10 +59,12 @@ anova.flipscores <- function(model0, model1=NULL,
     nvars <- max(0, varseq)
     resdev <- resdf <- NULL
   
-    scores=sapply(1:nvars, function(i) {
-      selected=which(varseq==i)
-      exclude <- if(type==2) which(varseq>i) else c()
-      flipscores:::socket_compute_scores(selected,model0,exclude=exclude,score_type=score_type)
+    scores=lapply(1:nvars, function(var_i) {
+      tested=which(varseq==var_i)
+      # print(tested)
+      excluded <- if(type==2) which(varseq>var_i) else c()
+      # print(excluded)
+      flipscores:::socket_compute_scores(tested,model0,exclude=excluded,score_type=score_type)
       })
     temp=sapply(scores,ncol)
     subsets_npc=list(1:temp[1])

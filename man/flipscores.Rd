@@ -28,7 +28,7 @@ glm class object with sign-flip score test.
 See also the related functions (summary.flipscores, plot.flipscores, print.flipscores).
 }
 \description{
-Provides two robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables.
+Provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables.
 
 Used to both fit generalized linear models and perform a sign-flip score test on coefficients.
 }

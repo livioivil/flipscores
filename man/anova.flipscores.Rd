@@ -33,12 +33,10 @@ anova.flipscores
 Z=rnorm(20)
 X=Z+rnorm(20)
 Y=rpois(n=20,lambda=exp(Z+X))
-mod0=glm(Y~Z,family="poisson")
-scr0=compute_scores(model0 = mod0, X = X, score_type = "basic")
-flip:::flip(scr0)
+mod0=flipscores(Y~Z,family="poisson")
+anova(model0 = mod0)
 
-mod1=glm(Y~Z+X,family="poisson")
-scr1=compute_scores(model0 = mod1, X = X, score_type = "basic")
-flip:::flip(scr1)
+mod1=flipscores(Y~Z+X,family="poisson")
+anova(model0 = mod1)
 
 }

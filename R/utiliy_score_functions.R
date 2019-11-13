@@ -1,5 +1,8 @@
 # i and exclude are indices of the columns of model.frame x
 socket_compute_scores <- function(i,model,exclude=NULL,score_type){
+  #to avoid re-run a flipscores everytime:
+  attributes(model)$class= attributes(model)$class[attributes(model)$class!="flipscores"]
+
   model$call$data=data.frame(model$y,model$x[,-c(i,exclude),drop=FALSE])
   yname=as.character(model$call$formula[[2]])
   model$call$formula=as.formula(paste(yname,"~0+."))

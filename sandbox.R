@@ -2,6 +2,15 @@ rm(list=ls())
 setwd("C:\\Users\\livio\\Documents\\github")
 
 library(devtools)
+document("flip")
+install("flip")
+library(flip)
+
+
+rm(list=ls())
+setwd("C:\\Users\\livio\\Documents\\github")
+
+library(devtools)
 document("flipscores")
 
 install("flipscores")
@@ -21,7 +30,19 @@ summary(mod)
 
 print(mod)
 
+mod=flipscores(y~z,data=D,family = binomial)
+summary(mod)
+anova(mod)
+mod=update(mod,x=TRUE)
+anova(mod)
+
+
 mod0=flipscores(y~x+z,data=D,family = binomial,score_type = "effect")
+
+
+modI=glm(y~1,data=D,family = binomial)
+modI=flipscores(y~1,data=D,family = binomial,score_type = "effect")
+
 # undebug(compute_scores)
 # compute_scores(mod0,mod)
 

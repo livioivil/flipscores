@@ -1,6 +1,6 @@
 #' @title Robust testing in GLMs
 #'
-#' @description Provides two robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables.
+#' @description Provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables.
 #'
 #' @param alternative Should be "greater", "less" or "two.sided". DEFAULT IS??
 #'
