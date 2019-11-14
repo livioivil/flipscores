@@ -11,14 +11,16 @@
 #' @param type type of test, "I", "III", 1, or 3. Roman numerals are equivalent to the corresponding Arabic numerals.
 #' @examples
 #'
+#' set.seed(1)
 #' Z=rnorm(20)
-#' X=Z+rnorm(20)
-#' Y=rpois(n=20,lambda=exp(Z+X))
-#' mod0=flipscores(Y~Z,family="poisson")
+#' X=factor(rep(LETTERS[1:3],length.out=20))
+#' Y=rpois(n=20,lambda=exp(Z*(X=="C")*.5))
+#' mod0=flipscores(Y~Z+X,family="poisson")
+#' summary(mod0)
 #' anova(model0 = mod0)
 #'
-#' mod1=flipscores(Y~Z+X,family="poisson")
-#' anova(model0 = mod1)
+#' mod1=flipscores(Y~Z*X,family="poisson")
+#' anova(model0 = mod0,mod1)
 #'
 #' @export
 
