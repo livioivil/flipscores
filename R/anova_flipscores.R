@@ -85,7 +85,7 @@ anova.flipscores <- function(model0, model1=NULL,
     if(!is.null(model0$id)) 
       scores=rowsum(scores,group = model0$id)
     
-    ps=flip::flip(scores,perms=n_flips,tail=1)
+    ps=flip::flip(as.matrix(scores),perms=n_flips,tail=1)
     res=flip::npc(ps@permT,comb.funct = "mahalanobist",subsets = subsets_npc)
     out_param=stats:::anova.glm(model0,test="Rao")
     out_param$Rao[-1]=res@res[,3]

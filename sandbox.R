@@ -32,7 +32,7 @@ mod_par
 mod=flipscores(y~x*z,data=D,family = binomial,score_type = "effect")
 summary(mod)
 
-print(mod)
+anova(mod)
 
 modz=flipscores(y~z,data=D,family = binomial)
 summary(modz)
@@ -42,7 +42,7 @@ anova(modz)
 
 
 mod0=flipscores(y~x+z,data=D,family = binomial,score_type = "effect")
-
+anova(mod0)
 
 modI=glm(y~1,data=D,family = binomial)
 modI=flipscores(y~1,data=D,family = binomial,score_type = "effect")
@@ -50,8 +50,8 @@ modI=flipscores(y~1,data=D,family = binomial,score_type = "effect")
 # undebug(compute_scores)
 # compute_scores(mod0,mod)
 
-anova(mod,mod0)
-stats:::anova.glm(mod,mod0)
+anova(mod0,mod)
+stats:::anova.glm(mod0,mod)
 
 
 #########
@@ -74,9 +74,11 @@ D$y=rpois(40,exp(1+.25*x))
 summary(glm(y~x*z,data=D,family = poisson))
 mod=flipscores(y~x*z,data=D,family = poisson)
 summary(mod)
+anova(mod)
 
 #### negative binomial
 summary(MASS::glm.nb(y~x*z,data=D))
 mod=flipscores(y~x*z,data=D,family="negbinom")
 summary(mod)
+# anova(mod)
 
