@@ -17,6 +17,6 @@
 #' 
 #' @docType package
 #'
-#' @author Livio Finos, Jesse Hemerik and Jelle Goeman with contribution of Vittorio Giatti,
+#' @author Livio Finos, Jelle Goeman and Jesse Hemerik, with contribution of Vittorio Giatti.
 #' @name flipscores-package
 NULL
