@@ -5,18 +5,14 @@
 #' @param score_type The type of score that is computed, either "orthogonalized", "effective" or "basic". 
 #' By default is "orthogonalized". "effective" and "orthogonalized" takes into account nuisance estimation.
 #'
+#' @author Livio Finos, Vittorio Giatti, Jelle Goeman and Jesse Hemerik
 #' @examples
 #'
 #' Z=rnorm(20)
 #' X=Z+rnorm(20)
 #' Y=rpois(n=20,lambda=exp(Z+X))
 #' mod0=glm(Y~Z,family="poisson")
-#' scr0=compute_scores(model0 = mod0, X = X, score_type = "basic")
-#' flip:::flip(scr0)
-#'
-#' mod1=glm(Y~Z+X,family="poisson")
-#' scr1=compute_scores(model0 = mod1, X = X, score_type = "basic")
-#' flip:::flip(scr1)
+#' (scr0=compute_scores(model0 = mod0, model1 = X, score_type = "effective"))
 #'
 #' @export
 

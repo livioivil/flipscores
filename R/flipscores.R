@@ -1,56 +1,41 @@
-#' @title Robust testing in GLMs
+#' @title Robust testing in GLMs, by sign-flipping score contributions
 #'
 #' @description Provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables.
-#'
-#' @param alternative Should be "greater", "less" or "two.sided". DEFAULT IS??
-#'
-#' @usage flipscores(model0, model1, X1, alternative = "two.sided",  w=1E5, scoretype="basic")
-
-#' @title Performing robust testing with GLM's estimation
-#'
-#' @description Used to both fit generalized linear models and perform a sign-flip score test on coefficients.
-#'
-#'  
-#' @param id a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. 
-#' 
 #' @param score_type The type of score that is computed, either "orthogonalized", "effective" or "basic". 
 #' By default is "orthogonalized". 
 #' "effective" and "orthogonalized" takes into account nuisance estimation.
 #' 
-#' @param alternative Should be "greater", "less" or "two.sided". By default is "two.sided"
-#'
 #' @param n_flips The number of random flips of the scores contributions
 #' When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed. 
 #' Default is 5000.
 #'
+#' @param id a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. 
+#' @param alternative Should be "greater", "less" or "two.sided" (default)
+#'
 #' @usage flipscores(formula, family, data, score_type = "orthogonalized", n_flips=1000, ...)
 #'
 #' @return glm class object with sign-flip score test.
-#' See also the related functions (summary.flipscores, plot.flipscores, print.flipscores). 
+#' See also the related functions (\code{summary.flipscores}, \code{anova.flipscores}, \code{print.flipscores}). 
 #'
-#' @details \code{flipscores} borrow the same parameters from function \code{glm} (and \code{glm.nb}). See these helps for more datail about parameters such as \code{formula}
-#' \code{data},\code{family}. Note: in order to use Negative Binomial family, \code{family} reference must have quotes (i.e. \code{family="negbinom"}). 
-#' 
-#' @examples
-#' data(iris)
-#' data=iris[iris$Species!="setosa",]
-#' data$Species=factor(data$Species)
-#' m1 = flipscores(Species~.+Petal.Width*Petal.Length, family=binomial(link = "logit"), data=data, score_type="orthogonalized", n_flips=1000)
-#' summary(m1)
-#' 
-#' data = as.data.frame(Titanic)
-#' m1 = flipscores(Freq~., family=poisson(link = "log"), data=data, score_type="orthogonalized", n_flips=1000)
-#' summary(m1)
+#' @details \code{flipscores} borrow the same parameters from function \code{glm} (and \code{glm.nb}). See these helps for more details about parameters such as \code{formula},
+#' \code{data}, \code{family}. Note: in order to use Negative Binomial family, \code{family} reference must have quotes (i.e. \code{family="negbinom"}). 
 #'
-#' @docType package
+#' @author Livio Finos, Vittorio Giatti, Jesse Hemerik and Jelle Goeman
 #'
-#' @author Livio Finos and Vittorio Giatti
-#'
-#' @seealso flip
+#' @seealso \code{\link{anova.flipscores}}, \code{\link{summary.flipscores}}, \code{\link[flip]{flip}}
 #'
 #' @name flipscores
 #' 
 #' @references "Robust testing in generalized linear models by sign-flipping score contributions" by J.Hemerik, J.Goeman and L.Finos.
+#' 
+#' @examples
+#' set.seed(1)
+#' dt=data.frame(X=rnorm(20),
+#'    Z=factor(rep(LETTERS[1:3],length.out=20)))
+#' dt$Y=rpois(n=20,lambda=exp(Z))
+#' mod=flipscores(Y~Z+X,data=dt,family="poisson")
+#' summary(mod)
+#' 
 #'
 #' @export
 
