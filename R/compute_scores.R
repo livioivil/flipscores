@@ -5,7 +5,7 @@
 #' @param score_type The type of score that is computed, either "orthogonalized", "effective" or "basic". 
 #' By default is "orthogonalized". "effective" and "orthogonalized" takes into account nuisance estimation.
 #'
-#' @author Livio Finos, Vittorio Giatti, Jelle Goeman and Jesse Hemerik
+#' @author Jesse Hemerik, Vittorio Giatti, Jelle Goeman and Livio Finos
 #' @examples
 #'
 #' Z=rnorm(20)
