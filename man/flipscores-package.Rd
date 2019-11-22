@@ -23,5 +23,5 @@ anova(mod,mod0)
 
 }
 \author{
-Livio Finos, Jesse Hemerik and Jelle Goeman with contribution of Vittorio Giatti,
+Livio Finos, Jelle Goeman and Jesse Hemerik, with contribution of Vittorio Giatti.
 }

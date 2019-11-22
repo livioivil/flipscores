@@ -75,12 +75,6 @@ anova.flipscores <- function(model0, model1=NULL,
         subsets_npc=c(subsets_npc,list(sum(temp[1:(i-1)])+(1:temp[i])))
         
     scores = as.data.frame(scores)
-      # resdev <- c(resdev, fit$deviance)
-      # resdf <- c(resdf, fit$df.residual)
-      # ############
-      # scores=compute_scores(model0=model0,
-      #                       model1=model1,
-      #                       score_type=score_type)
     mf <- match.call(expand.dots = TRUE)
     if(!is.null(mf$id)) 
       model0$id=mf$id

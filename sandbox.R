@@ -71,7 +71,6 @@ summary(mod)
 
 ##### poisson
 D$y=rpois(40,exp(1+.25*x))
-summary(glm(y~x*z,data=D,family = poisson))
 mod=flipscores(y~x*z,data=D,family = poisson)
 summary(mod)
 anova(mod)
@@ -82,3 +81,66 @@ mod=flipscores(y~x*z,data=D,family="negbinom")
 summary(mod)
 # anova(mod)
 
+################### correlation- multivariate
+# D$y=rpois(40,exp(1+.25*x+latent))
+# D$y2=rpois(40,exp(1+.25*x+latent))
+D$y=rpois(40,exp(latent))
+D$y2=rpois(40,exp(latent))
+
+mod=flipscores(y~x*z,data=D,family = poisson,score_type = "o")
+mod2=flipscores(y2~x*z,data=D,family = poisson,score_type = "o")
+
+cor(mod$scores[,2],mod2$scores[,2])
+plot(mod$scores[,2],mod2$scores[,2])
+
+
+############
+n=200
+x=(rep(0:1,length.out=n))
+D=data.frame(y=rbinom(n,1,.25+x*.5),x=x,
+             z=rnorm(n),id=rep(1:(n/2),each=2))
+
+res=c()
+for(i in 1:500)
+  {
+  # set.seed(i)
+  D$latent=rnorm(n)
+  D$y=rpois(n,exp(D$latent))
+  D$y2=rpois(n,exp(D$latent))
+  
+  scores=compute_scores(model0 = glm(y~x+z,data=D,family = poisson),
+                        model1 = glm(y~x*z,data=D,family = poisson),
+                        score_type = "o")
+  scores2=compute_scores(model0 = glm(y2~x+z,data=D,family = poisson),
+                         model1 = glm(y2~x*z,data=D,family = poisson),
+                         score_type = "o")
+  res=rbind(res,c(cor(scores,scores2),sum(scores),sum(scores2)))
+}  
+
+# sim <- function(){
+#   # set.seed(i)
+#   D$latent=rnorm(n)
+#   D$y=rpois(n,exp(D$latent))
+#   D$y2=rpois(n,exp(D$latent))
+#   
+#   scores=compute_scores(model0 = glm(y~x+z,data=D,family = poisson),
+#                         model1 = glm(y~x*z,data=D,family = poisson),
+#                         score_type = "e")
+#   scores2=compute_scores(model0 = glm(y2~x+z,data=D,family = poisson),
+#                          model1 = glm(y2~x*z,data=D,family = poisson),
+#                          score_type = "e")
+#   c(cor(scores,scores2),sum(scores),sum(scores2))
+# }
+# res=plyr::laply(1:10,sim)
+# sim()
+
+summary(res)
+hist(res[,1])
+cor(res[,-1])
+mean(res[,1])
+
+
+X=matrix(rnorm(12),4,3)
+sv=svd(X)
+sv$u%*%t(sv$u)
+t(sv$u)%*%sv$u

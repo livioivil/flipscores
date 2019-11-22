@@ -44,12 +44,15 @@ D=data.frame(y=rbinom(40,1,.25+x*.5), x=x,z=rnorm(40),id=rep(1:20,each=2))
 mod_par=glm(y~x*z,data=D,family = binomial)
 summary(mod_par)
 mod_par
-mod=flipscores_glm(y~x*z,data=D,family = binomial,score_type = "ortho")
+mod=flipscores(y~x*z,data=D,family = binomial,score_type = "ortho")
 summary(mod)
 print(mod)
-mod=flipscores_glm(y~x*z,data=D,family = binomial,score_type = "ortho", id=D$id)
+
+# with clustered observations:
+mod=flipscores(y~x*z,data=D,family = binomial,score_type = "ortho", id=D$id)
 summary(mod)
 ```
+
 ## Poisson
 
 ```{r,  message = FALSE}

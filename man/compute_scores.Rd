@@ -4,7 +4,8 @@
 \alias{compute_scores}
 \title{compute_scores}
 \usage{
-compute_scores(model0, model1, score_type = "orthogonalized")
+Same usage as \code{anova.glm}. 
+Also the parameter \code{id} is evaluted used, if present in \code{model0} (with priority) or in \code{model1}.
 }
 \arguments{
 \item{model0}{a \code{glm} object with the model under the null hypothesis (i.e. the covariates, the nuisances parameters).}
@@ -28,5 +29,5 @@ mod0=glm(Y~Z,family="poisson")
 
 }
 \author{
-Livio Finos, Vittorio Giatti, Jelle Goeman and Jesse Hemerik
+Jesse Hemerik, Vittorio Giatti, Jelle Goeman and Livio Finos
 }
