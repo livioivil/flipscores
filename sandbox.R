@@ -29,7 +29,9 @@ mod_par=glm(y~x*z,data=D,family = binomial)
 summary(mod_par)
 mod_par
 
-mod=flipscores(y~x*z,data=D,family = binomial,score_type = "effect")
+compute_scores(mod_par,rnorm(40))
+
+mod=flipscores(y~x*z,data=D,family = binomial)
 summary(mod)
 
 anova(mod)

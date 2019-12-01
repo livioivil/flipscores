@@ -60,7 +60,9 @@ compute_scores <- function(model0, model1,score_type="orthogonalized"){
         # sqrtWinv=diag(sqrt(1/diag(W)))
         # OneMinusHtilde=sqrtWinv%*% OneMinusH%*%sqrtW
         OneMinusHtilde=(OneMinusHtilde+t(OneMinusHtilde))/2
-        
+        # temp=diag(diag(sqrtW)^-1)%*%OneMinusHtilde
+        # deco2=svd(temp)
+        # temp2=OneMinusHtilde* matrix(diag(sqrtW),dim(OneMinusH)[1],dim(OneMinusH)[1],byrow = TRUE)
         deco=svd(OneMinusHtilde* matrix(diag(sqrtW),dim(OneMinusH)[1],dim(OneMinusH)[1],byrow = TRUE))
         # equivalent to:
         # deco=svd(OneMinusHtilde%*%sqrtW)
@@ -68,8 +70,8 @@ compute_scores <- function(model0, model1,score_type="orthogonalized"){
         deco$d[deco$d<1E-12]=0
         scores=
           t(t(X)%*%(deco$v)%*%diag(deco$d))*
-            as.vector(diag(deco$d)%*%t(deco$v)%*%diag(diag(W)^-1)%*%(residuals))
-
+            # as.vector(diag(deco$d)%*%t(deco$v)%*%diag(diag(W)^-1)%*%(residuals))
+        as.vector(t(deco$u) %*% diag(diag(W)^-.5)%*%(residuals))
         
       }
   if(!is.null(model0$id)){
