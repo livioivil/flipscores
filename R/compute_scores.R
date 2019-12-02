@@ -20,7 +20,7 @@
 #' @export
 
 compute_scores <- function(model0, model1,score_type="orthogonalized"){
-  score_type=match.arg(score_type,c("orthogonalized","effective","basic"))
+  score_type=match.arg(score_type,c("orthogonalized","prova","effective","basic"))
   X=get_X(model0,model1)
   if(!is.null(model0))
   {id_model1=if(is.list(model1)) eval(model1$id) 
@@ -73,7 +73,19 @@ compute_scores <- function(model0, model1,score_type="orthogonalized"){
             # as.vector(diag(deco$d)%*%t(deco$v)%*%diag(diag(W)^-1)%*%(residuals))
         as.vector(t(deco$u) %*% diag(diag(W)^-.5)%*%(residuals))
         
+      } else      if(score_type=="prova"){
+        sqrtW=diag(sqrt(diag(W)))
+        # OneMinusHtilde_0=(diag(n)-sqrtW%*%Z%*%solve(t(Z*diag(W))%*%Z)%*%t(Z)%*%sqrtW)
+        OneMinusH=(diag(nrow(Z))-W%*%Z%*%solve(t(Z*diag(W))%*%Z)%*%t(Z))
+        deco=svd(OneMinusH* matrix(diag(sqrtW),dim(OneMinusH)[1],dim(OneMinusH)[1],byrow = TRUE))
+        
+        deco$d[deco$d<1E-12]=0
+        scores=
+          t(t(X)%*%OneMinusH%*%deco$u)*
+          as.vector(t(deco$u)%*%(residuals))
+        
       }
+  
   if(!is.null(model0$id)){
     scores=rowsum(scores,eval(model0$id)) 
     } else if(!is.null(id_model1)){

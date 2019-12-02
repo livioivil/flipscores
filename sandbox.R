@@ -26,10 +26,10 @@ D=data.frame(y=rbinom(40,1,.25+x*.5),x=x,
              z=rnorm(40),id=rep(1:20,each=2))
 
 mod_par=glm(y~x*z,data=D,family = binomial)
+
 summary(mod_par)
 mod_par
 
-compute_scores(mod_par,rnorm(40))
 
 mod=flipscores(y~x*z,data=D,family = binomial)
 summary(mod)
