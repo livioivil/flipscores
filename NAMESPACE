@@ -3,3 +3,4 @@
 S3method(anova,flipscores)
 export(compute_scores)
 export(flipscores)
+export(summary.flipscores)

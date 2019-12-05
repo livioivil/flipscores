@@ -30,6 +30,10 @@ mod_par=glm(y~x*z,data=D,family = binomial)
 summary(mod_par)
 mod_par
 
+W=diag(mod_par$weights)
+Z=model.matrix(y~x*z,data=D)
+IH=diag(nrow(Z))-W%*%Z%*%solve(t(Z)%*%W%*%Z)%*%t(Z)
+plot(IH%*%(D$y-(.25+x*.5)),residuals(mod_par))
 
 mod=flipscores(y~x*z,data=D,family = binomial)
 summary(mod)
@@ -143,3 +147,21 @@ summary(mod)
 # sv=svd(X)
 # sv$u%*%t(sv$u)
 # t(sv$u)%*%sv$u
+
+
+n=100
+set.seed(1)
+x=(rep(0:1,n))
+D=data.frame(y=rbinom(n*2,1,.25+x*.5),x=x,
+             z=rnorm(n*2),id=rep(1:n,each=2))
+
+mod_par=glm(y~x*z,data=D,family = binomial)
+
+summary(mod_par)
+mod_par
+
+library(flipscores)
+mod=flipscores(y~x*z,data=D,family = binomial,score_type = "ort")
+summary(mod)
+mode=flipscores(y~x*z,data=D,family = binomial,score_type = "eff")
+summary(mode)

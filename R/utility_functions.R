@@ -23,7 +23,7 @@ print.flipscores <- function(x, ...) {
 }
 
 #' summary.flipscores
-
+#' @export summary.flipscores
 summary.flipscores <- function (object, ...) {
   sum_model=summary.glm(object = object)
   sum_model$coefficients=sum_model$coefficients[,c(1,1:4)]
