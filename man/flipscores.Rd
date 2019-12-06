@@ -9,7 +9,8 @@ flipscores(formula, family, data, score_type = "orthogonalized", n_flips=1000, .
 \arguments{
 \item{score_type}{The type of score that is computed, either "orthogonalized", "effective" or "basic". 
 By default is "orthogonalized". 
-"effective" and "orthogonalized" takes into account nuisance estimation.}
+Both "orthogonalized effective score" and "effective score" take account of nuisance estimation and they provide the same test statistic. In case of small samples "effective score" might be anti-conservative. "orthogonalized effective score" gives a solution for this issue. 
+Note: in case of big matrix model, the "orthogonalized effective score" requires several time.}
 
 \item{n_flips}{The number of random flips of the scores contributions
 When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed. 
