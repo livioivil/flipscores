@@ -3,8 +3,9 @@
 #' @description Provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables.
 #' @param score_type The type of score that is computed, either "orthogonalized", "effective" or "basic". 
 #' By default is "orthogonalized". 
-#' "effective" and "orthogonalized" takes into account nuisance estimation.
-#' 
+#' Both "orthogonalized effective score" and "effective score" take account of nuisance estimation and they provide the same test statistic. In case of small samples "effective score" might be anti-conservative. "orthogonalized effective score" gives a solution for this issue. 
+#' Note that in case of a big model matrix, the "orthogonalized effective score" requires several time.
+#'
 #' @param n_flips The number of random flips of the scores contributions
 #' When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed. 
 #' Default is 5000.
