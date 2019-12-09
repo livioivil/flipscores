@@ -30,8 +30,6 @@ To **install** this github version type (in R):
     install_github("livioivil/flipscores")
 
 
-* * *
-
 ## Some examples
 
 ## Binomial
@@ -44,88 +42,64 @@ D=data.frame(y=rbinom(40,1,.25+x*.5), x=x,z=rnorm(40),id=rep(1:20,each=2))
 mod_par=glm(y~x*z,data=D,family = binomial)
 summary(mod_par)
 mod_par
-mod=flipscores(y~x*z,data=D,family = binomial,score_type = "ortho")
+mod=flipscores(y~x*z,data=D,family = binomial)
 summary(mod)
 print(mod)
 
 # with clustered observations:
-mod=flipscores(y~x*z,data=D,family = binomial,score_type = "ortho", id=D$id)
+mod=flipscores(y~x*z,data=D,family = binomial, id=D$id)
 summary(mod)
 ```
 
 ## Poisson
 
 ```{r,  message = FALSE}
-set.seed(2)
+set.seed(1)
 y=(sample(1:200,20))
 x=(rep(0:1,20))
 D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40),id=rep(1:20,each=2))
 mod_par=glm(y~x*z,data=D, family = poisson)
 summary(mod_par)
-mod=flipscores_glm(y~x*z, data=D, family = poisson, score_type = "ortho")
+mod=flipscores(y~x*z, data=D, family = poisson)
 summary(mod)
-mod=flipscores_glm(y~x*z, data=D, family = poisson, score_type = "ortho", id=D$id)
+mod=flipscores(y~x*z, data=D, family = poisson, id=D$id)
 summary(mod)
 ```
 ## Linear model
 
 ```{r,  message = FALSE}
-set.seed(3)
-y=rnorm(40)
-x=(rep(0:1,20))
-D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40),id=rep(1:20,each=2))
-mod_par=glm(y~x*z,data=D, family = gaussian)
-summary(mod_par)
-mod=flipscores_glm(y~x*z, data=D, family = gaussian, score_type = "ortho")
-summary(mod)
-mod=flipscores_glm(y~x*z, data=D, family = gaussian, score_type = "ortho", id=D$id)
-summary(mod)
-```
-
-## Gamma
-
-```{r,  message = FALSE}
-set.seed(4)
-y=rgamma(40, shape=9, scale = 0.5)
-x=(rep(0:1,20))
-D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40), x2=rpois(40, lambda = 4) ,id=rep(1:20,each=2))
-mod_par=glm(y~x*z+x2,data=D, family = Gamma)
-summary(mod_par)
-mod=flipscores_glm(y~x*z+x2, data=D, family = Gamma, score_type = "ortho") #> senza +x2 non va?
-summary(mod)
-mod=flipscores_glm(y~x*z+x2, data=D, family = Gamma, score_type = "ortho", id=D$id)
+set.seed(1)
+D$y=rnorm(40)
+mod=flipscores(y~x*z, data=D, family = gaussian)
 summary(mod)
 ```
 
 ## Negative Binomial
 
 ```{r,  message = FALSE}
-set.seed(2)
-y=(sample(1:200,20))
-x=(rep(0:1,20))
-D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40),id=rep(1:20,each=2))
-mod_par=MASS::glm.nb(y~x*z,data=D, link="log")
+set.seed(1)
+D=data.frame(x=rnorm(40), z=rnorm(40))
+D$y=rnbinom(40,mu=exp(-D$x),size=3)
+
+mod_par=MASS::glm.nb(y~x+z,data=D, link="log")
 summary(mod_par)
-#>mod=flipscores::flipscores_glm(y~x*z, data=D, family = "negbinom", score_type = "ortho") 
-#>summary(mod)
-#>mod=flipscores::flipscores_glm(y~x*z, data=D, family = "negbinom", score_type = "ortho", id=D$id)
-#>summary(mod)
+mod=flipscores(y~x+z, data=D, family = "negbinom") 
+summary(mod)
 ```
 
 
-* * *
 
 ## References
 
+J Hemerik, JJ Goeman and L Finos (2019) Robust testing in generalized linear models by sign-flipping score contributions, Submitted, arXiv: 1909.03796
+
+<https://arxiv.org/abs/1909.03796>
 
 ## Bug reports
 If you encounter a bug, please file a
 [reprex](https://github.com/tidyverse/reprex) (minimal reproducible example)
 on [github](https://github.com/livioivil/flipscores/issues).
 
-
-
-* * *
 
 ## References
 

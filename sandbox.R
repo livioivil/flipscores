@@ -35,6 +35,17 @@ Z=model.matrix(y~x*z,data=D)
 IH=diag(nrow(Z))-W%*%Z%*%solve(t(Z)%*%W%*%Z)%*%t(Z)
 plot(IH%*%(D$y-(.25+x*.5)),residuals(mod_par))
 
+tr= function(X)sum(diag(X))
+y=rnorm(40)
+tr(IH%*%t(IH))
+f=diag(1-2*rbinom(40,1,.5))
+tr(f%*%IH%*%y%*%t(y)%*%t(IH)%*%f)
+
+sv=svd(IH)
+tr(IH%*%y%*%t(y)%*%t(IH))
+tr(f%*%IH%*%y%*%t(y)%*%t(IH)%*%f)
+tr(sv$u%*%f%*%t(sv$u)%*%IH%*%y%*%t(y)%*%t(IH)%*%sv$u%*%f%*%t(sv$u))
+
 mod=flipscores(y~x*z,data=D,family = binomial)
 summary(mod)
 
@@ -149,7 +160,7 @@ summary(mod)
 # t(sv$u)%*%sv$u
 
 
-n=100
+n=500
 set.seed(1)
 x=(rep(0:1,n))
 D=data.frame(y=rbinom(n*2,1,.25+x*.5),x=x,
@@ -161,7 +172,14 @@ summary(mod_par)
 mod_par
 
 library(flipscores)
-mod=flipscores(y~x*z,data=D,family = binomial,score_type = "ort")
-summary(mod)
-mode=flipscores(y~x*z,data=D,family = binomial,score_type = "eff")
-summary(mode)
+mod=flipscores(y~x*z,data=D,family = binomial,score_type = "ort",n_flips = 100000)
+summary(mod)$coeff[,5]
+mode=flipscores(y~x*z,data=D,family = binomial,score_type = "eff",n_flips = 100000)
+summary(mode)$coeff[,5]
+
+
+library(flipscores)
+mod=flipscores(y~x*z,data=D,family = gaussian,score_type = "ort",n_flips = 100000)
+summary(mod)$coeff[,5]
+mode=flipscores(y~x*z,data=D,family = gaussian,score_type = "eff",n_flips = 100000)
+summary(mode)$coeff[,5]
