@@ -61,6 +61,10 @@ anova.flipscores <- function(model0, model1=NULL,
     nvars <- max(0, varseq)
     resdev <- resdf <- NULL
   
+    mf <- match.call(expand.dots = TRUE)
+    if(!is.null(mf$id)) 
+      model0$id=mf$id
+    
     scores=lapply(1:nvars, function(var_i) {
       tested=which(varseq==var_i)
       # print(tested)
@@ -75,17 +79,19 @@ anova.flipscores <- function(model0, model1=NULL,
         subsets_npc=c(subsets_npc,list(sum(temp[1:(i-1)])+(1:temp[i])))
         
     scores = as.data.frame(scores)
-    mf <- match.call(expand.dots = TRUE)
-    if(!is.null(mf$id)) 
-      model0$id=mf$id
-    if(!is.null(model0$id)) 
-      scores=rowsum(scores,group = model0$id)
-    
+
+  
     ps=flip::flip(as.matrix(scores),perms=n_flips,tail=1)
     res=flip::npc(ps@permT,comb.funct = "mahalanobist",subsets = subsets_npc)
-    out_param=stats:::anova.glm(model0,test="Rao")
-    out_param$Rao[-1]=res@res[,3]
-    out_param$`Pr(>Chi)`[-1]=res@res[,4]
+    # res@res[, 3]=res@res[, 3]*nrow(ps@permT)
+    out_param=car::Anova(model0, test = "LR",type=type) 
+    #stats:::anova.glm(model0,test="Rao")
+    # out_param$Rao[-1]=res@res[,3]
+    # out_param$`Pr(>Chi)`[-1]=res@res[,4]
+    names(out_param)[1]="Score"
+    out_param[[1]]=res@res[,3]
+    names(out_param)[3]="Pr(>Score)"
+    out_param[[3]]=res@res[,4]
     if(type==1){
       type_test=": Type I test (i.e. terms added sequentially, first to last)"
     } else if (type==3) {
@@ -95,7 +101,6 @@ anova.flipscores <- function(model0, model1=NULL,
                     "\nModel: ", 
                     model0$family$family, ", link: ", model0$family$link, 
                     "\nResponse: ", as.character(varlist[-1L])[1L])
-    names(out_param)[5]="Score"
     title=gsub("Terms added sequentially .first to last.\\n\\n",
                                         "",title)
     attr(out_param,"heading")[[1]]=title
