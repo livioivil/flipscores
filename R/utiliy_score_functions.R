@@ -1,3 +1,27 @@
+mahalanobis_npc <- function(permT){
+  if(ncol(permT)==0) return(rep(0,nrow(permT)))
+  dimnames(permT)=NULL
+  if(ncol(permT)==1) {
+    permT=as.vector(permT)
+    return(abs(permT)/(sum(permT^2)^.5))}
+  #else
+  ei=eigen(t(permT)%*%permT)
+  ei$vectors=ei$vectors[,ei$values>1E-12,drop=FALSE]
+  ei$values=ei$values[ei$values>1E-12]
+  dst=abs(rowSums(permT%*%ei$vect%*%diag(ei$val^-.5)))
+  return(dst)
+  #manca ^2 e *nrow(permT). omesso per semplificare i calcoli
+}
+
+#performs mahalanobis_npc() on selected columns of permT
+mahalanobis_npc_multi <- function(ids_list,permT){
+  
+  ff=function(ids,permT) mahalanobis_npc(permT[,ids,drop=FALSE])
+  out=plyr::laply(ids_list,ff,permT)
+  t(out)
+}
+
+
 # i and exclude are indices of the columns of model.frame x
 socket_compute_scores <- function(i,model,exclude=NULL,score_type){
   #to avoid re-run a flipscores everytime:

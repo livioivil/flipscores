@@ -82,16 +82,18 @@ anova.flipscores <- function(model0, model1=NULL,
 
   
     ps=flip::flip(as.matrix(scores),perms=n_flips,tail=1)
-    res=flip::npc(ps@permT,comb.funct = "mahalanobist",subsets = subsets_npc)
+    res=mahalanobis_npc_multi(ids_list = subsets_npc,permT = ps@permT)
+    # flip::npc(ps@permT,comb.funct = "mahalanobist",subsets = subsets_npc)
     # res@res[, 3]=res@res[, 3]*nrow(ps@permT)
+    
     out_param=car::Anova(model0, test = "LR",type=type) 
     #stats:::anova.glm(model0,test="Rao")
     # out_param$Rao[-1]=res@res[,3]
     # out_param$`Pr(>Chi)`[-1]=res@res[,4]
     names(out_param)[1]="Score"
-    out_param[[1]]=res@res[,3]
+    out_param[[1]]=res[1,]^2*nrow(res)
     names(out_param)[3]="Pr(>Score)"
-    out_param[[3]]=res@res[,4]
+    out_param[[3]]=flip::t2p(res)[,]
     if(type==1){
       type_test=": Type I test (i.e. terms added sequentially, first to last)"
     } else if (type==3) {
@@ -99,8 +101,8 @@ anova.flipscores <- function(model0, model1=NULL,
     }
     title <- paste0("Analysis of Deviance Table", type_test,
                     "\nModel: ", 
-                    model0$family$family, ", link: ", model0$family$link, 
-                    "\nResponse: ", as.character(varlist[-1L])[1L])
+                    model0$family$family, ", link: ", model0$family$link)#, 
+                    # "\nResponse: ", as.character(varlist[-1L])[1L])
     title=gsub("Terms added sequentially .first to last.\\n\\n",
                                         "",title)
     attr(out_param,"heading")[[1]]=title
@@ -109,6 +111,6 @@ anova.flipscores <- function(model0, model1=NULL,
   #make up
   
   attr(out_param,"heading")[[1]]=  paste(attr(out_param,"heading")[[1]],sep="",
-          "Inference is provided by FlipScores approach (",model0$n_flips," sign flips).\n")
+          "\nInference is provided by FlipScores approach (",model0$n_flips," sign flips).\n")
   return(out_param)
 }
