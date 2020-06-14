@@ -2,10 +2,15 @@
 % Please edit documentation in R/utility_functions.R
 \name{summary.flipscores}
 \alias{summary.flipscores}
-\title{summary.flipscores}
+\title{summary.flipscores summary method for a flipscores-object.}
 \usage{
-\method{summary}{flipscores}(object, ...)
+summary.flipscores(object, ...)
+}
+\arguments{
+\item{object}{a flipscores-object}
+
+\item{...}{additional arguments to be passed}
 }
 \description{
-summary.flipscores
+summary.flipscores summary method for a flipscores-object.
 }

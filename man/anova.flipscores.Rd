@@ -4,41 +4,48 @@
 \alias{anova.flipscores}
 \title{anova.flipscores}
 \usage{
-\method{anova}{flipscores}(model0, model1 = NULL,
-  score_type = "orthogonalized", n_flips = 5000, type = 3,
-  id = NULL, ...)
+\method{anova}{flipscores}(
+  object,
+  model1 = NULL,
+  score_type = "orthogonalized",
+  n_flips = 5000,
+  type = 3,
+  id = NULL,
+  ...
+)
 }
 \arguments{
-\item{model0}{a \code{glm} (or \code{flipscores}) object with the model under the null hypothesis (i.e. the covariates, the nuisances parameters).}
+\item{object}{(the object) \code{glm} (or \code{flipscores}) object with the model under the null hypothesis (i.e. the covariates, the nuisance parameters).}
 
-\item{model1}{a \code{glm} (or \code{flipscores}) or a \code{matrix} (or \code{vector}). If it is a \code{glm} object, it has the model under the alternative hypothesis. The variables in \code{model1} are the same variables in \code{model0} plus one or more variables to be tested.  Alternatively, if
+\item{model1}{a \code{glm} (or \code{flipscores}) or a \code{matrix} (or \code{vector}). If it is a \code{glm} object, it has the model under the alternative hypothesis. The variables in \code{model1} are the same variables in \code{object} plus one or more variables to be tested.  Alternatively, if
 \code{model1} is a \code{matrix}, it contains the tested variables column-wise.}
 
-\item{score_type}{The type of score that is computed, either "orthogonalized", "effective" or "basic". 
-By default is "orthogonalized". "effective" and "orthogonalized" takes into account nuisance estimation.}
+\item{score_type}{The type of score that is computed. It can be "orthogonalized", "effective" or "basic".
+Default is "orthogonalized". "effective" and "orthogonalized" take into account the nuisance estimation.}
 
-\item{n_flips}{The number of random flips of the scores contributions
+\item{n_flips}{The number of random flips of the score contributions.
 When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed. 
 Default is 5000.}
 
 \item{type}{type of test, "I", "III", 1, or 3. Roman numerals are equivalent to the corresponding Arabic numerals.}
 
-\item{id}{a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. NOTE: if \code{model0} is a \code{flipscores} and \code{model$id} not \code{NULL}, this is considered in the inference.}
+\item{id}{a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. NOTE: if \code{object} is a \code{flipscores} and \code{model$id} is not \code{NULL}, this is considered in the inference.}
+
+\item{...}{other parameters allowed in \code{stats::anova}.}
 }
 \description{
 anova.flipscores
 }
 \examples{
-
 set.seed(1)
-Z=rnorm(20)
-X=factor(rep(LETTERS[1:3],length.out=20))
-Y=rpois(n=20,lambda=exp(Z*(X=="C")*.5))
-mod0=flipscores(Y~Z+X,family="poisson")
+dt=data.frame(X=rnorm(20),
+   Z=factor(rep(LETTERS[1:3],length.out=20)))
+dt$Y=rpois(n=nrow(dt),lambda=exp(dt$X*(dt$Z=="C")))
+mod0=flipscores(Y~Z+X,data=dt,family="poisson",score_type = "effective")
 summary(mod0)
-anova(model0 = mod0)
+anova(mod0)
 
-mod1=flipscores(Y~Z*X,family="poisson")
-anova(model0 = mod0,mod1)
+mod1=flipscores(Y~Z*X,data=dt,family="poisson",score_type = "effective")
+anova(mod0,model1 = mod1)
 
 }

@@ -1,5 +1,5 @@
 get_head_flip_out <- function(x){
-  if(stringr::word(x$family$family, 1)!="Negative")
+  if(length(grep("Negative Binomial",x$family$family))==0)
   {paste("Flip Score Test: 
          score_type =",x$score_type,
          ", n_flips =",x$n_flips,"\n")}
@@ -11,7 +11,12 @@ get_head_flip_out <- function(x){
 }
 
 
-#' print.flipscores
+#' print.flipscores print method for a flipscores-object.
+#' @rdname print.flipscores
+#' @param x a flipscores-object
+#' @param ... additional arguments to be passed
+#' @exportMethod print
+# @docType methods
 
 print.flipscores <- function(x, ...) {
   cat(get_head_flip_out(x))
@@ -22,8 +27,12 @@ print.flipscores <- function(x, ...) {
   # print.default(x)
 }
 
-#' summary.flipscores
-#' @export summary.flipscores
+#' summary.flipscores summary method for a flipscores-object.
+#' @rdname summary.flipscores
+#' @param object a flipscores-object
+#' @param ... additional arguments to be passed
+#' @exportMethod  summary
+
 summary.flipscores <- function (object, ...) {
   sum_model=summary.glm(object = object)
   sum_model$coefficients=sum_model$coefficients[,c(1,1:4)]

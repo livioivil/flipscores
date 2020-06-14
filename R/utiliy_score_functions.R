@@ -17,7 +17,7 @@ mahalanobis_npc <- function(permT){
 mahalanobis_npc_multi <- function(ids_list,permT){
   
   ff=function(ids,permT) mahalanobis_npc(permT[,ids,drop=FALSE])
-  out=plyr::laply(ids_list,ff,permT)
+  out=laply(ids_list,ff,permT)
   t(out)
 }
 

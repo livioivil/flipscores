@@ -4,21 +4,30 @@
 \alias{flipscores}
 \title{Robust testing in GLMs, by sign-flipping score contributions}
 \usage{
-flipscores(formula, family, data, score_type = "orthogonalized", n_flips=1000, ...)
+flipscores(formula, family, data, score_type, 
+n_flips=5000, alternative ="two.sided", id = NULL, ...)
 }
 \arguments{
-\item{score_type}{The type of score that is computed, either "orthogonalized", "effective" or "basic". 
-By default is "orthogonalized". 
-Both "orthogonalized effective score" and "effective score" take account of nuisance estimation and they provide the same test statistic. In case of small samples "effective score" might be anti-conservative. "orthogonalized effective score" gives a solution for this issue. 
-Note that in case of a big model matrix, the "orthogonalized effective score" requires several time.}
+\item{formula}{see \code{glm} function.}
 
-\item{n_flips}{The number of random flips of the scores contributions
-When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed. 
-Default is 5000.}
+\item{family}{see \code{glm} function.}
+
+\item{data}{see \code{glm} function.}
+
+\item{score_type}{The type of score that is computed. It can be "orthogonalized", "effective" or "basic". 
+Both "orthogonalized" and "effective" take into account the nuisance estimation and they provide the same
+test statistic. In case of small samples "effective score" might have a slight anti-conservative behaviour. 
+"orthogonalized effective score" gives a solution for this issue.
+Note that in case of a big model matrix, the "orthogonalized" may take a long time.}
+
+\item{n_flips}{The number of random flips of the score contributions.
+When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed.}
+
+\item{alternative}{It can be "greater", "less" or "two.sided" (default)}
 
 \item{id}{a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent.}
 
-\item{alternative}{Should be "greater", "less" or "two.sided" (default)}
+\item{...}{see \code{glm} function.}
 }
 \value{
 glm class object with sign-flip score test.
@@ -35,11 +44,9 @@ Provides robust tests for testing in GLMs, by sign-flipping score contributions.
 set.seed(1)
 dt=data.frame(X=rnorm(20),
    Z=factor(rep(LETTERS[1:3],length.out=20)))
-dt$Y=rpois(n=20,lambda=exp(Z))
-mod=flipscores(Y~Z+X,data=dt,family="poisson")
+dt$Y=rpois(n=20,lambda=exp(dt$Z=="C"))
+mod=flipscores(Y~Z+X,data=dt,family="poisson",score_type = "effective")
 summary(mod)
-
-
 }
 \references{
 "Robust testing in generalized linear models by sign-flipping score contributions" by J.Hemerik, J.Goeman and L.Finos.

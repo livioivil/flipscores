@@ -1,19 +1,25 @@
 #' @title Robust testing in GLMs, by sign-flipping score contributions
 #'
 #' @description Provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables.
-#' @param score_type The type of score that is computed, either "orthogonalized", "effective" or "basic". 
-#' By default is "orthogonalized". 
-#' Both "orthogonalized effective score" and "effective score" take account of nuisance estimation and they provide the same test statistic. In case of small samples "effective score" might be anti-conservative. "orthogonalized effective score" gives a solution for this issue. 
-#' Note that in case of a big model matrix, the "orthogonalized effective score" requires several time.
+#' @param score_type The type of score that is computed. It can be "orthogonalized", "effective" or "basic". 
+#' Both "orthogonalized" and "effective" take into account the nuisance estimation and they provide the same
+#' test statistic. In case of small samples "effective score" might have a slight anti-conservative behaviour. 
+#' "orthogonalized effective score" gives a solution for this issue.
+#' Note that in case of a big model matrix, the "orthogonalized" may take a long time.
 #'
-#' @param n_flips The number of random flips of the scores contributions
-#' When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed. 
-#' Default is 5000.
+#' @param n_flips The number of random flips of the score contributions.
+#' When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed.
 #'
 #' @param id a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. 
-#' @param alternative Should be "greater", "less" or "two.sided" (default)
+#' @param alternative It can be "greater", "less" or "two.sided" (default)
+#' @param formula see \code{glm} function.
+#' @param family see \code{glm} function.
+#' @param data see \code{glm} function.
+#' @param ... see \code{glm} function.
+#' 
 #'
-#' @usage flipscores(formula, family, data, score_type = "orthogonalized", n_flips=1000, ...)
+#' @usage flipscores(formula, family, data, score_type, 
+#' n_flips=5000, alternative ="two.sided", id = NULL, ...)
 #'
 #' @return glm class object with sign-flip score test.
 #' See also the related functions (\code{summary.flipscores}, \code{anova.flipscores}, \code{print.flipscores}). 
@@ -33,18 +39,21 @@
 #' set.seed(1)
 #' dt=data.frame(X=rnorm(20),
 #'    Z=factor(rep(LETTERS[1:3],length.out=20)))
-#' dt$Y=rpois(n=20,lambda=exp(Z))
-#' mod=flipscores(Y~Z+X,data=dt,family="poisson")
+#' dt$Y=rpois(n=20,lambda=exp(dt$Z=="C"))
+#' mod=flipscores(Y~Z+X,data=dt,family="poisson",score_type = "effective")
 #' summary(mod)
-#' 
-#'
 #' @export
 
+
+
 flipscores<-function(formula, family, data,
-                         score_type = "orthogonalized",
+                         score_type,
                          n_flips=5000, 
+                         alternative ="two.sided", 
                          id = NULL, 
                          ...){
+  # if(FALSE) flip() #just a trick to avoid warnings in package building
+  # temp=is(formula) #just a trick to avoid warnings in package building
   # catturo la call,
   fs_call <- mf <- match.call()
 
@@ -65,14 +74,15 @@ flipscores<-function(formula, family, data,
   #rinomino la funzione da chiamare:
   flip_param_call[[1L]]=quote(flip::flip)
   names(flip_param_call)[names(flip_param_call)=="alternative"]="tail"
-
+  names(flip_param_call)[names(flip_param_call)=="n_flips"]="perms"
+  
   # mi tengo solo quelli buoni per glm
   if(length(m)>0) mf <- mf[-m]
   
   param_x_ORIGINAL=mf$x
   #set the model to fit
   if(!is.null(mf$family)&&(mf$family=="negbinom")){
-    mf[[1L]]=quote(MASS::glm.nb)
+    mf[[1L]]=quote(glm.nb)
     mf$family=NULL
     } else{
       mf[[1L]]=quote(glm)
@@ -100,13 +110,14 @@ flipscores<-function(formula, family, data,
   #  call to flip::flip()
   flip_param_call$Y=model$scores
   flip_param_call$statTest = "sum"
+  # require(flip)
   results=eval(flip_param_call, parent.frame())
   
   ### output
   model$call=fs_call
   model$id=flip_param_call$id
   model$Tspace=results@permT
-  model$p.values=flip:::p.value(results)
+  model$p.values=results@res$`p-value`
   model$score_type=score_type
   model$n_flips=n_flips
 

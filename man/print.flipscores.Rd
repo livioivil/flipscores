@@ -2,10 +2,15 @@
 % Please edit documentation in R/utility_functions.R
 \name{print.flipscores}
 \alias{print.flipscores}
-\title{print.flipscores}
+\title{print.flipscores print method for a flipscores-object.}
 \usage{
 \method{print}{flipscores}(x, ...)
 }
+\arguments{
+\item{x}{a flipscores-object}
+
+\item{...}{additional arguments to be passed}
+}
 \description{
-print.flipscores
+print.flipscores print method for a flipscores-object.
 }
