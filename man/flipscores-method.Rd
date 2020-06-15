@@ -12,7 +12,7 @@
 summary.flipscores(object, ...)
 }
 \arguments{
-\item{x}{a flipscores-object}
+\item{x}{a flipscores object}
 
 \item{...}{additional arguments to be passed}
 
@@ -21,5 +21,5 @@ summary.flipscores(object, ...)
 \description{
 Methods for \code{flipscores} objects. 
 The following are methods to extract and manipulate relevant information from
-a \code{flipscores-object}.
+a \code{flipscores} object.
 }

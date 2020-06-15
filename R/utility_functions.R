@@ -2,19 +2,17 @@
 #'
 #' @description Methods for \code{flipscores} objects. 
 #' The following are methods to extract and manipulate relevant information from
-#' a \code{flipscores-object}.
+#' a \code{flipscores} object.
 #' 
 #' @name flipscores-method
-#' @rdname flipscores-method
 #' @docType methods
 
 NULL
 
 
 
-#' print.flipscores print method for a flipscores-object.
-#' @param x a flipscores-object
-#' @param ... additional arguments to be passed
+#' print.flipscores print method for a flipscores object.
+#' @param x a flipscores object
 #' @exportMethod print
 #' @docType methods
 #' @rdname flipscores-method
@@ -29,7 +27,7 @@ print.flipscores <- function(x, ...) {
   # print.default(x)
 }
 
-#' summary.flipscores summary method for a flipscores-object.
+#' summary.flipscores summary method for a flipscores object.
 #' @rdname flipscores-method
 #' @param object a flipscores object
 #' @param ... additional arguments to be passed
