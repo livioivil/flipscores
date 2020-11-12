@@ -54,7 +54,8 @@ compute_scores <- function(model0, model1,score_type="orthogonalized"){
         sqrtW=diag(sqrt(diag(W)))
         # OneMinusHtilde_0=(diag(n)-sqrtW%*%Z%*%solve(t(Z*diag(W))%*%Z)%*%t(Z)%*%sqrtW)
         OneMinusH=(diag(nrow(Z))-W%*%Z%*%solve(t(Z*diag(W))%*%Z)%*%t(Z))
-        deco=svd(OneMinusH* matrix(diag(sqrtW),dim(OneMinusH)[1],dim(OneMinusH)[1],byrow = TRUE))
+        deco=svd(OneMinusH* matrix(diag(sqrtW),dim(OneMinusH)[1],dim(OneMinusH)[1],byrow = TRUE),
+                 nv = 0)
         
         deco$d[deco$d<1E-12]=0
         scores=
@@ -69,5 +70,8 @@ compute_scores <- function(model0, model1,score_type="orthogonalized"){
       scores=rowsum(scores,id_model1)      
     }
   
+  # mean_adjustment
+  # median_adjustment
+  # 
   return(scores)
 }

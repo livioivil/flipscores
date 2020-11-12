@@ -9,7 +9,7 @@
 \usage{
 \method{print}{flipscores}(x, ...)
 
-summary.flipscores(object, ...)
+\method{summary}{flipscores}(object, ...)
 }
 \arguments{
 \item{x}{a flipscores object}

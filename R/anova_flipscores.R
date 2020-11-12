@@ -1,4 +1,5 @@
 #' anova.flipscores
+#' @description This is the \code{anova} method for \code{flipscores} object. Importantly it allow for type III deviance decomposition as in \code{car::Anova}.
 #' @param object (the object) \code{glm} (or \code{flipscores}) object with the model under the null hypothesis (i.e. the covariates, the nuisance parameters).
 #' @param model1 a \code{glm} (or \code{flipscores}) or a \code{matrix} (or \code{vector}). If it is a \code{glm} object, it has the model under the alternative hypothesis. The variables in \code{model1} are the same variables in \code{object} plus one or more variables to be tested.  Alternatively, if
 #' \code{model1} is a \code{matrix}, it contains the tested variables column-wise.

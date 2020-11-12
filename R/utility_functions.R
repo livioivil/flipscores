@@ -13,9 +13,10 @@ NULL
 
 #' print.flipscores print method for a flipscores object.
 #' @param x a flipscores object
-#' @exportMethod print
+#' @method print flipscores
 #' @docType methods
 #' @rdname flipscores-method
+#' @export
 
 
 print.flipscores <- function(x, ...) {
@@ -31,8 +32,9 @@ print.flipscores <- function(x, ...) {
 #' @rdname flipscores-method
 #' @param object a flipscores object
 #' @param ... additional arguments to be passed
-#' @exportMethod  summary
+#' @method  summary flipscores
 #' @docType methods
+#' @export
 
 summary.flipscores <- function (object, ...) {
   sum_model=summary.glm(object = object)

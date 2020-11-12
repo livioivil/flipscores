@@ -34,7 +34,7 @@ Default is 5000.}
 \item{...}{other parameters allowed in \code{stats::anova}.}
 }
 \description{
-anova.flipscores
+This is the \code{anova} method for \code{flipscores} object. Importantly it allow for type III deviance decomposition as in \code{car::Anova}.
 }
 \examples{
 set.seed(1)
