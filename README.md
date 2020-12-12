@@ -305,9 +305,6 @@ If you encounter a bug, please file a
 [reprex](https://github.com/tidyverse/reprex) (minimal reproducible
 example) on [github](https://github.com/livioivil/flipscores/issues).
 
-References
-----------
-
 Bug reports
 -----------
 
