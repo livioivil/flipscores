@@ -25,7 +25,7 @@ When \code{n_flips} is equal or larger than the maximum number of possible flips
 
 \item{alternative}{It can be "greater", "less" or "two.sided" (default)}
 
-\item{id}{a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent.}
+\item{id}{a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. If \code{id} is not \code{NULL}, only \code{score_type=="effective"} is allowed, yet.}
 
 \item{...}{see \code{glm} function.}
 }

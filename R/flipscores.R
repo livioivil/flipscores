@@ -10,7 +10,7 @@
 #' @param n_flips The number of random flips of the score contributions.
 #' When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed.
 #'
-#' @param id a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. 
+#' @param id a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. If \code{id} is not \code{NULL}, only \code{score_type=="effective"} is allowed, yet.
 #' @param alternative It can be "greater", "less" or "two.sided" (default)
 #' @param formula see \code{glm} function.
 #' @param family see \code{glm} function.
@@ -67,10 +67,21 @@ flipscores<-function(formula, family, data,
   if(missing(score_type))
     stop("test type is not specified or recognized")
 
+  
   # individuo i parametri specifici di flip score
   m <- match(c("score_type","n_flips","alternative","id"), names(mf), 0L)
   m <- m[m>0]
   flip_param_call= mf[c(1L,m)]
+
+  #####check id not null only with effective score:
+  if(!is.null(flip_param_call$id)&&(score_type!="effective")){
+    print(warning("WARNING: Use of id is allowed only with score_type=='effective', yet. 
+ Nothoing done."))
+    return(NULL)
+  }
+    
+  
+  
   #rinomino la funzione da chiamare:
   flip_param_call[[1L]]=quote(flip::flip)
   names(flip_param_call)[names(flip_param_call)=="alternative"]="tail"
@@ -104,8 +115,8 @@ flipscores<-function(formula, family, data,
   
   ### TODO RENDERE PIù AGILE INPUT DI id (es formula se possibile?) 
   # + quality check
-  if(!is.null(flip_param_call$id))
-    model$scores=rowsum(model$scores,eval(flip_param_call$id))
+  if(!is.null(flip_param_call$id)&&(score_type=="effective"))
+    model$scores=rowsum(model$scores,eval(flip_param_call$id, parent.frame()))
   
   #  call to flip::flip()
   flip_param_call$Y=model$scores

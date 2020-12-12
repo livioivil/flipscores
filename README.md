@@ -66,11 +66,12 @@ mod_par
 #> Degrees of Freedom: 39 Total (i.e. Null);  36 Residual
 #> Null Deviance:       55.05 
 #> Residual Deviance: 41.83     AIC: 49.83
-mod=flipscores(y~x*z,data=D,family = binomial)
+mod=flipscores(y~x*z,data=D,family = binomial, score_type = "effective")
 summary(mod)
 #> 
 #> Call:
-#> flipscores(formula = y ~ x * z, family = binomial, data = D)
+#> flipscores(formula = y ~ x * z, family = binomial, data = D, 
+#>     score_type = "effective")
 #> 
 #> Deviance Residuals: 
 #>     Min       1Q   Median       3Q      Max  
@@ -78,10 +79,10 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             Estimate   Score Std. Error z value Pr(>|z|)   
-#> (Intercept)  -0.7001 -2.7040     2.0778  -1.301    0.202   
-#> x             2.1557  4.1340     1.6165   2.557    0.008 **
-#> z            -1.1320 -2.1015     1.5240  -1.379    0.182   
-#> x:z           1.5070  1.6052     1.3589   1.181    0.258   
+#> (Intercept)  -0.7001 -2.7040     1.9441  -1.391    0.164   
+#> x             2.1557  4.1340     1.3697   3.018    0.004 **
+#> z            -1.1320 -2.1015     1.6562  -1.269    0.238   
+#> x:z           1.5070  1.6052     1.2372   1.297    0.238   
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -93,45 +94,23 @@ summary(mod)
 #> 
 #> Number of Fisher Scoring iterations: 4
 print(mod)
-#> 
-#> Call:  flipscores(formula = y ~ x * z, family = binomial, data = D)
+#> Flip Score Test: 
+#>          score_type = effective , n_flips = 5000 
+#> Call: flipscores(formula = y ~ x * z, family = binomial, data = D, 
+#>     score_type = "effective")
 #> 
 #> Coefficients:
-#> (Intercept)            x            z          x:z  
-#>     -0.7001       2.1557      -1.1320       1.5070  
-#> 
-#> Degrees of Freedom: 39 Total (i.e. Null);  36 Residual
-#> Null Deviance:       55.05 
-#> Residual Deviance: 41.83     AIC: 49.83
+#> (Intercept)           x           z         x:z 
+#>  -0.7000829   2.1556675  -1.1319694   1.5070293
 
 # with clustered observations:
-mod=flipscores(y~x*z,data=D,family = binomial, id=D$id)
+mod=flipscores(y~x*z,data=D,family = binomial, id=D$id, score_type = "ort")
+#> Warning in print(warning("WARNING: Use of id is allowed only with score_type=='effective', yet. \n Nothoing done.")): WARNING: Use of id is allowed only with score_type=='effective', yet. 
+#>  Nothoing done.
+#> [1] "WARNING: Use of id is allowed only with score_type=='effective', yet. \n Nothoing done."
 summary(mod)
-#> 
-#> Call:
-#> flipscores(formula = y ~ x * z, family = binomial, data = D, 
-#>     id = D$id)
-#> 
-#> Deviance Residuals: 
-#>     Min       1Q   Median       3Q      Max  
-#> -1.9510  -0.7475   0.5615   0.7202   2.1981  
-#> 
-#> Coefficients:
-#>             Estimate   Score Std. Error z value Pr(>|z|)  
-#> (Intercept)  -0.7001 -2.7040     2.0748  -1.303    0.210  
-#> x             2.1557  4.1340     1.6827   2.457    0.020 *
-#> z            -1.1320 -2.1015     1.5871  -1.324    0.222  
-#> x:z           1.5070  1.6052     1.3285   1.208    0.226  
-#> ---
-#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-#> 
-#> (Dispersion parameter for binomial family taken to be 1)
-#> 
-#>     Null deviance: 55.051  on 39  degrees of freedom
-#> Residual deviance: 41.830  on 36  degrees of freedom
-#> AIC: 49.83
-#> 
-#> Number of Fisher Scoring iterations: 4
+#> Length  Class   Mode 
+#>      0   NULL   NULL
 ```
 
 Poisson
@@ -168,11 +147,11 @@ summary(mod_par)
 #> AIC: 1541.4
 #> 
 #> Number of Fisher Scoring iterations: 5
-mod=flipscores(y~x*z, data=D, family = poisson)
+mod=flipscores(y~x*z, data=D, family = poisson, score_type = "effective")
 summary(mod)
 #> 
 #> Call:
-#> flipscores(formula = y ~ x * z, family = poisson, data = D)
+#> flipscores(formula = y ~ x * z, family = poisson, data = D, score_type = "effective")
 #> 
 #> Deviance Residuals: 
 #>      Min        1Q    Median        3Q       Max  
@@ -180,36 +159,10 @@ summary(mod)
 #> 
 #> Coefficients:
 #>              Estimate     Score Std. Error z value Pr(>|z|)   
-#> (Intercept)    4.4406 1532.4218   458.2904   3.344    0.002 **
-#> x              0.1209  104.0738   107.0132   0.973    0.282   
-#> z             -0.3140 -440.9885   213.2326  -2.068    0.014 * 
-#> x:z            0.4588  357.5901   187.4505   1.908    0.078 . 
-#> ---
-#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-#> 
-#> (Dispersion parameter for poisson family taken to be 1)
-#> 
-#>     Null deviance: 1468.7  on 39  degrees of freedom
-#> Residual deviance: 1289.4  on 36  degrees of freedom
-#> AIC: 1541.4
-#> 
-#> Number of Fisher Scoring iterations: 5
-mod=flipscores(y~x*z, data=D, family = poisson, id=D$id)
-summary(mod)
-#> 
-#> Call:
-#> flipscores(formula = y ~ x * z, family = poisson, data = D, id = D$id)
-#> 
-#> Deviance Residuals: 
-#>      Min        1Q    Median        3Q       Max  
-#> -12.1384   -5.2048   -0.7249    3.4922   11.3918  
-#> 
-#> Coefficients:
-#>              Estimate     Score Std. Error z value Pr(>|z|)   
-#> (Intercept)    4.4406 1532.4218   500.1758   3.064    0.002 **
-#> x              0.1209  104.0738   103.6834   1.004    0.336   
-#> z             -0.3140 -440.9885   223.4642  -1.973    0.024 * 
-#> x:z            0.4588  357.5901   178.3256   2.005    0.072 . 
+#> (Intercept)    4.4406 1532.4218   375.5455   4.081    0.002 **
+#> x              0.1209  104.0738   172.8491   0.602    0.538   
+#> z             -0.3140 -440.9885   255.9402  -1.723    0.092 . 
+#> x:z            0.4588  357.5901   159.8972   2.236    0.048 * 
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -228,11 +181,12 @@ Linear model
 ``` r
 set.seed(1)
 D$y=rnorm(40)
-mod=flipscores(y~x*z, data=D, family = gaussian)
+mod=flipscores(y~x*z, data=D, family = gaussian, score_type = "effective")
 summary(mod)
 #> 
 #> Call:
-#> flipscores(formula = y ~ x * z, family = gaussian, data = D)
+#> flipscores(formula = y ~ x * z, family = gaussian, data = D, 
+#>     score_type = "effective")
 #> 
 #> Deviance Residuals: 
 #>      Min        1Q    Median        3Q       Max  
@@ -240,10 +194,10 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error z value Pr(>|t|)   
-#> (Intercept)  0.03272  0.71313    3.64530   0.196    0.836   
-#> x            0.06963  0.68635    2.05525   0.334    0.770   
-#> z           -0.50382 -8.06234    3.20296  -2.517    0.012 * 
-#> x:z          1.11710  9.46884    3.01026   3.146    0.004 **
+#> (Intercept)  0.03272  0.71313    3.82746   0.186    0.874   
+#> x            0.06963  0.68635    2.18839   0.314    0.750   
+#> z           -0.50382 -8.06234    3.30916  -2.436    0.010 **
+#> x:z          1.11710  9.46884    2.80226   3.379    0.002 **
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -264,16 +218,17 @@ set.seed(1)
 D=data.frame(x=rnorm(40), z=rnorm(40))
 D$y=rnbinom(40,mu=exp(-D$x),size=3)
 
-mod_par=MASS::glm.nb(y~x+z,data=D, link="log")
+library(MASS)
+#> Warning: package 'MASS' was built under R version 3.6.3
+mod_par=glm.nb(y~x+z,data=D, link="log")
 #> Warning in theta.ml(Y, mu, sum(w), w, limit = control$maxit, trace =
 #> control$trace > : iteration limit reached
-
 #> Warning in theta.ml(Y, mu, sum(w), w, limit = control$maxit, trace =
 #> control$trace > : iteration limit reached
 summary(mod_par)
 #> 
 #> Call:
-#> MASS::glm.nb(formula = y ~ x + z, data = D, link = "log", init.theta = 5040.070663)
+#> glm.nb(formula = y ~ x + z, data = D, link = "log", init.theta = 5040.070663)
 #> 
 #> Deviance Residuals: 
 #>     Min       1Q   Median       3Q      Max  
@@ -301,7 +256,7 @@ summary(mod_par)
 #> Warning while fitting theta: iteration limit reached 
 #> 
 #>  2 x log-likelihood:  -90.234
-mod=flipscores(y~x+z, data=D, family = "negbinom") 
+mod=flipscores(y~x+z, data=D, family = "negbinom",score_type = "effective") 
 #> Warning in theta.ml(Y, mu, sum(w), w, limit = control$maxit, trace =
 #> control$trace > : iteration limit reached
 
@@ -310,7 +265,8 @@ mod=flipscores(y~x+z, data=D, family = "negbinom")
 summary(mod)
 #> 
 #> Call:
-#> flipscores(formula = y ~ x + z, family = "negbinom", data = D)
+#> flipscores(formula = y ~ x + z, family = "negbinom", data = D, 
+#>     score_type = "effective")
 #> 
 #> Deviance Residuals: 
 #>     Min       1Q   Median       3Q      Max  
@@ -318,9 +274,9 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error z value Pr(>|t|)  
-#> (Intercept)  -0.3371  -8.9318     4.7524  -1.879    0.040 *
-#> x            -0.6175 -11.0407     4.5520  -2.425    0.012 *
-#> z             0.1428   3.4697     5.8064   0.598    0.566  
+#> (Intercept)  -0.3371  -8.9318     5.1061  -1.749    0.066 .
+#> x            -0.6175 -11.0407     4.8196  -2.291    0.024 *
+#> z             0.1428   3.4697     5.5809   0.622    0.556  
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 

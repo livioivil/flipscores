@@ -42,12 +42,12 @@ D=data.frame(y=rbinom(40,1,.25+x*.5), x=x,z=rnorm(40),id=rep(1:20,each=2))
 mod_par=glm(y~x*z,data=D,family = binomial)
 summary(mod_par)
 mod_par
-mod=flipscores(y~x*z,data=D,family = binomial)
+mod=flipscores(y~x*z,data=D,family = binomial, score_type = "effective")
 summary(mod)
 print(mod)
 
 # with clustered observations:
-mod=flipscores(y~x*z,data=D,family = binomial, id=D$id)
+mod=flipscores(y~x*z,data=D,family = binomial, id=D$id, score_type = "ort")
 summary(mod)
 ```
 
@@ -60,17 +60,16 @@ x=(rep(0:1,20))
 D=data.frame(y=y, x=rbinom(40,1,.25+x*.5), z=rnorm(40),id=rep(1:20,each=2))
 mod_par=glm(y~x*z,data=D, family = poisson)
 summary(mod_par)
-mod=flipscores(y~x*z, data=D, family = poisson)
-summary(mod)
-mod=flipscores(y~x*z, data=D, family = poisson, id=D$id)
+mod=flipscores(y~x*z, data=D, family = poisson, score_type = "effective")
 summary(mod)
 ```
+
 ## Linear model
 
 ```{r,  message = FALSE}
 set.seed(1)
 D$y=rnorm(40)
-mod=flipscores(y~x*z, data=D, family = gaussian)
+mod=flipscores(y~x*z, data=D, family = gaussian, score_type = "effective")
 summary(mod)
 ```
 
@@ -81,9 +80,10 @@ set.seed(1)
 D=data.frame(x=rnorm(40), z=rnorm(40))
 D$y=rnbinom(40,mu=exp(-D$x),size=3)
 
-mod_par=MASS::glm.nb(y~x+z,data=D, link="log")
+library(MASS)
+mod_par=glm.nb(y~x+z,data=D, link="log")
 summary(mod_par)
-mod=flipscores(y~x+z, data=D, family = "negbinom") 
+mod=flipscores(y~x+z, data=D, family = "negbinom",score_type = "effective") 
 summary(mod)
 ```
 

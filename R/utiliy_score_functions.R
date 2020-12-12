@@ -28,8 +28,7 @@ socket_compute_scores <- function(i,model,exclude=NULL,score_type){
   attributes(model)$class= attributes(model)$class[attributes(model)$class!="flipscores"]
   tested_X=model$x[, i, drop = FALSE]
   model$x=model$x[,-c(i,exclude),drop=FALSE]
-  colnames(model$x)=gsub("\\(",".",colnames(model$x))
-  colnames(model$x)=gsub("\\)",".",colnames(model$x))
+  colnames(model$x)=paste0("V",1:ncol(model$x))
   model$call$data=data.frame(model$y,model$x)
   yname=as.character(model$call$formula[[2]])
   names(model$call$data)[1]=yname
