@@ -48,6 +48,7 @@ compute_scores <- function(model0, model1,score_type="orthogonalized"){
       OneMinusH=(diag(nrow(Z))-W%*%Z%*%solve(t(Z*diag(W))%*%Z)%*%t(Z))
       scores=as.vector(
         (t(X)%*%OneMinusH*(residuals)))
+      
     } else
       #ORTHO EFFECTIVE SCORE
       if(score_type=="orthogonalized"){
@@ -59,8 +60,8 @@ compute_scores <- function(model0, model1,score_type="orthogonalized"){
         
         deco$d[deco$d<1E-12]=0
         scores=
-          t(t(X)%*%OneMinusH%*%deco$u)*
-          as.vector(t(deco$u)%*%(residuals))
+          as.vector(t(t(X)%*%OneMinusH%*%deco$u)*
+          (t(deco$u)%*%(residuals)))
         
       }
   

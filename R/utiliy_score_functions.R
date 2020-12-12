@@ -26,13 +26,28 @@ mahalanobis_npc_multi <- function(ids_list,permT){
 socket_compute_scores <- function(i,model,exclude=NULL,score_type){
   #to avoid re-run a flipscores everytime:
   attributes(model)$class= attributes(model)$class[attributes(model)$class!="flipscores"]
-
-  model$call$data=data.frame(model$y,model$x[,-c(i,exclude),drop=FALSE])
+  tested_X=model$x[, i, drop = FALSE]
+  model$x=model$x[,-c(i,exclude),drop=FALSE]
+  colnames(model$x)=gsub("\\(",".",colnames(model$x))
+  colnames(model$x)=gsub("\\)",".",colnames(model$x))
+  model$call$data=data.frame(model$y,model$x)
   yname=as.character(model$call$formula[[2]])
-  model$call$formula=as.formula(paste(yname,"~0+."))
   names(model$call$data)[1]=yname
+  
+  call_char=as.character(model$call$formula[[3]])
+  ffst_id=grep("offset\\(",call_char)
+  if(length(ffst_id)>0){
+    ffst=paste0(call_char[ffst_id],"+") 
+    model$call$data=cbind(model$call$data,model.offset(model.frame(model)))
+    names(model$call$data)[ncol(model$call$data)]=
+      as.character(model$call$formula[[3]][[ffst_id]])[2]
+  } else{
+    ffst=""
+  }
+
+  model$call$formula=as.formula(paste(yname,"~0+",ffst,paste(colnames(model$x),collapse =" + ")))
   model_i <-update(model)
-  compute_scores(model0 = model_i,model1 = model$x[,i,drop=FALSE],score_type=score_type)
+  compute_scores(model0 = model_i,model1 = tested_X,score_type=score_type)
 }
 
 get_X <- function(model0,model1){
