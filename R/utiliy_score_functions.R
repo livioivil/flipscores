@@ -63,8 +63,8 @@ socket_compute_scores <- function(i,model,exclude=NULL,score_type){
   #   ffst=""
   # }
 
-  frml=update(as.formula(model$call$formula), ~. -.)
-  frml=update(frml, as.formula(paste(yname,"~0+",paste(colnames(model$x),collapse =" + "))))
+  # frml=update(as.formula(model$call$formula), ~. -.)
+  frml=update(as.formula(model$call$formula), as.formula(paste(yname,"~0+",paste(colnames(model$x),collapse =" + "))))
   model$call$formula=as.formula(frml)
   model$call$formula=update( model$call$formula,as.formula(paste("~.-",colnames(model$x)[i])))
   model_i <-update(model)

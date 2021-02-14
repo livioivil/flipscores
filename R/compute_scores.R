@@ -18,8 +18,8 @@
 #' (scr0=compute_scores(model0 = mod0, model1 = X, score_type = "effective"))
 #' @export
 
-compute_scores <- function(model0, model1,score_type="orthogonalized"){
-  score_type=match.arg(score_type,c("orthogonalized","effective","basic"))
+compute_scores <- function(model0, model1,score_type="effective"){
+  score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
   X=get_X(model0,model1)
   if(!is.null(model0))
   {id_model1=if(is.list(model1)) eval(model1$id) 
@@ -50,7 +50,19 @@ compute_scores <- function(model0, model1,score_type="orthogonalized"){
         (t(X)%*%OneMinusH*(residuals)))
       
     } else
-      #ORTHO EFFECTIVE SCORE
+      ##  EFFECTIVE SCORE standardized
+      if(score_type=="standardized"){
+        OneMinusH=(diag(nrow(Z))-W%*%Z%*%solve(t(Z*diag(W))%*%Z)%*%t(Z))
+        scores=as.vector(
+          (t(X)%*%OneMinusH*(residuals)))
+        var_obs=(t(X)%*%OneMinusH%*%W%*%t(OneMinusH)%*%X)[,]
+        e_var_flp=(t(X)%*%OneMinusH%*%diag(diag(OneMinusH%*%W%*%t(OneMinusH)))%*%t(OneMinusH)%*%X)[,]
+        scale_flp=sqrt(var_obs/e_var_flp)
+        attr(scores,"scale_flp")=scale_flp
+        scale_objects=list(a=t(t(X)%*%OneMinusH), B=OneMinusH%*%W%*%t(OneMinusH))
+        attr(scores,"scale_objects")=scale_objects
+      } else
+        #ORTHO EFFECTIVE SCORE
       if(score_type=="orthogonalized"){
         sqrtW=diag(sqrt(diag(W)))
         # OneMinusHtilde_0=(diag(n)-sqrtW%*%Z%*%solve(t(Z*diag(W))%*%Z)%*%t(Z)%*%sqrtW)

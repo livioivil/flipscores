@@ -63,7 +63,7 @@ flipscores<-function(formula, family, data,
     if (alternative == "greater" | alternative == "larger") {alternative = 1}}
   else alternative=0
 
-  score_type=match.arg(score_type,c("orthogonalized","effective","basic"))
+  score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
   if(missing(score_type))
     stop("test type is not specified or recognized")
 

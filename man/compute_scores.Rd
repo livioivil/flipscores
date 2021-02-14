@@ -4,7 +4,7 @@
 \alias{compute_scores}
 \title{compute_scores}
 \usage{
-compute_scores(model0, model1, score_type = "orthogonalized")
+compute_scores(model0, model1, score_type = "effective")
 }
 \arguments{
 \item{model0}{a \code{glm} object with the model under the null hypothesis (i.e. the covariates, the nuisance parameters).}
