@@ -30,8 +30,15 @@ compute_scores <- function(model0, model1,score_type="effective"){
   rm(model1)
   a <- get_a_expo_fam(model0)
   ###############
-  if(is.null(model0$x)||is.null(ncol(model0$x))) 
-    model0=update(model0,x=TRUE)
+  if(is.null(model0$x)||is.null(ncol(model0$x))) {
+    # model0=update(model0,x=TRUE)
+    call <- getCall(model0)
+    call$x=TRUE
+    term <- terms(model0)
+    env <- attr(term, ".Environment")
+    model0=eval(call, env, parent.frame())
+  }
+
   
   if(ncol(model0$x)==0) return(model0$y)
   Z=model0$x
