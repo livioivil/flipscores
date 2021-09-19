@@ -1,3 +1,42 @@
+.score_std=function(scr_eff,flp) {
+  # scr_eff #è un vettore
+  numeratore=t(scr_eff)%*%flp
+  aflp= attributes(scr_eff)$scale_objects$a * flp
+  denominatore= sqrt(t(aflp)  %*% attributes(scr_eff)$scale_objects$B %*% aflp)
+  numeratore/denominatore
+}
+#################
+.flip_test<- function(Y,score_type="standardized",alternative="two.sided",
+                      n_flips=1000,seed=NULL,
+                      statTest="sum"){
+  
+  
+  if(score_type=="standardized"){
+    n=length(Y)
+    Tobs=  .score_std(Y,rep(1,n))
+    set.seed(seed)
+    Tspace=data.frame(as.vector(c(Tobs,replicate(n_flips,{
+                   flp=1-2*rbinom(n,1,.5)
+                   .score_std(Y,flp)
+                 }))))
+    if(alternative=="two.sided") Tspace=abs(Tspace) else
+      if(alternative=="less") Tspace=-Tspace
+    p.values=flip::t2p(Tspace,obs.only = TRUE,tail=1)
+    # named vector?
+    
+    out=list(Tspace=Tspace,p.values=p.values)
+    
+  } else {# non standardized per ora dà errore
+    results=flip::flip(Y,tail=alternative,perms = n_flips,statTest = "sum",testType = "symmetry")
+    out=list(Tspace=results@permT,
+             p.values=results@res$`p-value`)
+    
+  }
+  names(out$p.values)=names(Y)
+  return(out)
+}
+
+#################################
 mahalanobis_npc <- function(permT){
   if(ncol(permT)==0) return(rep(0,nrow(permT)))
   dimnames(permT)=NULL
@@ -23,24 +62,12 @@ mahalanobis_npc_multi <- function(ids_list,permT){
 
 
 # i and exclude are indices of the columns of model.frame x
-socket_compute_scores <- function(i,model,exclude=NULL,score_type){
-  
-  # D$grp=factor(rbinom(nrow(D),2,.5))
-  # terms = attr(terms.formula(model$call$formula), "term.labels")
-  # terms(model)
-  # model.frame(model)
-  # model$call$formula=update(as.formula(model$call$formula), ~. -grp1)
-  # model_i <-eval(parse(text="update(model)"),parent.frame())
-  # NON funziona per le factor mi pare
-  # frml=update(as.formula(model$call$formula), ~. -.)
-  # frml=update(frml, ~.+v1+v2)
-  # model$call$formula=frml
-  # update(model)
-  # model_i <-eval(parse(text="update(model)"),parent.frame())
-  # model$data=eval(parse(text="D"),parent.frame())
-  # update(model)
+socket_compute_scores_and_flip <- function(i,model,exclude=NULL,flip_param_call#score_type,id,n_flips,
+                                           # alternative="two-sided",seed=NULL
+                                           ){
   
   model$x=model.matrix(model)
+  if(is.character(i)) i=which(colnames(model$x)==i)
   #to avoid re-run a flipscores everytime:
   attributes(model)$class= attributes(model)$class[attributes(model)$class!="flipscores"]
   tested_X=model$x[, i, drop = FALSE]
@@ -52,23 +79,33 @@ socket_compute_scores <- function(i,model,exclude=NULL,score_type){
   yname=as.character(model$call$formula[[2]])
   names(model$call$data)[1]=yname
   
-  # call_char=as.character(model$call$formula[[3]])
-  # ffst_id=grep("offset\\(",call_char)
-  # if(length(ffst_id)>0){
-  #   ffst=paste0(call_char[ffst_id],"+") 
-  #   model$call$data=cbind(model$call$data,model.offset(model.frame(model)))
-  #   names(model$call$data)[ncol(model$call$data)]=
-  #     as.character(model$call$formula[[3]][[ffst_id]])[2]
-  # } else{
-  #   ffst=""
-  # }
-
-  # frml=update(as.formula(model$call$formula), ~. -.)
   frml=update(as.formula(model$call$formula), as.formula(paste(yname,"~0+",paste(colnames(model$x),collapse =" + "))))
   model$call$formula=as.formula(frml)
   model$call$formula=update( model$call$formula,as.formula(paste("~.-",colnames(model$x)[i])))
   model_i <-update(model)
-  compute_scores(model0 = model_i,model1 = tested_X,score_type=score_type)
+  scores=compute_scores(model0 = model_i,model1 = tested_X,score_type=flip_param_call$score_type)
+  
+  ############### fit the H1 model and append the scores (refitted under H0s)
+  
+  ###############################
+  ## compute flips
+  
+  ### TODO RENDERE PIù AGILE INPUT DI id (es formula se possibile?) 
+  # + quality check
+  if(!is.null(flip_param_call$id)&&(score_type%in%c("effective"))) #"standardized"
+    scores=lapply(scores,rowsum,id)
+  # scores=as.matrix(unlist(scores[,]))
+  
+  #  call to flip::flip()
+  flip_param_call$Y=scores
+  
+  results=eval(flip_param_call, parent.frame())
+  # results=.flip_test(Y=scores,score_type=score_type,
+                     # alternative=alternative,n_flips=n_flips,
+                     # seed=seed,
+                     # statTest="sum")
+  results$scores=scores
+  results
 }
 
 get_X <- function(model0,model1){

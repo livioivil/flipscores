@@ -12,6 +12,7 @@
 #'
 #' @param id a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. If \code{id} is not \code{NULL}, only \code{score_type=="effective"} is allowed, yet.
 #' @param alternative It can be "greater", "less" or "two.sided" (default)
+#' @param seed \code{NULL} by deafult. 
 #' @param formula see \code{glm} function.
 #' @param family see \code{glm} function.
 #' @param data see \code{glm} function.
@@ -50,7 +51,8 @@ flipscores<-function(formula, family, data,
                          score_type,
                          n_flips=5000, 
                          alternative ="two.sided", 
-                         id = NULL, 
+                         id = NULL,
+                         seed=NULL,
                          ...){
   # if(FALSE) flip() #just a trick to avoid warnings in package building
   # temp=is(formula) #just a trick to avoid warnings in package building
@@ -69,10 +71,21 @@ flipscores<-function(formula, family, data,
 
   
   # individuo i parametri specifici di flip score
-  m <- match(c("score_type","n_flips","alternative","id"), names(mf), 0L)
+  m <- match(c("score_type","n_flips","alternative","id","seed"), names(mf), 0L)
   m <- m[m>0]
   flip_param_call= mf[c(1L,m)]
-
+  
+  # rinomino la funzione da chiamare:
+  flip_param_call[[1L]]=quote(flipscores:::.flip_test)
+  
+  m2 <- match(c("to_be_tested"), names(mf), 0L)
+  if(m2==0)
+    to_be_tested=NULL
+  else{
+    m <- c(m,m2)
+    to_be_tested=mf[[m2]]
+    }
+  
   #####check id not null only with effective score:
   if(!is.null(flip_param_call$id)&&(score_type!="effective")){
     print(warning("WARNING: Use of id is allowed only with score_type=='effective', yet. 
@@ -82,10 +95,7 @@ flipscores<-function(formula, family, data,
     
   
   
-  #rinomino la funzione da chiamare:
-  flip_param_call[[1L]]=quote(flip::flip)
-  names(flip_param_call)[names(flip_param_call)=="alternative"]="tail"
-  names(flip_param_call)[names(flip_param_call)=="n_flips"]="perms"
+  
   
   # mi tengo solo quelli buoni per glm
   if(length(m)>0) mf <- mf[-m]
@@ -105,30 +115,26 @@ flipscores<-function(formula, family, data,
   
   
   #compute H0s models
-  model$scores=sapply(1:ncol(model$x),socket_compute_scores,model,score_type=score_type)
-  colnames(model$scores)=colnames(model$x)
-  
-  ############### fit the H1 model and append the scores (refitted under H0s)
-  
-  ###############################
-  ## compute flips
-  
-  ### TODO RENDERE PIù AGILE INPUT DI id (es formula se possibile?) 
-  # + quality check
-  if(!is.null(flip_param_call$id)&&(score_type=="effective"))
-    model$scores=rowsum(model$scores,eval(flip_param_call$id, parent.frame()))
-  
-  #  call to flip::flip()
-  flip_param_call$Y=model$scores
-  flip_param_call$statTest = "sum"
-  # require(flip)
-  results=eval(flip_param_call, parent.frame())
+  if(is.null(to_be_tested))
+    to_be_tested=1:ncol(model$x)
+
+    if(is.null(flip_param_call$seed)) flip_param_call$seed=.Random.seed[1]
+  results=lapply(to_be_tested,socket_compute_scores_and_flip,
+                      model,
+                      flip_param_call=flip_param_call#score_type=score_type,
+                      # id=eval(flip_param_call$id, parent.frame()),
+                      # alternative=flip_param_call$alternative,
+                      # n_flips=flip_param_call$n_flips,
+                      # seed=flip_param_call$seed
+                      )
+  model$scores=data.frame(lapply(results,function(x)x$scores))
+  model$Tspace=data.frame(lapply(results,function(x)x$Tspace))
+  model$p.values=sapply(results,function(x)x$p.values)
+  names(model$scores)<- names(model$Tspace) <- names(model$p.values) <- colnames(model$x)[to_be_tested]
   
   ### output
   model$call=fs_call
   model$id=flip_param_call$id
-  model$Tspace=results@permT
-  model$p.values=results@res$`p-value`
   model$score_type=score_type
   model$n_flips=n_flips
 

@@ -48,25 +48,25 @@ compute_scores <- function(model0, model1,score_type="effective"){
 
   #BASIC SCORE
   if(score_type=="basic"){
-    scores=as.vector(X*(residuals))
+    scores=(X*(residuals))
   } else
     ##  EFFECTIVE SCORE
     if(score_type=="effective"){
       OneMinusH=(diag(nrow(Z))-W%*%Z%*%solve(t(Z*diag(W))%*%Z)%*%t(Z))
-      scores=as.vector(
-        (t(X)%*%OneMinusH*(residuals)))
+      scores=(OneMinusH%*%X)*residuals
       
     } else
-      ##  EFFECTIVE SCORE standardized
+      ##   SCORE standardized
       if(score_type=="standardized"){
         OneMinusH=(diag(nrow(Z))-W%*%Z%*%solve(t(Z*diag(W))%*%Z)%*%t(Z))
-        scores=as.vector(
-          (t(X)%*%OneMinusH*(residuals)))
-        var_obs=(t(X)%*%OneMinusH%*%W%*%t(OneMinusH)%*%X)[,]
-        e_var_flp=(t(X)%*%OneMinusH%*%diag(diag(OneMinusH%*%W%*%t(OneMinusH)))%*%t(OneMinusH)%*%X)[,]
-        scale_flp=sqrt(var_obs/e_var_flp)
-        attr(scores,"scale_flp")=scale_flp
-        scale_objects=list(a=t(t(X)%*%OneMinusH), B=OneMinusH%*%W%*%t(OneMinusH))
+        a=t(OneMinusH)%*%X
+        B=OneMinusH%*%W%*%t(OneMinusH)
+        scores=a*(residuals)
+        var_obs=(t(a)%*%W%*%a)[,]
+        e_var_flp=(t(a)%*%diag(diag(B))%*%a)[,]
+        scale_obs=sqrt(var_obs/e_var_flp)
+        attr(scores,"scale_obs")=scale_obs
+        scale_objects=list(a=a, B=B)
         attr(scores,"scale_objects")=scale_objects
       } else
         #ORTHO EFFECTIVE SCORE
@@ -79,16 +79,16 @@ compute_scores <- function(model0, model1,score_type="effective"){
         
         deco$d[deco$d<1E-12]=0
         scores=
-          as.vector(t(t(X)%*%OneMinusH%*%deco$u)*
+          (t(t(X)%*%OneMinusH%*%deco$u)*
           (t(deco$u)%*%(residuals)))
         
       }
   
-  if(!is.null(model0$id)){
-    scores=rowsum(scores,eval(model0$id)) 
-    } else if(!is.null(id_model1)){
-      scores=rowsum(scores,id_model1)      
-    }
+  # if(!is.null(model0$id)){
+  #   scores=rowsum(scores,eval(model0$id)) 
+  #   } else if(!is.null(id_model1)){
+  #     scores=rowsum(scores,id_model1)      
+  #   }
   
   # mean_adjustment
   # median_adjustment

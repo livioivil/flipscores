@@ -27,6 +27,8 @@ When \code{n_flips} is equal or larger than the maximum number of possible flips
 
 \item{id}{a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. If \code{id} is not \code{NULL}, only \code{score_type=="effective"} is allowed, yet.}
 
+\item{seed}{\code{NULL} by deafult.}
+
 \item{...}{see \code{glm} function.}
 }
 \value{
