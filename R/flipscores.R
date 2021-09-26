@@ -78,6 +78,7 @@ flipscores<-function(formula, family, data,
   # rinomino la funzione da chiamare:
   flip_param_call[[1L]]=quote(flipscores:::.flip_test)
   
+  flip_param_call$n_flips <- eval(flip_param_call$n_flips, parent.frame())
   m2 <- match(c("to_be_tested"), names(mf), 0L)
   if(m2==0)
     to_be_tested=NULL
@@ -128,7 +129,7 @@ flipscores<-function(formula, family, data,
                       # seed=flip_param_call$seed
                       )
   model$scores=data.frame(lapply(results,function(x)x$scores))
-  model$Tspace=data.frame(lapply(results,function(x)x$Tspace))
+  model$Tspace=data.frame(lapply(results,function(x)x$Tspace)) 
   model$p.values=sapply(results,function(x)x$p.values)
   names(model$scores)<- names(model$Tspace) <- names(model$p.values) <- colnames(model$x)[to_be_tested]
   

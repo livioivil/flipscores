@@ -1,9 +1,18 @@
+# for standardized:
 .score_std=function(scr_eff,flp) {
   # scr_eff #è un vettore
   numeratore=t(scr_eff)%*%flp
   aflp= attributes(scr_eff)$scale_objects$a * flp
   denominatore= sqrt(t(aflp)  %*% attributes(scr_eff)$scale_objects$B %*% aflp)
-  numeratore/denominatore
+  numeratore/denominatore/attributes(scr_eff)$sd_e
+}
+
+#for effective and others:
+.sum2t <- function(stat,sumY2,n){
+  # sumY2=sum(Y^2,na.rm = TRUE)
+  # n=sum(!is.na(Y))
+  stat=stat/(sqrt((sumY2-(stat^2)/n)*(n/(n-1))))
+  stat
 }
 #################
 .flip_test<- function(Y,score_type="standardized",alternative="two.sided",
@@ -28,7 +37,7 @@
     
   } else {# non standardized per ora dà errore
     results=flip::flip(Y,tail=alternative,perms = n_flips,statTest = "sum",testType = "symmetry")
-    out=list(Tspace=results@permT,
+    out=list(Tspace=.sum2t(results@permT,sumY2 = sum(Y^2,na.rm = TRUE),n=sum(!is.na(Y))),
              p.values=results@res$`p-value`)
     
   }

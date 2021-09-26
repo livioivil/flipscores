@@ -64,8 +64,8 @@ compute_scores <- function(model0, model1,score_type="effective"){
         scores=a*(residuals)
         var_obs=(t(a)%*%W%*%a)[,]
         e_var_flp=(t(a)%*%diag(diag(B))%*%a)[,]
-        scale_obs=sqrt(var_obs/e_var_flp)
-        attr(scores,"scale_obs")=scale_obs
+        attr(scores,"sd_obs")=sqrt(var_obs)
+        attr(scores,"sd_e")=sqrt(e_var_flp)
         scale_objects=list(a=a, B=B)
         attr(scores,"scale_objects")=scale_objects
       } else
