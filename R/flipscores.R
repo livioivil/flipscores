@@ -79,6 +79,8 @@ flipscores<-function(formula, family, data,
   flip_param_call[[1L]]=quote(flipscores:::.flip_test)
   
   flip_param_call$n_flips <- eval(flip_param_call$n_flips, parent.frame())
+  flip_param_call$score_type <- eval(flip_param_call$score_type, parent.frame())
+  
   m2 <- match(c("to_be_tested"), names(mf), 0L)
   if(m2==0)
     to_be_tested=NULL
