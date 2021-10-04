@@ -19,32 +19,29 @@
                       n_flips=1000,seed=NULL,
                       statTest="sum"){
 
+  if(alternative=="two.sided") ff <- function(Tspace) abs(Tspace) else
+    if(alternative=="less") ff <- function(Tspace) -Tspace else
+      if(alternative=="greater") ff <- function(Tspace) Tspace
+      
+  if(score_type=="standardized") .score_fun <- .score_std
+  if(score_type=="effective") .score_fun <- function(Y,flp) flp%*%Y
   
-  if(score_type=="standardized"){
-    
-    if(alternative=="two.sided") ff <- function(Tspace) abs(Tspace) else
-      if(alternative=="less") ff <- function(Tspace) -Tspace else
-        if(alternative=="greater") ff <- function(Tspace) Tspace
-        
-    n=length(Y)
-    Tobs=  .score_std(Y,rep(1,n))
-    set.seed(seed)
-    Tspace=data.frame(as.vector(c(Tobs,replicate(n_flips-1,{
+  n=length(Y)
+  Tobs=  .score_fun(Y,rep(1,n))
+  set.seed(seed)
+  Tspace=data.frame(as.vector(c(Tobs,replicate(n_flips-1,{
                    flp=1-2*rbinom(n,1,.5)
-                   .score_std(Y,flp)
+                   .score_fun(Y,flp)
                  }))))
-    p.values=flip::t2p(ff(Tspace),obs.only = TRUE,tail=1)
+  if(score_type=="effective")
+    Tspace=.sum2t(Tspace,
+                  sumY2 = sum(Y^2,na.rm = TRUE),
+                  n=sum(!is.na(Y)))
+                  
+  p.values=flip::t2p(ff(Tspace),obs.only = TRUE,tail=1)
     # named vector?
     
-    out=list(Tspace=Tspace,p.values=p.values)
-    
-  } else {# non standardized per ora dà errore
-    if(alternative=="two.sided") tail=0 else
-      if(alternative=="less") tail=-1 else tail = 1
-    results=flip::flip(Y,tail=alternative,perms = n_flips,statTest = "sum",testType = "symmetry")
-    out=list(Tspace=.sum2t(results@permT,sumY2 = sum(Y^2,na.rm = TRUE),n=sum(!is.na(Y))),
-             p.values=results@res$`p-value`)
-  }
+  out=list(Tspace=Tspace,p.values=p.values)
   names(out$p.values)=names(Y)
   return(out)
 }
