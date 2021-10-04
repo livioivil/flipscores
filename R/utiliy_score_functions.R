@@ -14,6 +14,10 @@
   stat=stat/sqrt((sumY2-(stat^2)/n)*(n/(n-1)))
   stat
 }
+
+t2p  <- function(pvls){
+  mean(as.vector(pvls)>=pvls[1])
+}
 #################
 .flip_test<- function(Y,score_type="standardized",alternative="two.sided",
                       n_flips=1000,seed=NULL,
@@ -33,12 +37,13 @@
                    flp=1-2*rbinom(n,1,.5)
                    .score_fun(Y,flp)
                  }))))
+  set.seed(NULL)
   if(score_type=="effective")
     Tspace=.sum2t(Tspace,
                   sumY2 = sum(Y^2,na.rm = TRUE),
                   n=sum(!is.na(Y)))
                   
-  p.values=flip::t2p(ff(Tspace),obs.only = TRUE,tail=1)
+  p.values=t2p(ff(unlist(Tspace)))
     # named vector?
     
   out=list(Tspace=Tspace,p.values=p.values)
