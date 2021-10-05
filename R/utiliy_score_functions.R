@@ -8,6 +8,9 @@
 }
 
 #for effective and others:
+.score <- function(Y,flp) flp%*%Y
+
+#transform sum stat into t stat
 .sum2t <- function(stat,sumY2,n){
   # sumY2=sum(Y^2,na.rm = TRUE)
   # n=sum(!is.na(Y))
@@ -15,6 +18,7 @@
   stat
 }
 
+#### compute p-value
 t2p  <- function(pvls){
   mean(as.vector(pvls)>=pvls[1])
 }
@@ -27,8 +31,8 @@ t2p  <- function(pvls){
     if(alternative=="less") ff <- function(Tspace) -Tspace else
       if(alternative=="greater") ff <- function(Tspace) Tspace
       
-  if(score_type=="standardized") .score_fun <- .score_std
-  if(score_type=="effective") .score_fun <- function(Y,flp) flp%*%Y
+  if(score_type=="standardized") .score_fun <- .score_std else
+       .score_fun <- .score
   
   n=length(Y)
   Tobs=  .score_fun(Y,rep(1,n))
