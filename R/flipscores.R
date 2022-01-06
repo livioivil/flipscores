@@ -12,7 +12,7 @@
 #'
 #' @param id a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. If \code{id} is not \code{NULL}, only \code{score_type=="effective"} is allowed, yet.
 #' @param alternative It can be "greater", "less" or "two.sided" (default)
-#' @param seed \code{NULL} by deafult. 
+#' @param seed \code{NULL} by default. 
 #' @param formula see \code{glm} function.
 #' @param family see \code{glm} function.
 #' @param data see \code{glm} function.
@@ -28,7 +28,7 @@
 #' @details \code{flipscores} borrow the same parameters from function \code{glm} (and \code{glm.nb}). See these helps for more details about parameters such as \code{formula},
 #' \code{data}, \code{family}. Note: in order to use Negative Binomial family, \code{family} reference must have quotes (i.e. \code{family="negbinom"}). 
 #'
-#' @author Livio Finos, Vittorio Giatti, Jesse Hemerik and Jelle Goeman
+#' @author Livio Finos, Riccardo De Santis, Vittorio Giatti, Jesse Hemerik and Jelle Goeman
 #'
 #' @seealso \code{\link{anova.flipscores}}, \code{\link{summary.flipscores}}, \code{\link[flip]{flip}}
 #'
@@ -59,12 +59,6 @@ flipscores<-function(formula, family, data,
   # catturo la call,
   fs_call <- mf <- match.call()
 
-  if(match(c("alternative"), names(call), 0L)){
-    if (alternative == "less" | alternative == "smaller") {alternative = -1}
-    if (alternative == "two.sided") {alternative = 0}
-    if (alternative == "greater" | alternative == "larger") {alternative = 1}}
-  else alternative=0
-
   score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
   if(missing(score_type))
     stop("test type is not specified or recognized")
@@ -78,8 +72,8 @@ flipscores<-function(formula, family, data,
   # rinomino la funzione da chiamare:
   flip_param_call[[1L]]=quote(flipscores:::.flip_test)
   
-  flip_param_call$n_flips <- eval(flip_param_call$n_flips, parent.frame())
-  flip_param_call$score_type <- eval(flip_param_call$score_type, parent.frame())
+  flip_param_call$n_flips <- eval(flip_param_call$n_flips, parent.frame()) ###useless
+  flip_param_call$score_type <- eval(flip_param_call$score_type, parent.frame()) ###useless
   
   m2 <- match(c("to_be_tested"), names(mf), 0L)
   if(m2==0)
@@ -92,7 +86,7 @@ flipscores<-function(formula, family, data,
   #####check id not null only with effective score:
   if(!is.null(flip_param_call$id)&&(score_type!="effective")){
     print(warning("WARNING: Use of id is allowed only with score_type=='effective', yet. 
- Nothoing done."))
+ Nothing done."))
     return(NULL)
   }
     
@@ -101,7 +95,7 @@ flipscores<-function(formula, family, data,
   
   
   # mi tengo solo quelli buoni per glm
-  if(length(m)>0) mf <- mf[-m]
+  if(length(m)>0) mf <- mf[-m] 
   
   param_x_ORIGINAL=mf$x
   #set the model to fit
@@ -115,8 +109,7 @@ flipscores<-function(formula, family, data,
   #compute H1 model
   mf$x=TRUE
   model <- eval(mf, parent.frame())
-  
-  
+
   #compute H0s models
   if(is.null(to_be_tested))
     to_be_tested=1:ncol(model$x)
@@ -143,7 +136,6 @@ flipscores<-function(formula, family, data,
 
   
   if(is.null(param_x_ORIGINAL)||(!param_x_ORIGINAL)) model$x=NULL
-  # class(model) <- 
   class(model) <- c("flipscores", class(model))
   return(model)
 }
