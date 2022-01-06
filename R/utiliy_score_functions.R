@@ -1,6 +1,6 @@
 # for standardized:
 .score_std=function(scr_eff,flp) {
-  # scr_eff #è un vettore
+  # scr_eff # un vettore
   numeratore=t(scr_eff)%*%flp
   aflp= attributes(scr_eff)$scale_objects$a * flp
   denominatore= sqrt(t(aflp)  %*% attributes(scr_eff)$scale_objects$B %*% aflp)
@@ -24,35 +24,35 @@ t2p  <- function(pvls){
 }
 #################
 .flip_test<- function(Y,score_type="standardized",alternative="two.sided",
-                      n_flips=1000,seed=NULL,
+                      n_flips=5000,seed=NULL,
                       statTest="sum"){
-
+  
   if(alternative=="two.sided") ff <- function(Tspace) abs(Tspace) else
     if(alternative=="less") ff <- function(Tspace) -Tspace else
       if(alternative=="greater") ff <- function(Tspace) Tspace
       
-  if(score_type=="standardized") .score_fun <- .score_std else
-       .score_fun <- .score
-  
-  n=length(Y)
-  Tobs=  .score_fun(Y,rep(1,n))
-  set.seed(seed)
-  Tspace=data.frame(as.vector(c(Tobs,replicate(n_flips-1,{
-                   flp=1-2*rbinom(n,1,.5)
-                   .score_fun(Y,flp)
-                 }))))
-  set.seed(NULL)
-  if(score_type=="effective")
-    Tspace=.sum2t(Tspace,
-                  sumY2 = sum(Y^2,na.rm = TRUE),
-                  n=sum(!is.na(Y)))
-                  
-  p.values=t2p(ff(unlist(Tspace)))
-    # named vector?
-    
-  out=list(Tspace=Tspace,p.values=p.values)
-  names(out$p.values)=names(Y)
-  return(out)
+      if(score_type=="standardized") .score_fun <- .score_std else
+        .score_fun <- .score
+      
+      n=length(Y)
+      Tobs=  .score_fun(Y,rep(1,n))
+      set.seed(seed)
+      Tspace=data.frame(as.vector(c(Tobs,replicate(n_flips-1,{
+        flp<-sample(c(-1,1),n, replace = T)
+        .score_fun(Y,flp)
+      }))))
+      set.seed(NULL)
+      if(score_type=="effective"||score_type=="orthogonalized") 
+        Tspace=.sum2t(Tspace,
+                      sumY2 = sum(Y^2,na.rm = TRUE),
+                      n=sum(!is.na(Y)))
+      
+      p.values=t2p(ff(unlist(Tspace)))
+      # named vector?
+      
+      out=list(Tspace=Tspace,p.values=p.values)
+      names(out$p.values)=names(Y)
+      return(out)
 }
 
 #################################
@@ -83,9 +83,7 @@ mahalanobis_npc_multi <- function(ids_list,permT){
 # i and exclude are indices of the columns of model.frame x
 socket_compute_scores_and_flip <- function(i,model,exclude=NULL,flip_param_call#score_type,id,n_flips,
                                            # alternative="two-sided",seed=NULL
-                                           ){
-  
-  model$x=model.matrix(model)
+){model$x=model.matrix(model)
   if(is.character(i)) i=which(colnames(model$x)==i)
   #to avoid re-run a flipscores everytime:
   attributes(model)$class= attributes(model)$class[attributes(model)$class!="flipscores"]
@@ -101,6 +99,10 @@ socket_compute_scores_and_flip <- function(i,model,exclude=NULL,flip_param_call#
   frml=update(as.formula(model$call$formula), as.formula(paste(yname,"~0+",paste(colnames(model$x),collapse =" + "))))
   model$call$formula=as.formula(frml)
   model$call$formula=update( model$call$formula,as.formula(paste("~.-",colnames(model$x)[i])))
+  if(!is.null(model$offset)){
+    offs<-model$offset
+    model$call$formula=update( model$call$formula,as.formula(paste("~.+offset(offs)")))
+  }
   model_i <-update(model)
   scores=compute_scores(model0 = model_i,model1 = tested_X,score_type=flip_param_call$score_type)
   
@@ -109,7 +111,7 @@ socket_compute_scores_and_flip <- function(i,model,exclude=NULL,flip_param_call#
   ###############################
   ## compute flips
   
-  ### TODO RENDERE PIù AGILE INPUT DI id (es formula se possibile?) 
+  ### TODO RENDERE PI AGILE INPUT DI id (es formula se possibile?) 
   # + quality check
   if(!is.null(flip_param_call$id)&&(score_type%in%c("effective"))) #"standardized"
     scores=lapply(scores,rowsum,id)
@@ -120,9 +122,9 @@ socket_compute_scores_and_flip <- function(i,model,exclude=NULL,flip_param_call#
   
   results=eval(flip_param_call, parent.frame())
   # results=.flip_test(Y=scores,score_type=score_type,
-                     # alternative=alternative,n_flips=n_flips,
-                     # seed=seed,
-                     # statTest="sum")
+  # alternative=alternative,n_flips=n_flips,
+  # seed=seed,
+  # statTest="sum")
   results$scores=scores
   results
 }
@@ -133,25 +135,28 @@ get_X <- function(model0,model1){
     vars1=colnames(mm)
     vars0=colnames(model.matrix(model0))
     model1=mm[,setdiff(vars1,vars0),drop=FALSE]
-  } else if(!is.matrix(model1)) 
+  } else if(!is.matrix(model1))
     model1=as.matrix(model1)
   # else is already a matrix
   model1
 }
-######### get the a scaling value of glm model (for compute_scores)
+######### get the matrices D, V of glm model (for compute_scores) and also dispersion parameter
 
-get_a_expo_fam <- function(model0){
+get_par_expo_fam <- function(model0){
   if(("lm"%in%class(model0))&(!("glm"%in%class(model0)))){
-    return(1)
+    Dhat<-diag(1, length(model0$y))
+    Vhat<-diag(1, length(model0$y))
+    a <- c(1, length(model0$y))
+    return(list(a=a, D=Dhat, V=Vhat))
   } else if(("glm"%in%class(model0))){
     
-    #The following lines for obtaining 'a' are taken from the mdscore package on CRAN
+    #The following lines are taken from the mdscore package on CRAN
     #by Antonio Hermes M. da Silva-Junior, Damiao N. da Silva and Silvia L. P. Ferrari
     
     # in response scale:
     mu.est <- model0$fitted.values
     eta.est <- model0$family$linkfun(mu.est)
-    V <- if(model0$family[[1]] == "gaussian") quote(1) 
+    V <- if(model0$family[[1]] == "gaussian") quote(1)
     else as.list(model0$family$variance)[[2]]
     
     if(model0$family[[2]] %in% c("log", "cloglog", "logit")){
@@ -161,9 +166,17 @@ get_a_expo_fam <- function(model0){
                    logit   = quote(exp(eta)/(1 + exp(eta))))
     }else mu <- as.list(model0$family$linkinv)[[2]]
     
-    Dmu <- D(mu,"eta")
-    a <- eval(V, list(mu= mu.est,.Theta=model0$theta)) / eval(Dmu, list(eta= eta.est))
-    return(a)
+    if(model0$family[[2]] %in% c("probit","cauchit")){
+      Dmu <- switch(model0$family[[2]],
+                    probit  = quote(exp(-eta^2/2)/sqrt(2*pi)),
+                    cauchit = quote(1/(pi*(1+eta^2)))) 
+    } else{
+      Dmu <- D(mu,"eta")
+    }
+    Dhat<-diag(eval(Dmu, list(eta= eta.est)), length(mu.est))
+    Vhat<-diag(eval(V, list(mu= mu.est,.Theta=model0$theta)), length(mu.est))
+    a <- diag(Vhat) / diag(Dhat)
+    return(list(a=a, D=Dhat, V=Vhat))
     
     # } else if(("glm"%in%class(model0))&&("negbin"%in%class(model0))){
     #   
@@ -176,6 +189,9 @@ get_a_expo_fam <- function(model0){
     #   a <- eval(V, list(mu= mu.est,.Theta=model0$theta)) / eval(Dmu, list(eta= eta.est))
     #   return(a)
     #   
-  } else { warning("Class of the model not detected, scale parameter is set to 1.")
-    return(1)}
+  } else { warning("Class of the model not detected, canonical link is assumed.")
+    Dhat<-diag(1, length(model0$y))
+    Vhat<-diag(1, length(model0$y))
+    a <- c(1, length(model0$y))
+    return(list(a=a, D=Dhat, V=Vhat))}
 }
