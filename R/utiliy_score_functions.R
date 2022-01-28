@@ -3,8 +3,8 @@
   # scr_eff # un vettore
   numeratore=t(scr_eff)%*%flp
   aflp= attributes(scr_eff)$scale_objects$a * flp
-  denominatore= sqrt(t(aflp)  %*% attributes(scr_eff)$scale_objects$B %*% aflp)
-  numeratore/denominatore/attributes(scr_eff)$sd_e
+  denominatore= sqrt((t(aflp)  %*% attributes(scr_eff)$scale_objects$B %*% aflp)/length(scr_eff))
+  numeratore/denominatore
 }
 
 #for effective and others:
@@ -31,6 +31,7 @@ t2p  <- function(pvls){
     if(alternative=="less") ff <- function(Tspace) -Tspace else
       if(alternative=="greater") ff <- function(Tspace) Tspace
       
+      score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
       if(score_type=="standardized") .score_fun <- .score_std else
         .score_fun <- .score
       
