@@ -52,24 +52,19 @@ compute_scores <- function(model0, model1,score_type){
   
   #BASIC SCORE
   if(score_type=="basic"){
-    scores=t(t(X)%*%D%*%(invV))*residuals*(1/length(model0$y))
+    scores=t(t(X)%*%D%*%(invV))*residuals*(1/length(model0$y)**0.5)
   } else
     ##  EFFECTIVE SCORE
     if(score_type=="effective"){
       OneMinusH=(diag(nrow(Z))-(W**0.5)%*%Z%*%solve(t(Z)%*%W%*%Z)%*%t(Z)%*%(W**0.5))
-      scores=t(t(X)%*%(W**0.5)%*%(OneMinusH))*((invV**0.5)%*%residuals)*(1/length(model0$y))
-      
+      scores=t(t(X)%*%(W**0.5)%*%(OneMinusH))*((invV**0.5)%*%residuals)*(1/length(model0$y)**0.5)
     } else
       ##   SCORE standardized
       if(score_type=="standardized"){
-        OneMinusH=(diag(nrow(Z))-W%*%Z%*%solve(t(Z*diag(W))%*%Z)%*%t(Z))
-        a=t(OneMinusH)%*%X
-        B=OneMinusH%*%W%*%t(OneMinusH)
-        scores=a*(residuals)
-        var_obs=(t(a)%*%W%*%a)[,]
-        e_var_flp=(t(a)%*%diag(diag(B))%*%a)[,]
-        attr(scores,"sd_obs")=sqrt(var_obs)
-        attr(scores,"sd_e")=sqrt(e_var_flp)
+        OneMinusH=(diag(nrow(Z))-(W**0.5)%*%Z%*%solve(t(Z)%*%W%*%Z)%*%t(Z)%*%(W**0.5))
+        a=OneMinusH%*%(W**0.5)%*%X
+        B=OneMinusH
+        scores=t(t(X)%*%(W**0.5)%*%(OneMinusH))*((invV**0.5)%*%residuals)*(1/length(model0$y)**0.5)
         scale_objects=list(a=a, B=B)
         attr(scores,"scale_objects")=scale_objects
       } else
@@ -79,7 +74,7 @@ compute_scores <- function(model0, model1,score_type){
         OneMinusH=(diag(nrow(Z))-(W**0.5)%*%Z%*%solve(t(Z)%*%W%*%Z)%*%t(Z)%*%(W**0.5))
         deco=svd((V^0.5)%*%OneMinusH,nv = 0)
         deco$d[deco$d<1E-12]=0
-        scores=t(t(X)%*%sqrtW%*%OneMinusH%*%(invV**0.5)%*%deco$u)*(t(deco$u)%*%residuals)*(1/length(model0$y))
+        scores=t(t(X)%*%sqrtW%*%OneMinusH%*%(invV**0.5)%*%deco$u)*(t(deco$u)%*%residuals)*(1/length(model0$y)**0.5)
   }
   return(scores)
 }
