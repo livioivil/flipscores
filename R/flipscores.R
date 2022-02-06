@@ -16,6 +16,8 @@
 #' @param formula see \code{glm} function.
 #' @param family see \code{glm} function.
 #' @param data see \code{glm} function.
+#' @param model can be a model (e.g. \code{lm} or \code{glm}). In this case other parameters used to fit a \code{glm} 
+#' (i.e. \code{formula}, \code{family}, \code{data}, etc) are not considered.  It is \code{NULL} by default (i.e. not used). 
 #' @param ... see \code{glm} function.
 #' 
 #'
