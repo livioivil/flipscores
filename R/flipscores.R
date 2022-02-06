@@ -43,6 +43,11 @@
 #' dt$Y=rpois(n=20,lambda=exp(dt$Z=="C"))
 #' mod=flipscores(Y~Z+X,data=dt,family="poisson",score_type = "effective")
 #' summary(mod)
+#' 
+#' # Equivalent to:
+#' model=glm(Y~Z+X,data=dt,family="poisson")
+#' mod2=flipscores(model=model,score_type = "effective")
+#' summary(mod2)
 #' @export
 
 
@@ -53,6 +58,7 @@ flipscores<-function(formula, family, data,
                          alternative ="two.sided", 
                          id = NULL,
                          seed=NULL,
+                         model=NULL,
                          ...){
   # if(FALSE) flip() #just a trick to avoid warnings in package building
   # temp=is(formula) #just a trick to avoid warnings in package building
@@ -89,26 +95,33 @@ flipscores<-function(formula, family, data,
  Nothing done."))
     return(NULL)
   }
-    
-  
-  
-  
   
   # mi tengo solo quelli buoni per glm
   if(length(m)>0) mf <- mf[-m] 
   
-  param_x_ORIGINAL=mf$x
-  #set the model to fit
-  if(!is.null(mf$family)&&(mf$family=="negbinom")){
-    mf[[1L]]=quote(glm.nb)
-    mf$family=NULL
+  if("model"%in%names(mf)){
+    #compute H1 model
+    model <- eval(mf$model, parent.frame())
+    if(is.null(model[["x"]])){
+      param_x_ORIGINAL=FALSE
+      model=update(model,x=TRUE)
+      } else param_x_ORIGINAL=TRUE
+    
+  } else { #fit the glm or negbinom model
+    #set the model to fit
+    if(!is.null(mf$family)&&(mf$family=="negbinom")){
+      mf[[1L]]=quote(glm.nb)
+      mf$family=NULL
     } else{
       mf[[1L]]=quote(glm)
     }
+    
+      #compute H1 model
+      param_x_ORIGINAL=mf$x
+      mf$x=TRUE
+      model <- eval(mf, parent.frame())
+  }
   
-  #compute H1 model
-  mf$x=TRUE
-  model <- eval(mf, parent.frame())
 
   #compute H0s models
   if(is.null(to_be_tested))

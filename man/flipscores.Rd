@@ -27,7 +27,7 @@ When \code{n_flips} is equal or larger than the maximum number of possible flips
 
 \item{id}{a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. If \code{id} is not \code{NULL}, only \code{score_type=="effective"} is allowed, yet.}
 
-\item{seed}{\code{NULL} by deafult.}
+\item{seed}{\code{NULL} by default.}
 
 \item{...}{see \code{glm} function.}
 }
@@ -49,6 +49,11 @@ dt=data.frame(X=rnorm(20),
 dt$Y=rpois(n=20,lambda=exp(dt$Z=="C"))
 mod=flipscores(Y~Z+X,data=dt,family="poisson",score_type = "effective")
 summary(mod)
+
+# Equivalent to:
+model=glm(Y~Z+X,data=dt,family="poisson")
+mod2=flipscores(model,score_type = "effective")
+summary(mod2)
 }
 \references{
 "Robust testing in generalized linear models by sign-flipping score contributions" by J.Hemerik, J.Goeman and L.Finos.
@@ -57,5 +62,5 @@ summary(mod)
 \code{\link{anova.flipscores}}, \code{\link{summary.flipscores}}, \code{\link[flip]{flip}}
 }
 \author{
-Livio Finos, Vittorio Giatti, Jesse Hemerik and Jelle Goeman
+Livio Finos, Riccardo De Santis, Vittorio Giatti, Jesse Hemerik and Jelle Goeman
 }
