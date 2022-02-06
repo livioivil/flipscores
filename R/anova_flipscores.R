@@ -24,6 +24,7 @@
 #' anova(mod0,model1 = mod1)
 #'
 #' @export
+#' @importFrom 
 
 
 anova.flipscores <- function(object, model1=NULL,
