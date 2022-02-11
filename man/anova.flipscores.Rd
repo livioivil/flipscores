@@ -29,7 +29,7 @@ Default is 5000.}
 
 \item{type}{type of test, "I", "III", 1, or 3. Roman numerals are equivalent to the corresponding Arabic numerals.}
 
-\item{id}{a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. NOTE: if \code{object} is a \code{flipscores} and \code{model$id} is not \code{NULL}, this is considered in the inference.}
+\item{id}{a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. NOTE: if \code{object} is a \code{flipscores} and \code{model$flip_param_call$id} is not \code{NULL}, this is considered in the inference.}
 
 \item{...}{other parameters allowed in \code{stats::anova}.}
 }

@@ -127,7 +127,7 @@ flipscores<-function(formula, family, data,
 
   #compute H0s models
   if(is.null(to_be_tested))
-    to_be_tested=1:ncol(model$x)
+    to_be_tested=1:ncol(model[["x"]])
 
     if(is.null(flip_param_call$seed)) flip_param_call$seed=.Random.seed[1]
   results=lapply(to_be_tested,socket_compute_scores_and_flip,
@@ -141,11 +141,12 @@ flipscores<-function(formula, family, data,
   model$scores=data.frame(lapply(results,function(x)x$scores))
   model$Tspace=data.frame(lapply(results,function(x)x$Tspace)) 
   model$p.values=sapply(results,function(x)x$p.values)
-  names(model$scores)<- names(model$Tspace) <- names(model$p.values) <- colnames(model$x)[to_be_tested]
+  names(model$scores)<- names(model$Tspace) <- names(model$p.values) <- colnames(model[["x"]])[to_be_tested]
   
   ### output
   model$call=fs_call
-  model$id=flip_param_call$id
+  model$flip_param_call=flip_param_call
+  # model$id=flip_param_call$id
   model$score_type=score_type
   model$n_flips=n_flips
 

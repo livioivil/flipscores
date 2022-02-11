@@ -24,7 +24,7 @@ compute_scores <- function(model0, model1,score_type){
     stop("test type is not specified or recognized")
   X=get_X(model0,model1)
   if(!is.null(model0))  
-  {id_model1=if(is.list(model1)) eval(model1$id) 
+  {id_model1=if(is.list(model1)) eval(model1$flip_param_call$id) 
   else 
     NULL
   } else id_model1=NULL
@@ -48,33 +48,32 @@ compute_scores <- function(model0, model1,score_type){
   pars_score<-get_par_expo_fam(model0)
   D<-pars_score$D
   V<-pars_score$V
-  invV<-diag(diag(V**(-1)))
+  invV_vect<-diag(V**(-1))
   
   #BASIC SCORE
   if(score_type=="basic"){
-    scores=t(t(X)%*%D%*%(invV))*residuals*(1/length(model0$y)**0.5)
+    scores=t(t(X)%*%D%*%(diag(invV_vect)))*residuals*(1/length(model0$y)**0.5)
   } else
-    ##  EFFECTIVE SCORE
-    if(score_type=="effective"){
+    ##  EFFECTIVE SCORE OR "standardized"
+  if(score_type%in%c("standardized","effective")){
       OneMinusH=(diag(nrow(Z))-(W**0.5)%*%Z%*%solve(t(Z)%*%W%*%Z)%*%t(Z)%*%(W**0.5))
-      scores=t(t(X)%*%(W**0.5)%*%(OneMinusH))*((invV**0.5)%*%residuals)*(1/length(model0$y)**0.5)
+      scores=t(t(X)%*%(W**0.5)%*%(OneMinusH))*((invV_vect**0.5)*residuals)*(1/length(model0$y)**0.5)
     } else
-      ##   SCORE standardized
-      if(score_type=="standardized"){
-        OneMinusH=(diag(nrow(Z))-(W**0.5)%*%Z%*%solve(t(Z)%*%W%*%Z)%*%t(Z)%*%(W**0.5))
-        a=OneMinusH%*%(W**0.5)%*%X
-        B=OneMinusH
-        scores=t(t(X)%*%(W**0.5)%*%(OneMinusH))*((invV**0.5)%*%residuals)*(1/length(model0$y)**0.5)
-        scale_objects=list(a=a, B=B)
-        attr(scores,"scale_objects")=scale_objects
-      } else
         #ORTHO EFFECTIVE SCORE
-      if(score_type=="orthogonalized"){
+  if(score_type=="orthogonalized"){
         sqrtW=diag(sqrt(diag(W)))
         OneMinusH=(diag(nrow(Z))-(W**0.5)%*%Z%*%solve(t(Z)%*%W%*%Z)%*%t(Z)%*%(W**0.5))
         deco=svd((V^0.5)%*%OneMinusH,nv = 0)
         deco$d[deco$d<1E-12]=0
-        scores=t(t(X)%*%sqrtW%*%OneMinusH%*%(invV**0.5)%*%deco$u)*(t(deco$u)%*%residuals)*(1/length(model0$y)**0.5)
+        scores=t(t(X)%*%sqrtW%*%OneMinusH%*%(diag(invV_vect)**0.5)%*%deco$u)*(t(deco$u)%*%residuals)*(1/length(model0$y)**0.5)
   }
+  
+  if(score_type=="standardized"){
+    a=OneMinusH%*%(W**0.5)%*%X
+    B=OneMinusH
+    scale_objects=list(a=a, B=B)
+    attr(scores,"scale_objects")=scale_objects
+  }
+  rownames(scores)=names(model0$fitted.values)
   return(scores)
 }

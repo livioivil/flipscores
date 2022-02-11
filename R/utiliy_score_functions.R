@@ -35,7 +35,7 @@ t2p  <- function(pvls){
       if(score_type=="standardized") .score_fun <- .score_std else
         .score_fun <- .score
       
-      n=length(Y)
+      n=nrow(Y)
       Tobs=  .score_fun(Y,rep(1,n))
       set.seed(seed)
       Tspace=data.frame(as.vector(c(Tobs,replicate(n_flips-1,{
@@ -84,25 +84,26 @@ mahalanobis_npc_multi <- function(ids_list,permT){
 # i and exclude are indices of the columns of model.frame x
 socket_compute_scores_and_flip <- function(i,model,exclude=NULL,flip_param_call#score_type,id,n_flips,
                                            # alternative="two-sided",seed=NULL
-){model$x=model.matrix(model)
+                                            ){
+  model$x=model.matrix(model)
   if(is.character(i)) i=which(colnames(model$x)==i)
   #to avoid re-run a flipscores everytime:
   attributes(model)$class= attributes(model)$class[attributes(model)$class!="flipscores"]
-  tested_X=model$x[, i, drop = FALSE]
+  tested_X=model[["x"]][, i, drop = FALSE]
   # model$x=model$x[,-c(i,exclude),drop=FALSE]
-  if(ncol(model$x)>0)
-    colnames(model$x)=paste0("V",1:ncol(model$x))
+  if(ncol(model[["x"]])>0)
+    colnames(model[["x"]])=paste0("V",1:ncol(model$x))
   
   model$call$data=data.frame(model$y,model$x)
   yname=as.character(model$call$formula[[2]])
   names(model$call$data)[1]=yname
   
-  frml=update(as.formula(model$call$formula), as.formula(paste(yname,"~0+",paste(colnames(model$x),collapse =" + "))))
+  frml=update(as.formula(model$call$formula), formula(paste(yname,"~0+",paste(colnames(model[["x"]]),collapse =" + "))))
   model$call$formula=as.formula(frml)
-  model$call$formula=update( model$call$formula,as.formula(paste("~.-",colnames(model$x)[i])))
+  model$call$formula=update( model$call$formula,formula(paste("~.",paste("-",colnames(model[["x"]])[i],collapse=""))))
   if(!is.null(model$offset)){
     offs<-model$offset
-    model$call$formula=update( model$call$formula,as.formula(paste("~.+offset(offs)")))
+    model$call$formula=update( model$call$formula,formula(paste("~.+offset(offs)")))
   }
   model_i <-update(model)
   scores=compute_scores(model0 = model_i,model1 = tested_X,score_type=flip_param_call$score_type)

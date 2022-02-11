@@ -29,6 +29,9 @@ When \code{n_flips} is equal or larger than the maximum number of possible flips
 
 \item{seed}{\code{NULL} by default.}
 
+\item{model}{can be a model (e.g. \code{lm} or \code{glm}). In this case other parameters used to fit a \code{glm} 
+(i.e. \code{formula}, \code{family}, \code{data}, etc) are not considered.  It is \code{NULL} by default (i.e. not used).}
+
 \item{...}{see \code{glm} function.}
 }
 \value{
@@ -52,7 +55,7 @@ summary(mod)
 
 # Equivalent to:
 model=glm(Y~Z+X,data=dt,family="poisson")
-mod2=flipscores(model,score_type = "effective")
+mod2=flipscores(model=model,score_type = "effective")
 summary(mod2)
 }
 \references{

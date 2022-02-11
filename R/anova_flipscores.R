@@ -8,7 +8,7 @@
 #' @param n_flips The number of random flips of the score contributions.
 #' When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed. 
 #' Default is 5000.
-#' @param id a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. NOTE: if \code{object} is a \code{flipscores} and \code{model$id} is not \code{NULL}, this is considered in the inference.
+#' @param id a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. NOTE: if \code{object} is a \code{flipscores} and \code{model$flip_param_call$id} is not \code{NULL}, this is considered in the inference.
 #' @param type type of test, "I", "III", 1, or 3. Roman numerals are equivalent to the corresponding Arabic numerals.
 #' @param ... other parameters allowed in \code{stats::anova}.
 #' @examples
@@ -24,7 +24,6 @@
 #' anova(mod0,model1 = mod1)
 #'
 #' @export
-#' @importFrom 
 
 
 anova.flipscores <- function(object, model1=NULL,
@@ -47,7 +46,7 @@ anova.flipscores <- function(object, model1=NULL,
                           model1 = model1,
                           score_type = score_type)
     mf <- match.call(expand.dots = TRUE)
-    if(!is.null(mf$id))
+    if(!is.null(mf$flip_param_call$id))
       scores=rowsum(scores,group = id)
     ps=flip::flip(scores,perms=n_flips)
     res=npc(ps@permT,comb.funct = "mahalanobist")
@@ -60,24 +59,24 @@ anova.flipscores <- function(object, model1=NULL,
     } else   { ## type I or III deviance decomposition
     
     varlist <- attr(object$terms, "variables")
-    if (!is.matrix(object$x)) 
+    if (!is.matrix(object[["x"]])) 
       object$x = model.matrix(object)
     varseq <- attr(object$x, "assign")
     nvars <- max(0, varseq)
     resdev <- resdf <- NULL
   
     mf <- match.call(expand.dots = TRUE)
-    if(!is.null(mf$id)) 
-      object$id=mf$id
+    if(!is.null(mf$flip_param_call$id)) 
+      object$id=mf$flip_param_call$id
     
     scores=lapply(1:nvars, function(var_i) {
       tested=which(varseq==var_i)
       # print(tested)
       excluded <- if(type==2) which(varseq>var_i) else c()
       # print(excluded)
-      socket_compute_scores(tested,object,exclude=excluded,score_type=score_type)
+      socket_compute_scores_and_flip(tested,object,exclude=excluded,flip_param_call=object$flip_param_call)
       })
-    temp=sapply(scores,ncol)
+    temp=sapply(scores,function(K)ncol(K$scores))
     subsets_npc=list(1:temp[1])
     if(length(temp)>1)
       for(i in 2:length(temp))
