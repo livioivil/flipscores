@@ -106,6 +106,8 @@ socket_compute_scores_and_flip <- function(i,model,exclude=NULL,flip_param_call#
     model$call$formula=update( model$call$formula,formula(paste("~.+offset(offs)")))
   }
   model_i <-update(model)
+  # print(flip_param_call$score_type)
+  # browser()
   scores=compute_scores(model0 = model_i,model1 = tested_X,score_type=flip_param_call$score_type)
   
   ############### fit the H1 model and append the scores (refitted under H0s)

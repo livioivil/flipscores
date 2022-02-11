@@ -65,7 +65,7 @@ compute_scores <- function(model0, model1,score_type){
         OneMinusH=(diag(nrow(Z))-(W**0.5)%*%Z%*%solve(t(Z)%*%W%*%Z)%*%t(Z)%*%(W**0.5))
         deco=svd((V^0.5)%*%OneMinusH,nv = 0)
         deco$d[deco$d<1E-12]=0
-        scores=t(t(X)%*%sqrtW%*%OneMinusH%*%(diag(invV_vect)**0.5)%*%deco$u)*(t(deco$u)%*%residuals)*(1/length(model0$y)**0.5)
+        scores=t(t(X)%*%sqrtW%*%OneMinusH%*%(diag(invV_vect)**0.5)%*%deco$u)*(t(deco$u)%*%residuals)[,]*(1/length(model0$y)**0.5)
   }
   
   if(score_type=="standardized"){

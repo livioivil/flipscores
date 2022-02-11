@@ -4,7 +4,7 @@
 #' @param model1 a \code{glm} (or \code{flipscores}) or a \code{matrix} (or \code{vector}). If it is a \code{glm} object, it has the model under the alternative hypothesis. The variables in \code{model1} are the same variables in \code{object} plus one or more variables to be tested.  Alternatively, if
 #' \code{model1} is a \code{matrix}, it contains the tested variables column-wise.
 #' @param score_type The type of score that is computed. It can be "orthogonalized", "effective" or "basic".
-#' Default is "orthogonalized". "effective" and "orthogonalized" take into account the nuisance estimation.
+#' Default is "orthogonalized". "effective" and "orthogonalized" take into account the nuisance estimation. The default is \code{NULL}, in this case the value is taken from \code{object}.
 #' @param n_flips The number of random flips of the score contributions.
 #' When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed. 
 #' Default is 5000.
@@ -15,6 +15,7 @@
 #' set.seed(1)
 #' dt=data.frame(X=rnorm(20),
 #'    Z=factor(rep(LETTERS[1:3],length.out=20)))
+#' contrasts(dt$Z) <- contr.sum(3)
 #' dt$Y=rpois(n=nrow(dt),lambda=exp(dt$X*(dt$Z=="C")))
 #' mod0=flipscores(Y~Z+X,data=dt,family="poisson",score_type = "effective")
 #' summary(mod0)
@@ -27,7 +28,7 @@
 
 
 anova.flipscores <- function(object, model1=NULL,
-                           score_type="orthogonalized",
+                           score_type=NULL,
                            n_flips=5000, type=3,id=NULL,
                            ...){
   
@@ -44,7 +45,7 @@ anova.flipscores <- function(object, model1=NULL,
   if(!is.null(model1)){ 
     scores=compute_scores(model0 = object,
                           model1 = model1,
-                          score_type = score_type)
+                          score_type = if(is.null(score_type)) object$score_type else score_type)
     mf <- match.call(expand.dots = TRUE)
     if(!is.null(mf$flip_param_call$id))
       scores=rowsum(scores,group = id)
@@ -74,9 +75,9 @@ anova.flipscores <- function(object, model1=NULL,
       # print(tested)
       excluded <- if(type==2) which(varseq>var_i) else c()
       # print(excluded)
-      socket_compute_scores_and_flip(tested,object,exclude=excluded,flip_param_call=object$flip_param_call)
+      socket_compute_scores_and_flip(tested,object,exclude=excluded,flip_param_call=object$flip_param_call)$scores
       })
-    temp=sapply(scores,function(K)ncol(K$scores))
+    temp=sapply(scores,function(K)ncol(K))
     subsets_npc=list(1:temp[1])
     if(length(temp)>1)
       for(i in 2:length(temp))
