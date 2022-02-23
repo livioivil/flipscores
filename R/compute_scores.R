@@ -42,9 +42,10 @@ compute_scores <- function(model0, model1,score_type){
   
   
   if(ncol(model0$x)==0) return(model0$y)
+  if(is.null(model0$y)) model0$y=model0$model[,1]
   Z=model0$x
   residuals=(model0$y-model0$fitted.values)
-  W=diag(as.numeric(model0$weights))
+  if(is.null(model0$weights))  W=rep(1,length(residuals)) else W=(as.numeric(model0$weights))
   pars_score<-get_par_expo_fam(model0)
   D<-pars_score$D
   V<-pars_score$V
@@ -56,8 +57,8 @@ compute_scores <- function(model0, model1,score_type){
   } else
     ##  EFFECTIVE SCORE OR "standardized"
   if(score_type%in%c("standardized","effective")){
-      OneMinusH=(diag(nrow(Z))-(W**0.5)%*%Z%*%solve(t(Z)%*%W%*%Z)%*%t(Z)%*%(W**0.5))
-      scores=t(t(X)%*%(W**0.5)%*%(OneMinusH))*((invV_vect**0.5)*residuals)*(1/length(model0$y)**0.5)
+      OneMinusH=diag(nrow(Z))-((W**0.5)*Z)%*%solve(t(Z*W)%*%Z)%*%t(Z*(W**0.5))
+      scores=t(t(X*(W**0.5))%*%(OneMinusH))*((invV_vect**0.5)*residuals)*(1/length(model0$y)**0.5)
     } else
         #ORTHO EFFECTIVE SCORE
   if(score_type=="orthogonalized"){
@@ -69,7 +70,7 @@ compute_scores <- function(model0, model1,score_type){
   }
   
   if(score_type=="standardized"){
-    a=OneMinusH%*%(W**0.5)%*%X
+    a=OneMinusH%*%((W**0.5)*X)
     B=OneMinusH
     scale_objects=list(a=a, B=B)
     attr(scores,"scale_objects")=scale_objects

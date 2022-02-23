@@ -7,7 +7,7 @@
 \method{anova}{flipscores}(
   object,
   model1 = NULL,
-  score_type = "orthogonalized",
+  score_type = NULL,
   n_flips = 5000,
   type = 3,
   id = NULL,
@@ -21,7 +21,7 @@
 \code{model1} is a \code{matrix}, it contains the tested variables column-wise.}
 
 \item{score_type}{The type of score that is computed. It can be "orthogonalized", "effective" or "basic".
-Default is "orthogonalized". "effective" and "orthogonalized" take into account the nuisance estimation.}
+Default is "orthogonalized". "effective" and "orthogonalized" take into account the nuisance estimation. The default is \code{NULL}, in this case the value is taken from \code{object}.}
 
 \item{n_flips}{The number of random flips of the score contributions.
 When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed. 
@@ -40,6 +40,7 @@ This is the \code{anova} method for \code{flipscores} object. Importantly it all
 set.seed(1)
 dt=data.frame(X=rnorm(20),
    Z=factor(rep(LETTERS[1:3],length.out=20)))
+contrasts(dt$Z) <- contr.sum(3)
 dt$Y=rpois(n=nrow(dt),lambda=exp(dt$X*(dt$Z=="C")))
 mod0=flipscores(Y~Z+X,data=dt,family="poisson",score_type = "effective")
 summary(mod0)
