@@ -148,9 +148,8 @@ get_X <- function(model0,model1){
 
 get_par_expo_fam <- function(model0){
   if(("lm"%in%class(model0))&(!("glm"%in%class(model0)))){
-    Dhat<-diag(1, length(model0$y))
-    Vhat<-diag(1, length(model0$y))
-    a <- c(1, length(model0$y))
+    Dhat<- Vhat<- a <-rep(1, length(model0$y))
+    Vhat<-rep(1, length(model0$y))
     return(list(a=a, D=Dhat, V=Vhat))
   } else if(("glm"%in%class(model0))){
     
@@ -177,9 +176,9 @@ get_par_expo_fam <- function(model0){
     } else{
       Dmu <- D(mu,"eta")
     }
-    Dhat<-diag(eval(Dmu, list(eta= eta.est)), length(mu.est))
-    Vhat<-diag(eval(V, list(mu= mu.est,.Theta=model0$theta)), length(mu.est))
-    a <- diag(Vhat) / diag(Dhat)
+    Dhat<-as.vector(eval(Dmu, list(eta= eta.est)))
+    Vhat<-as.vector(eval(V, list(mu= mu.est,.Theta=model0$theta)))
+    a <- Vhat / Dhat
     return(list(a=a, D=Dhat, V=Vhat))
     
     # } else if(("glm"%in%class(model0))&&("negbin"%in%class(model0))){
@@ -193,9 +192,8 @@ get_par_expo_fam <- function(model0){
     #   a <- eval(V, list(mu= mu.est,.Theta=model0$theta)) / eval(Dmu, list(eta= eta.est))
     #   return(a)
     #   
-  } else { warning("Class of the model not detected, canonical link is assumed.")
-    Dhat<-diag(1, length(model0$y))
-    Vhat<-diag(1, length(model0$y))
-    a <- c(1, length(model0$y))
+  } else { 
+    warning("Class of the model not detected, canonical link is assumed.")
+    Dhat<-Vhat<-a<-rep(1, length(model0$y))
     return(list(a=a, D=Dhat, V=Vhat))}
 }

@@ -11,6 +11,7 @@
 #'
 #' @author Jesse Hemerik, Riccardo De Santis, Vittorio Giatti, Jelle Goeman and Livio Finos
 #' @examples
+#' set.seed(1)
 #' Z=rnorm(20)
 #' X=Z+rnorm(20)
 #' Y=rpois(n=20,lambda=exp(Z+X))
@@ -47,13 +48,13 @@ compute_scores <- function(model0, model1,score_type){
   residuals=(model0$y-model0$fitted.values)
   if(is.null(model0$weights))  W=rep(1,length(residuals)) else W=(as.numeric(model0$weights))
   pars_score<-get_par_expo_fam(model0)
-  D<-pars_score$D
-  V<-pars_score$V
-  invV_vect<-diag(V**(-1))
+  D_vect<-pars_score$D
+  V_vect<-pars_score$V
+  invV_vect<-V_vect**(-1)
   
   #BASIC SCORE
   if(score_type=="basic"){
-    scores=t(t(X)%*%D%*%(diag(invV_vect)))*residuals*(1/length(model0$y)**0.5)
+    scores=t(t(X*D_vect)%*%(diag(invV_vect)))*residuals*(1/length(model0$y)**0.5)
   } else
     ##  EFFECTIVE SCORE OR "standardized"
   if(score_type%in%c("standardized","effective")){
@@ -62,11 +63,11 @@ compute_scores <- function(model0, model1,score_type){
     } else
         #ORTHO EFFECTIVE SCORE
   if(score_type=="orthogonalized"){
-        sqrtW=diag(sqrt(diag(W)))
-        OneMinusH=(diag(nrow(Z))-(W**0.5)%*%Z%*%solve(t(Z)%*%W%*%Z)%*%t(Z)%*%(W**0.5))
-        deco=svd((V^0.5)%*%OneMinusH,nv = 0)
+        sqrtW=sqrt(W)
+        OneMinusH = diag(nrow(Z)) - ((W^0.5)* Z) %*% solve(t(Z) %*% (W * Z)) %*% t(Z * (W^0.5))
+        deco=svd((V_vect^0.5)*OneMinusH,nv = 0)
         deco$d[deco$d<1E-12]=0
-        scores=t(t(X)%*%sqrtW%*%OneMinusH%*%(diag(invV_vect)**0.5)%*%deco$u)*(t(deco$u)%*%residuals)[,]*(1/length(model0$y)**0.5)
+        scores=t((t(X*sqrtW)%*%OneMinusH*(invV_vect**0.5))%*%deco$u)*(t(deco$u)%*%residuals)[,]*(1/length(model0$y)**0.5)
   }
   
   if(score_type=="standardized"){
