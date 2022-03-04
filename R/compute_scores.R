@@ -54,7 +54,7 @@ compute_scores <- function(model0, model1,score_type){
   
   #BASIC SCORE
   if(score_type=="basic"){
-    scores=t(t(X*D_vect)%*%(diag(invV_vect)))*residuals*(1/length(model0$y)**0.5)
+    scores=t(t(X*D_vect)%*%(diag(invV_vect, nrow=length(W))))*residuals*(1/length(model0$y)**0.5)
   } else
     ##  EFFECTIVE SCORE OR "standardized"
   if(score_type%in%c("standardized","effective")){
