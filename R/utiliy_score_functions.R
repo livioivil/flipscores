@@ -1,10 +1,41 @@
 # for standardized:
+.score_maybe=function(scr_eff,flp) {
+  # scr_eff # un vettore
+  numerator=t(scr_eff)%*%flp
+  U<- attributes(scr_eff)$scale_objects$U
+  m<- attributes(scr_eff)$scale_objects$m
+  B<- attributes(scr_eff)$scale_objects$B
+  if (all(sign(flp)==1)|(all(sign(flp)==-1))){
+    denominator = m
+  } else {
+    denominator = m - sum((crossprod(B[flp==1,],U[flp==1,]) -crossprod(B[flp==-1,],U[flp==-1,]))^2)
+  }
+  numerator/(denominator**0.5)
+}
+
+
 .score_std=function(scr_eff,flp) {
   # scr_eff # un vettore
-  numeratore=t(scr_eff)%*%flp
-  aflp= attributes(scr_eff)$scale_objects$a * flp
-  denominatore= sqrt((t(aflp)  %*% attributes(scr_eff)$scale_objects$B %*% aflp)/length(scr_eff))
-  numeratore/denominatore
+  numerator=t(scr_eff)%*%flp
+  A<- attributes(scr_eff)$scale_objects$A
+  AA<- attributes(scr_eff)$scale_objects$AA
+  m<- attributes(scr_eff)$scale_objects$m
+  B<- attributes(scr_eff)$scale_objects$B
+  if (sum(flp)!=(-length(scr_eff)+2)){
+    Avplus = crossprod(A[flp==1,],B[flp==1])
+  } else {
+    Avplus = crossprod(t(A[flp==1,]),B[flp==1])
+  }
+  if (sum(flp)!=(length(scr_eff)-2)){
+    Avminus = crossprod(A[flp==-1,],B[flp==-1])
+  } else {
+    Avminus = crossprod(t(A[flp==-1,]),B[flp==-1])
+  }
+  if (abs(sum(flp)) < length(scr_eff)){
+    denominator = (m + 4 * crossprod(Avplus, solve(AA, Avminus)))}
+  else
+    {denominator = m}
+  numerator/(denominator**0.5)
 }
 
 #for effective and others:
@@ -31,8 +62,9 @@ t2p  <- function(pvls){
     if(alternative=="less") ff <- function(Tspace) -Tspace else
       if(alternative=="greater") ff <- function(Tspace) Tspace
       
-      score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
+      score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic","maybe"))
       if(score_type=="standardized") .score_fun <- .score_std else
+        if(score_type=="maybe") .score_fun <- .score_maybe else
         .score_fun <- .score
       
       n=nrow(Y)
@@ -148,9 +180,8 @@ get_X <- function(model0,model1){
 
 get_par_expo_fam <- function(model0){
   if(("lm"%in%class(model0))&(!("glm"%in%class(model0)))){
-    Dhat<- Vhat<- a <-rep(1, length(model0$y))
-    Vhat<-rep(1, length(model0$y))
-    return(list(a=a, D=Dhat, V=Vhat))
+    Dhat<- Vhat <-1
+    return(list(D=Dhat, V=Vhat))
   } else if(("glm"%in%class(model0))){
     
     #The following lines are taken from the mdscore package on CRAN
@@ -178,8 +209,7 @@ get_par_expo_fam <- function(model0){
     }
     Dhat<-as.vector(eval(Dmu, list(eta= eta.est)))
     Vhat<-as.vector(eval(V, list(mu= mu.est,.Theta=model0$theta)))
-    a <- Vhat / Dhat
-    return(list(a=a, D=Dhat, V=Vhat))
+    return(list(D=Dhat, V=Vhat))
     
     # } else if(("glm"%in%class(model0))&&("negbin"%in%class(model0))){
     #   
@@ -193,7 +223,7 @@ get_par_expo_fam <- function(model0){
     #   return(a)
     #   
   } else { 
-    warning("Class of the model not detected, canonical link is assumed.")
-    Dhat<-Vhat<-a<-rep(1, length(model0$y))
-    return(list(a=a, D=Dhat, V=Vhat))}
+    warning("Class of the model not detected, homoscedasticity and canonical link are assumed.")
+    Dhat<-Vhat<-1
+    return(list(D=Dhat, V=Vhat))}
 }

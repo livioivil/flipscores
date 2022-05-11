@@ -20,7 +20,7 @@
 #' @export
 
 compute_scores <- function(model0, model1,score_type){
-  score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
+  score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic","maybe"))
   if(missing(score_type))
     stop("test type is not specified or recognized")
   X=get_X(model0,model1)
@@ -46,36 +46,55 @@ compute_scores <- function(model0, model1,score_type){
   if(is.null(model0$y)) model0$y=model0$model[,1]
   Z=model0$x
   residuals=(model0$y-model0$fitted.values)
-  if(is.null(model0$weights))  W=rep(1,length(residuals)) else W=(as.numeric(model0$weights))
+  if(is.null(model0$weights))  sqrtW=rep(1,length(residuals)) else sqrtW=(as.numeric(model0$weights)**0.5)
   pars_score<-get_par_expo_fam(model0)
   D_vect<-pars_score$D
   V_vect<-pars_score$V
-  invV_vect<-V_vect**(-1)
+  sqrtinvV_vect<-V_vect**(-0.5)
   
+
   #BASIC SCORE
-  if(score_type=="basic"){
-    scores=t(t(X*D_vect)%*%(diag(invV_vect, nrow=length(W))))*residuals*(1/length(model0$y)**0.5)
+  if (score_type == "basic") {
+    B=t(t(X * D_vect) %*% (diag(sqrtinvV_vect**2, nrow = length(sqrtW))))
+    scores = B * (sqrtinvV_vect*residuals) * (1/length(model0$y)^0.5)
+    scale_objects=list(nrm=sum(B^2)*sum((sqrtinvV_vect*residuals)^2))
   } else
-    ##  EFFECTIVE SCORE OR "standardized"
-  if(score_type%in%c("standardized","effective")){
-      OneMinusH=diag(nrow(Z))-((W**0.5)*Z)%*%solve(t(Z*W)%*%Z)%*%t(Z*(W**0.5))
-      scores=t(t(X*(W**0.5))%*%(OneMinusH))*((invV_vect**0.5)*residuals)*(1/length(model0$y)**0.5)
-    } else
+    ##  EFFECTIVE SCORE 
+  if(score_type=="effective"){
+    A<-(sqrtW)*Z
+    B<-X*(sqrtW)-t(crossprod(crossprod(A,X*(sqrtW)),solve(crossprod(A),t(A))))
+    scores=B*sqrtinvV_vect*residuals/(length(model0$y)**0.5)
+    scale_objects=list(nrm=sum(B^2)*sum((sqrtinvV_vect*residuals)^2))
+  } else
+    ##  STANDARDIZED SCORE
+    if(score_type=="standardized"){
+      A<-(sqrtW)*Z
+      B<-X*(sqrtW)-t(crossprod(crossprod(A,X*(sqrtW)),solve(crossprod(A),t(A))))
+      scores=B*sqrtinvV_vect*residuals
+      AA = crossprod(A)
+      AB = crossprod(A,B)
+      m = sum(B * B) - crossprod(AB, solve(AA, AB))
+      scale_objects=list(AA=AA,A=A, B=B,m=m,nrm=sum(B^2)*sum((sqrtinvV_vect*residuals)^2))
+    } else  
+      if(score_type=="maybe"){
+        U=svd((sqrtW*Z),nv=0)$u
+        B=((diag(nrow(Z))-tcrossprod(U))%*%(X*(sqrtW)))
+        m = sum(B^2)
+        scores=B*sqrtinvV_vect*residuals
+        nrm=sum((sqrtinvV_vect*residuals)^2)*sum(B^2)
+        scale_objects=list(U=U,B=B,m=m,nrm=nrm)
+      } else  
         #ORTHO EFFECTIVE SCORE
   if(score_type=="orthogonalized"){
-        sqrtW=sqrt(W)
-        OneMinusH = diag(nrow(Z)) - ((W^0.5)* Z) %*% solve(t(Z) %*% (W * Z)) %*% t(Z * (W^0.5))
+        OneMinusH = diag(nrow(Z)) - ((sqrtW)* Z) %*% solve(t(Z) %*% ((sqrtW**2) * Z)) %*% t(Z * (sqrtW))
         deco=svd((V_vect^0.5)*OneMinusH,nv = 0)
         deco$d[deco$d<1E-12]=0
-        scores=t((t(X*sqrtW)%*%OneMinusH*(invV_vect**0.5))%*%deco$u)*(t(deco$u)%*%residuals)[,]*(1/length(model0$y)**0.5)
+        B=(t(X*sqrtW)%*%OneMinusH*(invV_vect**0.5))
+        scores=t(B%*%deco$u)*(t(deco$u)%*%(sqrtinvV_vect*residuals))[,]*(1/length(model0$y)**0.5)
+        nrm=sum(B^2)*sum((sqrtinvV_vect*residuals)^2)
+        scale_objects=list(U=U,B=B,m=m,nrm=nrm)
   }
-  
-  if(score_type=="standardized"){
-    a=OneMinusH%*%((W**0.5)*X)
-    B=OneMinusH
-    scale_objects=list(a=a, B=B)
-    attr(scores,"scale_objects")=scale_objects
-  }
+  attr(scores,"scale_objects")=scale_objects
   rownames(scores)=names(model0$fitted.values)
   return(scores)
 }

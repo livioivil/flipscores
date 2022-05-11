@@ -21,6 +21,7 @@ The parameter \code{id}  is used too,
 if present in \code{model0} (with priority) or in \code{model1}.
 }
 \examples{
+set.seed(1)
 Z=rnorm(20)
 X=Z+rnorm(20)
 Y=rpois(n=20,lambda=exp(Z+X))
