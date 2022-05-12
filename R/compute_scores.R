@@ -57,14 +57,14 @@ compute_scores <- function(model0, model1,score_type){
   if (score_type == "basic") {
     B=t(t(X * D_vect) %*% (diag(sqrtinvV_vect**2, nrow = length(sqrtW))))
     scores = B * (sqrtinvV_vect*residuals) * (1/length(model0$y)^0.5)
-    scale_objects=list(nrm=sum(B^2)*sum((sqrtinvV_vect*residuals)^2))
+    scale_objects=list(nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect*residuals)^2)))
   } else
     ##  EFFECTIVE SCORE 
   if(score_type=="effective"){
     A<-(sqrtW)*Z
     B<-X*(sqrtW)-t(crossprod(crossprod(A,X*(sqrtW)),solve(crossprod(A),t(A))))
     scores=B*sqrtinvV_vect*residuals/(length(model0$y)**0.5)
-    scale_objects=list(nrm=sum(B^2)*sum((sqrtinvV_vect*residuals)^2))
+    scale_objects=list(nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect*residuals)^2)))
   } else
     ##  STANDARDIZED SCORE
     if(score_type=="standardized"){
@@ -74,15 +74,16 @@ compute_scores <- function(model0, model1,score_type){
       AA = crossprod(A)
       AB = crossprod(A,B)
       m = sum(B * B) - crossprod(AB, solve(AA, AB))
-      scale_objects=list(AA=AA,A=A, B=B,m=m,nrm=sum(B^2)*sum((sqrtinvV_vect*residuals)^2))
+      scale_objects=list(AA=AA,A=A, B=B,m=m,nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect*residuals)^2)))
     } else  
       if(score_type=="maybe"){
         U=svd((sqrtW*Z),nv=0)$u
-        B=((diag(nrow(Z))-tcrossprod(U))%*%(X*(sqrtW)))
+        B=crossprod(diag(nrow(Z))-tcrossprod(U),X*sqrtW)
+        BU=B[,]*U
         m = sum(B^2)
         scores=B*sqrtinvV_vect*residuals
-        nrm=sum((sqrtinvV_vect*residuals)^2)*sum(B^2)
-        scale_objects=list(U=U,B=B,m=m,nrm=nrm)
+        nrm=sqrt(sum((sqrtinvV_vect*residuals)^2)*sum(B^2))
+        scale_objects=list(BU=BU,m=m,nrm=nrm)
       } else  
         #ORTHO EFFECTIVE SCORE
   if(score_type=="orthogonalized"){
@@ -91,7 +92,7 @@ compute_scores <- function(model0, model1,score_type){
         deco$d[deco$d<1E-12]=0
         B=(t(X*sqrtW)%*%OneMinusH*(invV_vect**0.5))
         scores=t(B%*%deco$u)*(t(deco$u)%*%(sqrtinvV_vect*residuals))[,]*(1/length(model0$y)**0.5)
-        nrm=sum(B^2)*sum((sqrtinvV_vect*residuals)^2)
+        nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect*residuals)^2))
         scale_objects=list(U=U,B=B,m=m,nrm=nrm)
   }
   attr(scores,"scale_objects")=scale_objects

@@ -2,13 +2,12 @@
 .score_maybe=function(scr_eff,flp) {
   # scr_eff # un vettore
   numerator=t(scr_eff)%*%flp
-  U<- attributes(scr_eff)$scale_objects$U
+  BU<- attributes(scr_eff)$scale_objects$BU
   m<- attributes(scr_eff)$scale_objects$m
-  B<- attributes(scr_eff)$scale_objects$B
   if (all(sign(flp)==1)|(all(sign(flp)==-1))){
     denominator = m
   } else {
-    denominator = m - sum((crossprod(B[flp==1,],U[flp==1,]) -crossprod(B[flp==-1,],U[flp==-1,]))^2)
+    denominator = m - sum((colSums(BU[flp==1,]) -colSums(BU[flp==-1,]))^2)
   }
   numerator/(denominator**0.5)
 }

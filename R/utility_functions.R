@@ -38,14 +38,15 @@ print.flipscores <- function(x, ...) {
 
 summary.flipscores <- function (object, ...) {
   sum_model=summary.glm(object = object)
-  sum_model$coefficients=sum_model$coefficients[,c(1,1:4),drop=FALSE]
+  sum_model$coefficients=sum_model$coefficients[,c(1,1:4,4),drop=FALSE]
   sum_model$coefficients[,-1]=NA
-  sum_model$coefficients[names(object$p.values),5]=object$p.values
+  sum_model$coefficients[names(object$p.values),6]=object$p.values
   sum_model$coefficients[names(object$p.values),2]=unlist(object$Tspace[1,,drop=TRUE])
   sum_model$coefficients[names(object$p.values),3]=unlist(sapply(object$scores,sd)*sqrt(nrow(object$scores)))
+  sum_model$coefficients[names(object$p.values),5]=(sum_model$coefficients[names(object$p.values),2]/attributes(object$scores)$nrm)[]
   sum_model$coefficients[,4]=sum_model$coefficients[,2]/sum_model$coefficients[,3]
   # sum_model$coefficients=sum_model$coefficients[,c(1,4)]
-  colnames(sum_model$coefficients)[c(2,4)]=c("Score","z value")
+  colnames(sum_model$coefficients)[c(2,4,5)]=c("Score","z value","eff_size")
   
   structure(sum_model, heading = get_head_flip_out(object), class = c("data.frame"))
   sum_model

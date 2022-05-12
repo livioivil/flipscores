@@ -146,6 +146,9 @@ if(is.null(model$y)) model$y=model$model[,1]
                       # seed=flip_param_call$seed
                       )
   model$scores=data.frame(lapply(results,function(x)x$scores))
+  nrm=sapply(results,function(x)attributes(x$scores)$scale_objects$nrm)
+  names(nrm)=names(model$scores)
+  attr(model$scores,"nrm")=nrm
   model$Tspace=data.frame(lapply(results,function(x)x$Tspace)) 
   model$p.values=sapply(results,function(x)x$p.values)
   names(model$scores)<- names(model$Tspace) <- names(model$p.values) <- colnames(model[["x"]])[to_be_tested]
