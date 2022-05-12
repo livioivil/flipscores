@@ -7,7 +7,7 @@
   if (all(sign(flp)==1)|(all(sign(flp)==-1))){
     denominator = m
   } else {
-    denominator = m - sum((colSums(BU[flp==1,]) -colSums(BU[flp==-1,]))^2)
+    denominator = m - sum((colSums(BU[flp==1,,drop=FALSE]) -colSums(BU[flp==-1,,drop=FALSE]))^2)
   }
   numerator/(denominator**0.5)
 }
