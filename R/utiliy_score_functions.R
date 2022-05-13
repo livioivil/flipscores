@@ -1,41 +1,42 @@
 # for standardized:
-.score_maybe=function(scr_eff,flp) {
-  # scr_eff # un vettore
-  numerator=t(scr_eff)%*%flp
-  BU<- attributes(scr_eff)$scale_objects$BU
-  m<- attributes(scr_eff)$scale_objects$m
-  if (all(sign(flp)==1)|(all(sign(flp)==-1))){
-    denominator = m
-  } else {
-    denominator = m - sum((colSums(BU[flp==1,,drop=FALSE]) -colSums(BU[flp==-1,,drop=FALSE]))^2)
-  }
-  numerator/(denominator**0.5)
-}
-
-
 .score_std=function(scr_eff,flp) {
   # scr_eff # un vettore
   numerator=t(scr_eff)%*%flp
   A<- attributes(scr_eff)$scale_objects$A
-  AA<- attributes(scr_eff)$scale_objects$AA
   m<- attributes(scr_eff)$scale_objects$m
-  B<- attributes(scr_eff)$scale_objects$B
-  if (sum(flp)!=(-length(scr_eff)+2)){
-    Avplus = crossprod(A[flp==1,],B[flp==1])
+  if (all(sign(flp)==1)|(all(sign(flp)==-1))){
+    denominator = m
   } else {
-    Avplus = crossprod(t(A[flp==1,]),B[flp==1])
+    denominator = m - sum((colSums(A[flp==1,,drop=FALSE]) 
+                          -colSums(A[flp==-1,,drop=FALSE]))^2)
   }
-  if (sum(flp)!=(length(scr_eff)-2)){
-    Avminus = crossprod(A[flp==-1,],B[flp==-1])
-  } else {
-    Avminus = crossprod(t(A[flp==-1,]),B[flp==-1])
-  }
-  if (abs(sum(flp)) < length(scr_eff)){
-    denominator = (m + 4 * crossprod(Avplus, solve(AA, Avminus)))}
-  else
-    {denominator = m}
   numerator/(denominator**0.5)
 }
+
+#old:
+# .score_std=function(scr_eff,flp) {
+#   # scr_eff # un vettore
+#   numerator=t(scr_eff)%*%flp
+#   A<- attributes(scr_eff)$scale_objects$A
+#   AA<- attributes(scr_eff)$scale_objects$AA
+#   m<- attributes(scr_eff)$scale_objects$m
+#   B<- attributes(scr_eff)$scale_objects$B
+#   if (sum(flp)!=(-length(scr_eff)+2)){
+#     Avplus = crossprod(A[flp==1,],B[flp==1])
+#   } else {
+#     Avplus = crossprod(t(A[flp==1,]),B[flp==1])
+#   }
+#   if (sum(flp)!=(length(scr_eff)-2)){
+#     Avminus = crossprod(A[flp==-1,],B[flp==-1])
+#   } else {
+#     Avminus = crossprod(t(A[flp==-1,]),B[flp==-1])
+#   }
+#   if (abs(sum(flp)) < length(scr_eff)){
+#     denominator = (m + 4 * crossprod(Avplus, solve(AA, Avminus)))}
+#   else
+#     {denominator = m}
+#   numerator/(denominator**0.5)
+# }
 
 #for effective and others:
 .score <- function(Y,flp) flp%*%Y
@@ -61,9 +62,8 @@ t2p  <- function(pvls){
     if(alternative=="less") ff <- function(Tspace) -Tspace else
       if(alternative=="greater") ff <- function(Tspace) Tspace
       
-      score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic","maybe"))
+      score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
       if(score_type=="standardized") .score_fun <- .score_std else
-        if(score_type=="maybe") .score_fun <- .score_maybe else
         .score_fun <- .score
       
       n=nrow(Y)

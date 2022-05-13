@@ -20,7 +20,7 @@
 #' @export
 
 compute_scores <- function(model0, model1,score_type){
-  score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic","maybe"))
+  score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
   if(missing(score_type))
     stop("test type is not specified or recognized")
   X=get_X(model0,model1)
@@ -68,22 +68,22 @@ compute_scores <- function(model0, model1,score_type){
   } else
     ##  STANDARDIZED SCORE
     if(score_type=="standardized"){
-      A<-(sqrtW)*Z
-      B<-X*(sqrtW)-t(crossprod(crossprod(A,X*(sqrtW)),solve(crossprod(A),t(A))))
-      scores=B*sqrtinvV_vect*residuals
-      AA = crossprod(A)
-      AB = crossprod(A,B)
-      m = sum(B * B) - crossprod(AB, solve(AA, AB))
-      scale_objects=list(AA=AA,A=A, B=B,m=m,nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect*residuals)^2)))
-    } else  
-      if(score_type=="maybe"){
+    #   A<-(sqrtW)*Z
+    #   B<-X*(sqrtW)-t(crossprod(crossprod(A,X*(sqrtW)),solve(crossprod(A),t(A))))
+    #   scores=B*sqrtinvV_vect*residuals
+    #   AA = crossprod(A)
+    #   AB = crossprod(A,B)
+    #   m = sum(B * B) - crossprod(AB, solve(AA, AB))
+    #   scale_objects=list(AA=AA,A=A, B=B,m=m,nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect*residuals)^2)))
+    # } else  
+    #   if(score_type=="maybe"){
         U=svd((sqrtW*Z),nv=0)$u
-        B=crossprod(diag(nrow(Z))-tcrossprod(U),X*sqrtW)
-        BU=B[,]*U
-        m = sum(B^2)
-        scores=B*sqrtinvV_vect*residuals
-        nrm=sqrt(sum((sqrtinvV_vect*residuals)^2)*sum(B^2))
-        scale_objects=list(BU=BU,m=m,nrm=nrm)
+        b=crossprod(diag(nrow(Z))-tcrossprod(U),X*sqrtW)
+        A=b[,]*U
+        m = sum(b^2)
+        scores=b*sqrtinvV_vect*residuals
+        nrm=sqrt(sum((sqrtinvV_vect*residuals)^2)*m)
+        scale_objects=list(A=A,m=m,nrm=nrm)
       } else  
         #ORTHO EFFECTIVE SCORE
   if(score_type=="orthogonalized"){
