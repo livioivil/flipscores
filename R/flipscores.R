@@ -22,7 +22,8 @@
 #' 
 #'
 #' @usage flipscores(formula, family, data, score_type, 
-#' n_flips=5000, alternative ="two.sided", id = NULL, ...)
+#' n_flips=5000, alternative ="two.sided", 
+#' id = NULL, seed = NULL, ...)
 #'
 #' @return glm class object with sign-flip score test.
 #' See also the related functions (\code{summary.flipscores}, \code{anova.flipscores}, \code{print.flipscores}). 
