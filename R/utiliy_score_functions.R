@@ -2,13 +2,13 @@
 .score_std=function(scr_eff,flp) {
   # scr_eff # un vettore
   numerator=t(scr_eff)%*%flp
-  A<- attributes(scr_eff)$scale_objects$A
-  m<- attributes(scr_eff)$scale_objects$m
+  # A<- attributes(scr_eff)$scale_objects$A
+  # m<- attributes(scr_eff)$scale_objects$m
   if (all(sign(flp)==1)|(all(sign(flp)==-1))){
-    denominator = m
+    denominator = 1
   } else {
-    denominator = m - sum((colSums(A[flp==1,,drop=FALSE]) 
-                          -colSums(A[flp==-1,,drop=FALSE]))^2)
+    denominator = 1 - sum((colSums(attributes(scr_eff)$scale_objects$A[flp==1,,drop=FALSE]) 
+                          -colSums(attributes(scr_eff)$scale_objects$A[flp==-1,,drop=FALSE]))^2)
   }
   numerator/(denominator**0.5)
 }
@@ -74,11 +74,11 @@ t2p  <- function(pvls){
         .score_fun(Y,flp)
       }))))
       set.seed(NULL)
-      if(score_type=="effective"||score_type=="orthogonalized") 
-        Tspace=.sum2t(Tspace,
-                      sumY2 = sum(Y^2,na.rm = TRUE),
-                      n=sum(!is.na(Y)))
-      
+      # if(score_type=="effective"||score_type=="orthogonalized") 
+      #   Tspace=.sum2t(Tspace,
+      #                 sumY2 = sum(Y^2,na.rm = TRUE),
+      #                 n=sum(!is.na(Y)))
+      # 
       p.values=t2p(ff(unlist(Tspace)))
       # named vector?
       

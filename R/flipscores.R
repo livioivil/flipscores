@@ -83,6 +83,7 @@ flipscores<-function(formula, family, data,
   
   flip_param_call$n_flips <- eval(flip_param_call$n_flips, parent.frame()) ###useless
   flip_param_call$score_type <- eval(flip_param_call$score_type, parent.frame()) ###useless
+  flip_param_call$seed <- eval(flip_param_call$seed, parent.frame()) ###useless
   
   m2 <- match(c("to_be_tested"), names(mf), 0L)
   if(m2==0)
