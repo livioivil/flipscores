@@ -94,7 +94,7 @@ flipscores<-function(formula, family, data,
     }
   
   #####check id not null only with effective score:
-  if(!is.null(flip_param_call$id)&&(score_type!="effective")){
+  if(!is.null(flip_param_call$id)&&(score_type%in%c("orthogonalized"))){
     print(warning("WARNING: Use of id is allowed only with score_type=='effective', yet. 
  Nothing done."))
     return(NULL)
@@ -135,7 +135,7 @@ if(is.null(model$y)) model$y=model$model[,1]
 
   #compute H0s models
   if(is.null(to_be_tested))
-    to_be_tested=1:ncol(model[["x"]]) else
+    to_be_tested=colnames(model[["x"]]) else
       to_be_tested=eval(to_be_tested,parent.frame())
 
     if(is.null(flip_param_call$seed)) flip_param_call$seed=.Random.seed[1]
@@ -153,7 +153,7 @@ if(is.null(model$y)) model$y=model$model[,1]
   attr(model$scores,"nrm")=nrm
   model$Tspace=data.frame(lapply(results,function(x)x$Tspace)) 
   model$p.values=sapply(results,function(x)x$p.values)
-  names(model$scores)<- names(model$Tspace) <- names(model$p.values) <- colnames(model[["x"]])[to_be_tested]
+  names(model$scores)<- names(model$Tspace) <- names(model$p.values) <-to_be_tested
   
   ### output
   model$call=fs_call

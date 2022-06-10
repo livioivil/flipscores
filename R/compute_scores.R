@@ -91,10 +91,10 @@ compute_scores <- function(model0, model1,score_type){
         OneMinusH = diag(nrow(Z)) - ((sqrtW)* Z) %*% solve(t(Z) %*% ((sqrtW**2) * Z)) %*% t(Z * (sqrtW))
         deco=svd((V_vect^0.5)*OneMinusH,nv = 0)
         deco$d[deco$d<1E-12]=0
-        B=(t(X*sqrtW)%*%OneMinusH*(invV_vect**0.5))
+        B=(t(X*sqrtW)%*%OneMinusH*(sqrtinvV_vect))
         scores=t(B%*%deco$u)*(t(deco$u)%*%(sqrtinvV_vect*residuals))[,]*(1/length(model0$y)**0.5)
         nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect*residuals)^2)/length(model0$y))
-        scale_objects=list(U=U,B=B,m=m,nrm=nrm)
+        scale_objects=list(U=deco$u,B=B,nrm=nrm)
   }
   attr(scores,"scale_objects")=scale_objects
   rownames(scores)=names(model0$fitted.values)
