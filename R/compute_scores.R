@@ -52,7 +52,7 @@ compute_scores <- function(model0, model1,score_type){
   V_vect<-pars_score$V
   sqrtinvV_vect<-V_vect**(-0.5)
   
-
+  
   #BASIC SCORE
   if (score_type == "basic") {
     B=t(t(X * D_vect) %*% (diag(sqrtinvV_vect**2, nrow = length(sqrtW))))
@@ -60,23 +60,23 @@ compute_scores <- function(model0, model1,score_type){
     scale_objects=list(nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect*residuals)^2)/length(model0$y)))
   } else
     ##  EFFECTIVE SCORE 
-  if(score_type=="effective"){
-    A<-(sqrtW)*Z
-    B<-X*(sqrtW)-t(crossprod(crossprod(A,X*(sqrtW)),solve(crossprod(A),t(A))))
-    scores=B*sqrtinvV_vect*residuals/(length(model0$y)**0.5)
-    scale_objects=list(nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect*residuals)^2)/length(model0$y)))
-  } else
-    ##  STANDARDIZED SCORE
-    if(score_type=="standardized"){
-    #   A<-(sqrtW)*Z
-    #   B<-X*(sqrtW)-t(crossprod(crossprod(A,X*(sqrtW)),solve(crossprod(A),t(A))))
-    #   scores=B*sqrtinvV_vect*residuals
-    #   AA = crossprod(A)
-    #   AB = crossprod(A,B)
-    #   m = sum(B * B) - crossprod(AB, solve(AA, AB))
-    #   scale_objects=list(AA=AA,A=A, B=B,m=m,nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect*residuals)^2)))
-    # } else  
-    #   if(score_type=="maybe"){
+    if(score_type=="effective"){
+      A<-(sqrtW)*Z
+      B<-X*(sqrtW)-t(crossprod(crossprod(A,X*(sqrtW)),solve(crossprod(A),t(A))))
+      scores=B*sqrtinvV_vect*residuals/(length(model0$y)**0.5)
+      scale_objects=list(nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect*residuals)^2)/length(model0$y)))
+    } else
+      ##  STANDARDIZED SCORE
+      if(score_type=="standardized"){
+        #   A<-(sqrtW)*Z
+        #   B<-X*(sqrtW)-t(crossprod(crossprod(A,X*(sqrtW)),solve(crossprod(A),t(A))))
+        #   scores=B*sqrtinvV_vect*residuals
+        #   AA = crossprod(A)
+        #   AB = crossprod(A,B)
+        #   m = sum(B * B) - crossprod(AB, solve(AA, AB))
+        #   scale_objects=list(AA=AA,A=A, B=B,m=m,nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect*residuals)^2)))
+        # } else  
+        #   if(score_type=="maybe"){
         U=svd((sqrtW*Z),nv=0)$u
         b=crossprod(diag(nrow(Z))-tcrossprod(U),X*sqrtW)
         m = sum(b^2)
@@ -87,15 +87,15 @@ compute_scores <- function(model0, model1,score_type){
         scale_objects=list(A=A,nrm=nrm)
       } else  
         #ORTHO EFFECTIVE SCORE
-  if(score_type=="orthogonalized"){
-        OneMinusH = diag(nrow(Z)) - ((sqrtW)* Z) %*% solve(t(Z) %*% ((sqrtW**2) * Z)) %*% t(Z * (sqrtW))
-        deco=svd((V_vect^0.5)*OneMinusH,nv = 0)
-        deco$d[deco$d<1E-12]=0
-        B=(t(X*sqrtW)%*%OneMinusH*(sqrtinvV_vect))
-        scores=t(B%*%deco$u)*(t(deco$u)%*%(sqrtinvV_vect*residuals))[,]*(1/length(model0$y)**0.5)
-        nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect*residuals)^2)/length(model0$y))
-        scale_objects=list(U=deco$u,B=B,nrm=nrm)
-  }
+        if(score_type=="orthogonalized"){
+          OneMinusH = diag(nrow(Z)) - ((sqrtW)* Z) %*% solve(t(Z) %*% ((sqrtW**2) * Z)) %*% t(Z * (sqrtW))
+          deco=svd((V_vect^0.5)*OneMinusH,nv = 0)
+          deco$d[deco$d<1E-12]=0
+          B=(t(X*sqrtW)%*%OneMinusH*(sqrtinvV_vect))
+          scores=t(B%*%deco$u)*(t(deco$u)%*%(sqrtinvV_vect*residuals))[,]*(1/length(model0$y)**0.5)
+          nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect*residuals)^2)/length(model0$y))
+          scale_objects=list(U=deco$u,B=B,nrm=nrm)
+        }
   attr(scores,"scale_objects")=scale_objects
   rownames(scores)=names(model0$fitted.values)
   return(scores)

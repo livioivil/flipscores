@@ -56,22 +56,22 @@
 
 
 flipscores<-function(formula, family, data,
-                         score_type,
-                         n_flips=5000, 
-                         alternative ="two.sided", 
-                         id = NULL,
-                         seed=NULL,
-                         model=NULL,
-                         ...){
+                     score_type,
+                     n_flips=5000, 
+                     alternative ="two.sided", 
+                     id = NULL,
+                     seed=NULL,
+                     model=NULL,
+                     ...){
   # if(FALSE) flip() #just a trick to avoid warnings in package building
   # temp=is(formula) #just a trick to avoid warnings in package building
   # catturo la call,
   fs_call <- mf <- match.call()
-
+  
   score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
   if(missing(score_type))
     stop("test type is not specified or recognized")
-
+  
   
   # individuo i parametri specifici di flip score
   m <- match(c("score_type","n_flips","alternative","id","seed"), names(mf), 0L)
@@ -91,10 +91,10 @@ flipscores<-function(formula, family, data,
   else{
     m <- c(m,m2)
     to_be_tested=mf[[m2]]
-    }
+  }
   
   #####check id not null only with effective score:
-  if(!is.null(flip_param_call$id)&&(score_type%in%c("orthogonalized"))){
+  if(!is.null(flip_param_call$id)&&(score_type=="orthogonalized")){
     print(warning("WARNING: Use of id is allowed only with score_type=='effective', yet. 
  Nothing done."))
     return(NULL)
@@ -114,39 +114,39 @@ flipscores<-function(formula, family, data,
     #     } else param_x_ORIGINAL=TRUE
     #   
     # } else { #fit the glm or negbinom model
-      #set the model to fit
-      if(!is.null(mf$family)&&(mf$family=="negbinom")){
-        mf[[1L]]=quote(glm.nb)
-        mf$family=NULL
-      } else{
-        mf[[1L]]=quote(glm)
-      }
-      
-        #compute H1 model
-        param_x_ORIGINAL=mf$x
-        mf$x=TRUE
-        model <- eval(mf, parent.frame())
+    #set the model to fit
+    if(!is.null(mf$family)&&(mf$family=="negbinom")){
+      mf[[1L]]=quote(glm.nb)
+      mf$family=NULL
+    } else{
+      mf[[1L]]=quote(glm)
+    }
+    
+    #compute H1 model
+    param_x_ORIGINAL=mf$x
+    mf$x=TRUE
+    model <- eval(mf, parent.frame())
   } else { # input is a model
     param_x_ORIGINAL <- TRUE
     model <- update(model,x=TRUE)
   }
   
-if(is.null(model$y)) model$y=model$model[,1]
-
+  if(is.null(model$y)) model$y=model$model[,1]
+  
   #compute H0s models
   if(is.null(to_be_tested))
     to_be_tested=colnames(model[["x"]]) else
       to_be_tested=eval(to_be_tested,parent.frame())
-
-    if(is.null(flip_param_call$seed)) flip_param_call$seed=.Random.seed[1]
+  
+  if(is.null(flip_param_call$seed)) flip_param_call$seed=.Random.seed[1]
   results=lapply(to_be_tested,socket_compute_scores_and_flip,
-                      model,
-                      flip_param_call=flip_param_call#score_type=score_type,
-                      # id=eval(flip_param_call$id, parent.frame()),
-                      # alternative=flip_param_call$alternative,
-                      # n_flips=flip_param_call$n_flips,
-                      # seed=flip_param_call$seed
-                      )
+                 model,
+                 flip_param_call=flip_param_call#score_type=score_type,
+                 # id=eval(flip_param_call$id, parent.frame()),
+                 # alternative=flip_param_call$alternative,
+                 # n_flips=flip_param_call$n_flips,
+                 # seed=flip_param_call$seed
+  )
   model$scores=data.frame(lapply(results,function(x)x$scores))
   nrm=sapply(results,function(x)attributes(x$scores)$scale_objects$nrm)
   names(nrm)=names(model$scores)
@@ -161,7 +161,7 @@ if(is.null(model$y)) model$y=model$model[,1]
   # model$id=flip_param_call$id
   model$score_type=score_type
   model$n_flips=n_flips
-
+  
   
   if(is.null(param_x_ORIGINAL)||(!param_x_ORIGINAL)) model$x=NULL
   class(model) <- c("flipscores", class(model))

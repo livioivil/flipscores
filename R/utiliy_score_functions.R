@@ -1,21 +1,20 @@
 # for standardized:
 .score_std=function(scr_eff,flp) {
   # scr_eff # un vettore
-  numerator=crossprod(flp,scr_eff)
+  numerator=crossprod(flp,scr_eff) #t(scr_eff)%*%flp
   # A<- attributes(scr_eff)$scale_objects$A
   # m<- attributes(scr_eff)$scale_objects$m
   if (all(sign(flp)==1)|(all(sign(flp)==-1))){
     denominator = 1
   } else {
     denominator = 1 - sum((colSums(attributes(scr_eff)$scale_objects$A[flp==1,,drop=FALSE]) 
-                          -colSums(attributes(scr_eff)$scale_objects$A[flp==-1,,drop=FALSE]))^2)
+                           -colSums(attributes(scr_eff)$scale_objects$A[flp==-1,,drop=FALSE]))^2)
   }
   numerator/(denominator**0.5)
 }
 
 #for effective and others:
 .score <- function(Y,flp) flp%*%Y
-   # crossprod(flp,Y)
 
 #transform sum stat into t stat
 .sum2t <- function(stat,sumY2,n){
@@ -34,14 +33,15 @@
                       n_flips=5000,
                       seed=NULL,
                       statTest="sum"){
-  score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
-
-  if(score_type=="standardized") {
-    .score_fun <- .score_std   
-    
+  
   if(alternative=="two.sided") ff <- function(Tspace) abs(Tspace) else
     if(alternative=="less") ff <- function(Tspace) -Tspace else
       if(alternative=="greater") ff <- function(Tspace) Tspace
+      
+      score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
+      if(score_type=="standardized") .score_fun <- .score_std else
+        .score_fun <- .score
+      
       n=nrow(Y)
       Tobs=  .score_fun(Y,rep(1,n))
       set.seed(seed)
@@ -50,13 +50,14 @@
         .score_fun(Y,flp)
       }))))
       set.seed(NULL)
-      }  else
-        {
-        Tspace=data.frame(t(pecora::oneSample(Y,n_flips,seed = seed)))
-      }
+      # if(score_type=="effective"||score_type=="orthogonalized") 
+      #   Tspace=.sum2t(Tspace,
+      #                 sumY2 = sum(Y^2,na.rm = TRUE),
+      #                 n=sum(!is.na(Y)))
+      # 
+      p.values=t2p(ff(unlist(Tspace)))
       # named vector?
-  p.values=pecora::t2p(t(unlist(Tspace)),alternative = "greater",permReturn = FALSE)
-  
+      
       out=list(Tspace=Tspace,p.values=p.values)
       names(out$p.values)=names(Y)
       return(out)
@@ -86,10 +87,9 @@ mahalanobis_npc_multi <- function(ids_list,permT){
   t(out)
 }
 
-######################################
-# i are names of the columns of model.frame x
+
+# i and exclude are indices of the columns of model.frame x
 socket_compute_scores <- function(i,model,score_type){
-  model$x=model.matrix(model)
   if(is.numeric(i)) {
     i=colnames(model$x)[i]
   }
@@ -99,17 +99,22 @@ socket_compute_scores <- function(i,model,score_type){
   }
   
   i_id=which(colnames(model$x)==i)
+  
+  if(is.character(i)) i=which(colnames(model$x)==i)
   #to avoid re-run a flipscores everytime:
   attributes(model)$class= attributes(model)$class[attributes(model)$class!="flipscores"]
   tested_X=model[["x"]][, i_id, drop = FALSE]
   # model$x=model$x[,-c(i,exclude),drop=FALSE]
-  # if(ncol(model[["x"]])>0)
-    # colnames(model[["x"]])=paste0("V",1:ncol(model$x))
+  if(ncol(model[["x"]])>0)
+    colnames(model[["x"]])=paste0("V",1:ncol(model$x))
   
   model$call$data=data.frame(model[["y"]],model[["x"]][,-i_id,drop=FALSE])
   yname=as.character(model$call$formula[[2]])
   names(model$call$data)[1]=yname
   
+  # frml=update(as.formula(model$call$formula), formula(paste(yname,"~0+",paste(colnames(model[["x"]]),collapse =" + "))))
+  # model$call$formula=as.formula(frml)
+  # model$call$formula=update( model$call$formula,formula(paste("~.",paste("-",colnames(model[["x"]])[i],collapse=""))))
   frml=as.formula(paste(yname,"~0+."))
   model$call$formula=as.formula(paste(yname,"~0+."))
   if(!is.null(model$offset)){
@@ -126,11 +131,18 @@ socket_compute_scores <- function(i,model,score_type){
 #####################
 # i and exclude are indices of the columns of model.frame x
 socket_compute_flip <- function(scores,flip_param_call,score_type){
+  ############### fit the H1 model and append the scores (refitted under H0s)
   
+  ###############################
+  ## compute flips
+  
+  ### TODO RENDERE PI AGILE INPUT DI id (es formula se possibile?) 
+  # + quality check
   if(!is.null(flip_param_call$id)&&
-     (!(flip_param_call$score_type%in%c("orthogonalized")))) 
+     (!(flip_param_call$score_type%in%c("orthogonalized"))))
     scores=lapply(scores,rowsum,id)
-
+  # scores=as.matrix(unlist(scores[,]))
+  
   #  call to flip::flip()
   flip_param_call$Y=scores
   
@@ -143,18 +155,15 @@ socket_compute_flip <- function(scores,flip_param_call,score_type){
   results
 }
 
-
-#####################
+############################################
 # i and exclude are indices of the columns of model.frame x
 socket_compute_scores_and_flip <- function(i,model,exclude=NULL,
                                            flip_param_call){
-
-    scores  <- socket_compute_scores(i,model,score_type=flip_param_call$score_type)
-    results <- socket_compute_flip (scores,flip_param_call)
-
+  scores  <- socket_compute_scores(i,model,score_type=flip_param_call$score_type)
+  results <- socket_compute_flip (scores,flip_param_call)
 }
 
-#####################################
+##########################
 get_X <- function(model0,model1){
   if(is(model1,"glm")){
     mm=model.matrix(model1)
