@@ -1,11 +1,11 @@
 Package: flipscores
-Version: 1.1.0
-Date: 2020-06-15
+Version: 1.2.0
+Date: 2022-06-29
 Title: Robust Score Testing in GLMs, by Sign-Flip Contributions 
 Author: Livio Finos, Jesse Hemerik and Jelle Goeman with contribution by Vittorio Giatti
 Maintainer: Livio Finos <livio.finos@unipd.it>
 Description: Provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables. See Hemerik, Goeman and Finos (2020) <doi:10.1111/rssb.12369>.
-Imports: car, MASS, plyr, methods 
+Imports: MASS, plyr, methods 
 Encoding: UTF-8
 License: GPL-2
 RoxygenNote: 7.1.2
