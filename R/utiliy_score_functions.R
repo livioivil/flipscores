@@ -55,7 +55,7 @@
       #                 sumY2 = sum(Y^2,na.rm = TRUE),
       #                 n=sum(!is.na(Y)))
       # 
-      p.values=t2p(ff(unlist(Tspace)))
+      p.values=flipscores:::.t2p(ff(unlist(Tspace)))
       # named vector?
       
       out=list(Tspace=Tspace,p.values=p.values)
@@ -75,8 +75,8 @@ mahalanobis_npc <- function(permT){
   ei$vectors=ei$vectors[,ei$values>1E-12,drop=FALSE]
   ei$values=ei$values[ei$values>1E-12]
   dst=abs(rowSums(permT%*%ei$vect%*%diag(ei$val^-.5)))
+  dst=dst^2*nrow(permT)
   return(dst)
-  #manca ^2 e *nrow(permT). omesso per semplificare i calcoli
 }
 
 #performs mahalanobis_npc() on selected columns of permT

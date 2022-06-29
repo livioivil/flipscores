@@ -49,13 +49,13 @@ anova.flipscores <- function(object, model1=NULL,
     mf <- match.call(expand.dots = TRUE)
     if(!is.null(mf$flip_param_call$id))
       scores=rowsum(scores,group = id)
-    ps=flip::flip(scores,perms=n_flips)
-    res=npc(ps@permT,comb.funct = "mahalanobist")
+    ps=flipscores:::.flip_test(scores,perms=n_flips)
+    res=flipscores:::mahalanobis_npc(ps@Tspace)
     anova_temp=get("anova.glm", envir = asNamespace("stats"),
                    inherits = FALSE)
     out_param=anova_temp(object,model1,test="Rao")
-    out_param$Rao[2]=res@res[1,3]
-    out_param$`Pr(>Chi)`[2]=res@res[1,4]
+    out_param$Rao[2]=dst[1]
+    out_param$`Pr(>Chi)`[2]=flipscores:::.t2p(dst)
     
     } else   { ## type I or III deviance decomposition
     
@@ -84,9 +84,8 @@ anova.flipscores <- function(object, model1=NULL,
         subsets_npc=c(subsets_npc,list(sum(temp[1:(i-1)])+(1:temp[i])))
         
     scores = as.data.frame(scores)
-
-  
-    ps=flip::flip(as.matrix(scores),perms=n_flips,tail=1)
+    ps=flipscores:::.flip_test(as.matrix(scores),scores,perms=n_flips,alternative = "greater")
+    res=flipscores:::mahalanobis_npc(ps@Tspace)
     res=mahalanobis_npc_multi(ids_list = subsets_npc,permT = ps@permT)
     # flip::npc(ps@permT,comb.funct = "mahalanobist",subsets = subsets_npc)
     # res@res[, 3]=res@res[, 3]*nrow(ps@permT)
@@ -96,9 +95,9 @@ anova.flipscores <- function(object, model1=NULL,
     # out_param$Rao[-1]=res@res[,3]
     # out_param$`Pr(>Chi)`[-1]=res@res[,4]
     names(out_param)[1]="Score"
-    out_param[[1]]=res[1,]^2*nrow(res)
+    out_param[[1]]=res[1,]
     names(out_param)[3]="Pr(>Score)"
-    out_param[[3]]=flip::t2p(res)[,]
+    out_param[[3]]=apply(res,2,flipscores:::.t2p)
     if(type==1){
       type_test=": Type I test (i.e. terms added sequentially, first to last)"
     } else if (type==3) {

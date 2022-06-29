@@ -45,10 +45,6 @@ mod_par
 mod=flipscores(y~x*z,data=D,family = binomial, score_type = "effective")
 summary(mod)
 print(mod)
-
-# with clustered observations:
-mod=flipscores(y~x*z,data=D,family = binomial, id=D$id, score_type = "ort")
-summary(mod)
 ```
 
 ## Poisson
