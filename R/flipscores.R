@@ -61,7 +61,6 @@ flipscores<-function(formula, family, data,
                      alternative ="two.sided", 
                      id = NULL,
                      seed=NULL,
-                     model=NULL,
                      ...){
   # if(FALSE) flip() #just a trick to avoid warnings in package building
   # temp=is(formula) #just a trick to avoid warnings in package building
@@ -128,7 +127,7 @@ flipscores<-function(formula, family, data,
     model <- eval(mf, parent.frame())
   } else { # input is a model
     param_x_ORIGINAL <- TRUE
-    model <- update(model,x=TRUE)
+    model <- update(model,x=TRUE,family=model$family)
   }
   
   if(is.null(model$y)) model$y=model$model[,1]
