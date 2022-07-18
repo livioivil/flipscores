@@ -63,30 +63,36 @@ anova.flipscores <- function(object, model1=NULL,
     if (!is.matrix(object[["x"]])) 
       object$x = model.matrix(object)
     varseq <- attr(object$x, "assign")
-    nvars <- max(0, varseq)
-    resdev <- resdf <- NULL
-  
-    mf <- match.call(expand.dots = TRUE)
-    if(!is.null(mf$flip_param_call$id)) 
-      object$id=mf$flip_param_call$id
     
-    scores=lapply(1:nvars, function(var_i) {
-      tested=which(varseq==var_i)
-      # print(tested)
-      excluded <- if(type==2) which(varseq>var_i) else c()
-      # print(excluded)
-      socket_compute_scores_and_flip(tested,object,exclude=excluded,flip_param_call=object$flip_param_call)$scores
-      })
-    temp=sapply(scores,function(K)ncol(K))
-    subsets_npc=list(1:temp[1])
-    if(length(temp)>1)
-      for(i in 2:length(temp))
-        subsets_npc=c(subsets_npc,list(sum(temp[1:(i-1)])+(1:temp[i])))
-        
-    scores = as.data.frame(scores)
-    ps=flipscores:::.flip_test(as.matrix(scores),scores,perms=n_flips,alternative = "greater")
-    res=flipscores:::mahalanobis_npc(ps@Tspace)
-    res=mahalanobis_npc_multi(ids_list = subsets_npc,permT = ps@permT)
+    ############################
+    subsets_npc=lapply(unique(varseq[varseq!=0]),function(i)which(varseq==i))
+    # nvars <- max(0, varseq)
+    # resdev <- resdf <- NULL
+    # 
+    # mf <- match.call(expand.dots = TRUE)
+    # if(!is.null(mf$flip_param_call$id)) 
+    #   object$id=mf$flip_param_call$id
+    # 
+    # scores=lapply(1:nvars, function(var_i) {
+    #   tested=which(varseq==var_i)
+    #   # print(tested)
+    #   excluded <- if(type==2) which(varseq>var_i) else c()
+    #   # print(excluded)
+    #   socket_compute_scores_and_flip(tested,object,exclude=excluded,flip_param_call=object$flip_param_call)$scores
+    #   })
+    # temp=sapply(scores,function(K)ncol(K))
+    # subsets_npc=list(1:temp[1])
+    # if(length(temp)>1)
+    #   for(i in 2:length(temp))
+    #     subsets_npc=c(subsets_npc,list(sum(temp[1:(i-1)])+(1:temp[i])))
+    #     
+    # scores = as.data.frame(scores)
+    # ps=flipscores:::.flip_test(as.matrix(scores),
+    #                            score_type = score_type,
+    #                            scores,perms=n_flips,
+    #                            alternative = "greater")
+    #### res=flipscores:::mahalanobis_npc(ps@Tspace)
+    res=mahalanobis_npc_multi(ids_list = subsets_npc,permT = as.matrix(object$Tspace))
     # flip::npc(ps@permT,comb.funct = "mahalanobist",subsets = subsets_npc)
     # res@res[, 3]=res@res[, 3]*nrow(ps@permT)
     

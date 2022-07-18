@@ -42,7 +42,7 @@ compute_scores <- function(model0, model1,score_type){
   }
   
   
-  if(ncol(model0$x)==0) return(model0$y)
+  if(ncol(model0$x)==0) return(matrix(model0$y))
   if(is.null(model0$y)) model0$y=model0$model[,1]
   Z=model0$x
   residuals=(model0$y-model0$fitted.values)

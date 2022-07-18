@@ -44,7 +44,7 @@
 #' dt=data.frame(X=rnorm(20),
 #'    Z=factor(rep(LETTERS[1:3],length.out=20)))
 #' dt$Y=rpois(n=20,lambda=exp(dt$Z=="C"))
-#' mod=flipscores(Y~Z+X,data=dt,family="poisson",score_type = "effective")
+#' mod=flipscores(Y~Z+X,data=dt,family="poisson",score_type = "standardized")
 #' summary(mod)
 #' 
 #' # Equivalent to:
@@ -137,7 +137,7 @@ flipscores<-function(formula, family, data,
     to_be_tested=colnames(model[["x"]]) else
       to_be_tested=eval(to_be_tested,parent.frame())
   
-  if(is.null(flip_param_call$seed)) flip_param_call$seed=.Random.seed[1]
+  if(is.null(flip_param_call$seed)) flip_param_call$seed=Sys.time() #eval(.Random.seed[1], envir=.GlobalEnv)
   results=lapply(to_be_tested,socket_compute_scores_and_flip,
                  model,
                  flip_param_call=flip_param_call#score_type=score_type,

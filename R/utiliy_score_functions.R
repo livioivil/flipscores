@@ -32,7 +32,7 @@
 .flip_test<- function(Y,score_type="standardized",alternative="two.sided",
                       n_flips=5000,
                       seed=NULL,
-                      statTest="sum"){
+                      statTest="sum",...){
   
   if(alternative=="two.sided") ff <- function(Tspace) abs(Tspace) else
     if(alternative=="less") ff <- function(Tspace) -Tspace else
@@ -42,11 +42,11 @@
       if(score_type=="standardized") .score_fun <- .score_std else
         .score_fun <- .score
       
-      n=nrow(Y)
-      Tobs=  .score_fun(Y,rep(1,n))
+      nobs=nrow(Y)
+      Tobs=  .score_fun(Y,rep(1,nobs))
       set.seed(seed)
       Tspace=data.frame(as.vector(c(Tobs,replicate(n_flips-1,{
-        flp<-sample(c(-1,1),n, replace = T)
+        flp<-sample(c(-1,1),nobs, replace = T)
         .score_fun(Y,flp)
       }))))
       set.seed(NULL)
@@ -74,8 +74,8 @@ mahalanobis_npc <- function(permT){
   ei=eigen(t(permT)%*%permT)
   ei$vectors=ei$vectors[,ei$values>1E-12,drop=FALSE]
   ei$values=ei$values[ei$values>1E-12]
-  dst=abs(rowSums(permT%*%ei$vect%*%diag(ei$val^-.5)))
-  dst=dst^2*nrow(permT)
+  dst=rowSums((permT%*%ei$vect%*%diag(ei$val^-.5))^2)
+  dst=dst*nrow(permT)
   return(dst)
 }
 
@@ -83,8 +83,8 @@ mahalanobis_npc <- function(permT){
 mahalanobis_npc_multi <- function(ids_list,permT){
   
   ff=function(ids,permT) mahalanobis_npc(permT[,ids,drop=FALSE])
-  out=lapply(ids_list,ff,permT)
-  t(out)
+  out=sapply(ids_list,ff,permT)
+  (out)
 }
 
 
@@ -95,12 +95,12 @@ socket_compute_scores <- function(i,model,score_type){
   }
   if(is.character(i)) {
     #check if it is present
-    if(!(i%in%colnames(model$x))) warning("Variable ",i," is not present in the model")
+    if(!all(i%in%colnames(model$x))) warning("Variable(s) ",paste(sep=", ",setdiff(i,colnames(model$x)))," is(are) not present in the model")
   }
   
-  i_id=which(colnames(model$x)==i)
+  i_id=sapply(i,grep,colnames(model$x))
   
-  if(is.character(i)) i=which(colnames(model$x)==i)
+  #if(is.character(i)) i=which(colnames(model$x)==i)
   #to avoid re-run a flipscores everytime:
   attributes(model)$class= attributes(model)$class[attributes(model)$class!="flipscores"]
   tested_X=model[["x"]][, i_id, drop = FALSE]
@@ -121,6 +121,9 @@ socket_compute_scores <- function(i,model,score_type){
     offs<-model$offset
     model$call$formula=update( model$call$formula,formula(paste("~.+offset(offs)")))
   }
+  model$call$score_type=NULL
+  model$call$perms = NULL
+  model$call[[1]]=quote(glm)
   model_i <-update(model)
   # print(flip_param_call$score_type)
   # browser()
@@ -143,7 +146,7 @@ socket_compute_flip <- function(scores,flip_param_call,score_type){
     scores=lapply(scores,rowsum,id)
   # scores=as.matrix(unlist(scores[,]))
   
-  #  call to flip::flip()
+
   flip_param_call$Y=scores
   
   results=eval(flip_param_call, parent.frame())
@@ -197,7 +200,7 @@ get_par_expo_fam <- function(model0){
                    log     = quote(exp(eta)),
                    cloglog = quote(1 - exp(-exp(eta))),
                    logit   = quote(exp(eta)/(1 + exp(eta))))
-    }else mu <- as.list(model0$family$linkinv)[[2]]
+    } else mu <- as.list(model0$family$linkinv)[[2]]
     
     if(model0$family[[2]] %in% c("probit","cauchit")){
       Dmu <- switch(model0$family[[2]],
