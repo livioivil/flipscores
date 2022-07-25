@@ -41,16 +41,23 @@ anova.flipscores <- function(object, model1=NULL,
   
   if(is.null(object$x)||(length(object$x)==0)) object=update(object,x=TRUE)
   
+  if(is.null(score_type)) score_type = object$score_type
   ## comparison of 2 nested models
   if(!is.null(model1)){ 
     scores=compute_scores(model0 = object,
                           model1 = model1,
-                          score_type = if(is.null(score_type)) object$score_type else score_type)
+                          score_type = score_type)
     mf <- match.call(expand.dots = TRUE)
     if(!is.null(mf$flip_param_call$id))
       scores=rowsum(scores,group = id)
-    ps=flipscores:::.flip_test(scores,perms=n_flips)
-    res=flipscores:::mahalanobis_npc(ps@Tspace)
+    
+    Tspace=sapply(1:ncol(scores), function(id_col){
+      score1=scores[,id_col,drop=FALSE]
+      attributes(score1)$scale_objects=attributes(scores)$scale_objects[[id_col]]
+      as.matrix(flipscores:::.flip_test(score1,perms=n_flips,
+                                        score_type = score_type)$Tspace)
+      })
+    dst=flipscores:::mahalanobis_npc(Tspace)
     anova_temp=get("anova.glm", envir = asNamespace("stats"),
                    inherits = FALSE)
     out_param=anova_temp(object,model1,test="Rao")

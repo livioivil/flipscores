@@ -16,10 +16,10 @@
 #' # Anova test
 #' anova(mod)
 #' # or
-#' mod0=flipscores(Y~Z,data=dt,family="poisson",score_type = "effective")
+#' mod0=flipscores(Y~Z,data=dt,family="poisson",score_type = "standardized")
 #' anova(mod0,mod)
 #' # and
-#' mod0=flipscores(Y~X,data=dt,family="poisson",score_type = "effective")
+#' mod0=flipscores(Y~X,data=dt,family="poisson",score_type = "standardized")
 #' anova(mod0,mod)
 #' @docType package
 #'

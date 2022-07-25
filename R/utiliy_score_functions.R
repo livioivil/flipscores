@@ -145,16 +145,25 @@ socket_compute_flip <- function(scores,flip_param_call,score_type){
      (!(flip_param_call$score_type%in%c("orthogonalized"))))
     scores=lapply(scores,rowsum,id)
   # scores=as.matrix(unlist(scores[,]))
-  
 
-  flip_param_call$Y=scores
+  results=lapply(1:ncol(scores), function(id_col){
+    score1=scores[,id_col,drop=FALSE]
+    attributes(score1)$scale_objects=attributes(scores)$scale_objects[[id_col]]
+    flip_param_call$Y=score1
+    res=eval(flip_param_call, parent.frame())  
+    res$scores=score1
+    res
+  })
+    
   
-  results=eval(flip_param_call, parent.frame())
+  # flip_param_call$Y=scores
+  # 
+  # results=eval(flip_param_call, parent.frame())
   # results=.flip_test(Y=scores,score_type=score_type,
   # alternative=alternative,n_flips=n_flips,
   # seed=seed,
   # statTest="sum")
-  results$scores=scores
+  # results$scores=scores
   results
 }
 

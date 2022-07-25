@@ -146,13 +146,12 @@ flipscores<-function(formula, family, data,
                  # n_flips=flip_param_call$n_flips,
                  # seed=flip_param_call$seed
   )
-  model$scores=data.frame(lapply(results,function(x)x$scores))
-  nrm=sapply(results,function(x)attributes(x$scores)$scale_objects$nrm)
-  names(nrm)=names(model$scores)
+  model$scores=data.frame(lapply(results,function(x)x[[1]]$scores))
+  nrm=sapply(results,function(x)attributes(x[[1]]$scores)$scale_objects$nrm)
+  model$Tspace=data.frame(lapply(results,function(x)x[[1]]$Tspace)) 
+  model$p.values=sapply(results,function(x)x[[1]]$p.values)
+  names(nrm) <- names(model$scores)<- names(model$Tspace) <- names(model$p.values) <-to_be_tested
   attr(model$scores,"nrm")=nrm
-  model$Tspace=data.frame(lapply(results,function(x)x$Tspace)) 
-  model$p.values=sapply(results,function(x)x$p.values)
-  names(model$scores)<- names(model$Tspace) <- names(model$p.values) <-to_be_tested
   
   ### output
   model$call=fs_call
