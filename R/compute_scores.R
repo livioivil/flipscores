@@ -42,7 +42,15 @@ compute_scores <- function(model0, model1,score_type){
   }
   
   
-  if(ncol(model0$x)==0) return(matrix(model0$y))
+  # no variables in the null model
+  if(ncol(model0$x)==0){
+    scores=matrix(model0$y)
+    attr(scores,"scale_objects")=list(A=matrix(0,nrow(scores),1),
+                                      nrm=1)
+    rownames(scores)=names(model0$fitted.values)
+    return(scores)
+  }
+  
   if(is.null(model0$y)) model0$y=model0$model[,1]
   Z=model0$x
   residuals=(model0$y-model0$fitted.values)
