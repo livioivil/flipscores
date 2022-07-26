@@ -10,6 +10,7 @@
     denominator = 1 - sum((colSums(attributes(scr_eff)$scale_objects$A[flp==1,,drop=FALSE]) 
                            -colSums(attributes(scr_eff)$scale_objects$A[flp==-1,,drop=FALSE]))^2)
   }
+  if(is.na(numerator/(denominator**0.5))) browser()
   numerator/(denominator**0.5)
 }
 
