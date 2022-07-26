@@ -10,13 +10,13 @@
 #' dt=data.frame(X=rnorm(20),
 #'    Z=factor(rep(LETTERS[1:3],length.out=20)))
 #' dt$Y=rpois(n=20,lambda=exp(dt$X))
-#' mod=flipscores(Y~Z+X,data=dt,family="poisson",score_type = "effective")
+#' mod=flipscores(Y~Z+X,data=dt,family="poisson",score_type = "effective",x=TRUE,)
 #' summary(mod)
 #' 
 #' # Anova test
 #' anova(mod)
 #' # or
-#' mod0=flipscores(Y~Z,data=dt,family="poisson",score_type = "standardized")
+#' mod0=flipscores(Y~Z,data=dt,family="poisson",score_type = "standardized",x=TRUE)
 #' anova(mod0,mod)
 #' # and
 #' mod0=flipscores(Y~X,data=dt,family="poisson",score_type = "standardized")

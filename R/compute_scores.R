@@ -16,7 +16,9 @@
 #' X=Z+rnorm(20)
 #' Y=rpois(n=20,lambda=exp(Z+X))
 #' mod0=glm(Y~Z,family="poisson")
-#' (scr0=compute_scores(model0 = mod0, model1 = X, score_type = "effective"))
+#' X=data.frame(X=X)
+#' scr0=compute_scores(model0 = mod0, model1 = X, score_type = "standardized")
+#' head(scr0)
 #' @export
 
 compute_scores <- function(model0, model1,score_type){
