@@ -10,7 +10,6 @@
     denominator = 1 - sum((colSums(attributes(scr_eff)$scale_objects$A[flp==1,,drop=FALSE]) 
                            -colSums(attributes(scr_eff)$scale_objects$A[flp==-1,,drop=FALSE]))^2)
   }
-  if(is.na(numerator/(denominator**0.5))) browser()
   numerator/(denominator**0.5)
 }
 
@@ -21,8 +20,13 @@
 .sum2t <- function(stat,sumY2,n){
   # sumY2=sum(Y^2,na.rm = TRUE)
   # n=sum(!is.na(Y))
+  # print(sumY2)
+  # print(stat)
+  # stat0=stat
   stat=stat/sqrt((sumY2-(stat^2)/n)*(n/(n-1)))
-  stat
+  # print(stat)
+# if(any(is.na(stat))) browser()
+    stat
 }
 
 #### compute p-value
@@ -51,11 +55,11 @@
         .score_fun(Y,flp)
       }))))
       set.seed(NULL)
-      # if(score_type=="effective"||score_type=="orthogonalized") 
-      #   Tspace=.sum2t(Tspace,
-      #                 sumY2 = sum(Y^2,na.rm = TRUE),
-      #                 n=sum(!is.na(Y)))
-      # 
+       if(score_type=="effective"||score_type=="orthogonalized") 
+        Tspace=.sum2t(Tspace,
+                      sumY2 = sum(Y^2,na.rm = TRUE),
+                      n=sum(!is.na(Y)))
+
       p.values=flipscores:::.t2p(ff(unlist(Tspace)))
       # named vector?
       
