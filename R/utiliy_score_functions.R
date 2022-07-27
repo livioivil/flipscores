@@ -100,10 +100,10 @@ socket_compute_scores <- function(i,model,score_type){
   }
   if(is.character(i)) {
     #check if it is present
-    if(!all(i%in%colnames(model$x))) warning("Variable(s) ",paste(sep=", ",setdiff(i,colnames(model$x)))," is(are) not present in the model")
+    if(!any(i%in%colnames(model$x))) warning("Variable(s) ",paste(sep=", ",setdiff(i,colnames(model$x)))," is(are) not present in the model")
   }
   
-  i_id=sapply(i,grep,colnames(model$x))
+  i_id=sapply(i,function(ii)which(colnames(model$x)==ii))
   
   #if(is.character(i)) i=which(colnames(model$x)==i)
   #to avoid re-run a flipscores everytime:
