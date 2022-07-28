@@ -60,7 +60,7 @@
                       sumY2 = sum(Y^2,na.rm = TRUE),
                       n=sum(!is.na(Y)))
 
-      p.values=flipscores:::.t2p(ff(unlist(Tspace)))
+      p.values=.t2p(ff(unlist(Tspace)))
       # named vector?
       
       out=list(Tspace=Tspace,p.values=p.values)
@@ -146,6 +146,7 @@ socket_compute_flip <- function(scores,flip_param_call,score_type){
   
   ### TODO RENDERE PI AGILE INPUT DI id (es formula se possibile?) 
   # + quality check
+  id=NULL
   if(!is.null(flip_param_call$id)&&
      (!(flip_param_call$score_type%in%c("orthogonalized"))))
     scores=lapply(scores,rowsum,id)

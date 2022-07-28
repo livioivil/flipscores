@@ -48,7 +48,7 @@ set.seed(1)
 dt=data.frame(X=rnorm(20),
    Z=factor(rep(LETTERS[1:3],length.out=20)))
 dt$Y=rpois(n=20,lambda=exp(dt$Z=="C"))
-mod=flipscores(Y~Z+X,data=dt,family="poisson",score_type = "effective")
+mod=flipscores(Y~Z+X,data=dt,family="poisson",score_type = "standardized")
 summary(mod)
 
 # Equivalent to:

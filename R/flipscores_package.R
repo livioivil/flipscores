@@ -1,10 +1,9 @@
 #' Robust Score Testing in GLMs, by Sign-Flip Contributions 
 #'
 #' @description It provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables.
-#' @importFrom car Anova
 #' @importFrom MASS glm.nb
 #' @importFrom methods is
-#' @importFrom stats D as.formula model.matrix sd summary.glm update
+#' @importFrom stats D as.formula model.matrix sd summary.glm update formula getCall terms
 #' @examples
 #' set.seed(1)
 #' dt=data.frame(X=rnorm(20),
