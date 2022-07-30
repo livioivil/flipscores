@@ -1,11 +1,11 @@
 #' @title Robust testing in GLMs, by sign-flipping score contributions
 #'
 #' @description Provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables.
-#' @param score_type The type of score that is computed. It can be "orthogonalized", "effective" or "basic". 
-#' Both "orthogonalized" and "effective" take into account the nuisance estimation and they provide the same
-#' test statistic. In case of small samples "effective score" might have a slight anti-conservative behaviour. 
-#' "orthogonalized effective score" gives a solution for this issue.
-#' Note that in case of a big model matrix, the "orthogonalized" may take a long time.
+#' @param score_type The type of score that is computed. It can be "standardized", "effective", "orthogonalized" or "basic". 
+#' All but "basic" take into account the nuisance estimation and they provide the same
+#' test statistic. In case of small samples "effective score" might have a slight anti-conservative behaviour, 
+#' while "standardized" and "orthogonalized" give a solution for this issue.
+#' Note that in case of a big model matrix, the  "standardized" and "orthogonalized" may take a long time, while "effective" is much faster (and usually has a good control of the type I error).
 #'
 #' @param n_flips The number of random flips of the score contributions.
 #' When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed.
@@ -56,7 +56,7 @@
 
 
 flipscores<-function(formula, family, data,
-                     score_type,
+                     score_type = "standardized",
                      n_flips=5000, 
                      alternative ="two.sided", 
                      id = NULL,
