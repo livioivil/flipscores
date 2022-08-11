@@ -22,6 +22,6 @@
 #' anova(mod0,mod)
 #' @docType package
 #'
-#' @author Livio Finos, Jelle Goeman and Jesse Hemerik, with contribution of Vittorio Giatti.
+#' @author Livio Finos, Jelle Goeman and Jesse Hemerik, with contribution of Riccardo De Santis.
 #' @name flipscores-package
 NULL
