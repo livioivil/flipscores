@@ -1,11 +1,11 @@
 #' @title Robust testing in GLMs, by sign-flipping score contributions
 #'
 #' @description Provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables.
-#' @param score_type The type of score that is computed. It can be "standardized", "effective", "orthogonalized" or "basic". 
-#' All but "basic" take into account the nuisance estimation and they provide the same
-#' test statistic. In case of small samples "effective score" might have a slight anti-conservative behaviour, 
-#' while "standardized" and "orthogonalized" give a solution for this issue.
-#' Note that in case of a big model matrix, the  "standardized" and "orthogonalized" may take a long time, while "effective" is much faster (and usually has a good control of the type I error).
+#' @param score_type The type of score that is computed. It can be "orthogonalized", "effective" or "basic". 
+#' Both "orthogonalized" and "effective" take into account the nuisance estimation and they provide the same
+#' test statistic. In case of small samples "effective score" might have a slight anti-conservative behaviour. 
+#' "orthogonalized effective score" gives a solution for this issue.
+#' Note that in case of a big model matrix, the "orthogonalized" may take a long time.
 #'
 #' @param n_flips The number of random flips of the score contributions.
 #' When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed.
@@ -44,12 +44,12 @@
 #' dt=data.frame(X=rnorm(20),
 #'    Z=factor(rep(LETTERS[1:3],length.out=20)))
 #' dt$Y=rpois(n=20,lambda=exp(dt$Z=="C"))
-#' mod=flipscores(Y~Z+X,data=dt,family="poisson",score_type = "standardized")
+#' mod=flipscores(Y~Z+X,data=dt,family="poisson")
 #' summary(mod)
 #' 
 #' # Equivalent to:
 #' model=glm(Y~Z+X,data=dt,family="poisson")
-#' mod2=flipscores(model,score_type = "effective")
+#' mod2=flipscores(model)
 #' summary(mod2)
 #' @export
 
@@ -78,11 +78,12 @@ flipscores<-function(formula, family, data,
   flip_param_call= mf[c(1L,m)]
   
   # rinomino la funzione da chiamare:
-  flip_param_call[[1L]]=quote(flipscores:::.flip_test)
+  flip_param_call[[1L]]=.flip_test#quote(flipscores:::.flip_test) #
   
-  flip_param_call$n_flips <- eval(flip_param_call$n_flips, parent.frame()) ###useless
-  flip_param_call$score_type <- eval(flip_param_call$score_type, parent.frame()) ###useless
-  flip_param_call$seed <- eval(flip_param_call$seed, parent.frame()) ###useless
+  flip_param_call$n_flips <- eval(flip_param_call$n_flips, parent.frame())
+  flip_param_call$score_type <- eval(flip_param_call$score_type, parent.frame()) 
+  if(is.null(flip_param_call$score_type)) flip_param_call$score_type = "standardized"
+  flip_param_call$seed <- eval(flip_param_call$seed, parent.frame())
   
   m2 <- match(c("to_be_tested"), names(mf), 0L)
   if(m2==0)

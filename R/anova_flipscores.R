@@ -15,11 +15,11 @@
 #' dt=data.frame(X=scale(rnorm(50)),
 #'    Z=factor(rep(LETTERS[1:3],length.out=50)))
 #' dt$Y=rpois(n=nrow(dt),lambda=exp(dt$X*(dt$Z=="C")))
-#' mod0=flipscores(Y~Z+X,data=dt,family="poisson",score_type = "standardized")
+#' mod0=flipscores(Y~Z+X,data=dt,family="poisson")
 #' summary(mod0)
 #' anova(mod0)
 #'
-#' mod1=flipscores(Y~Z*X,data=dt,family="poisson",score_type = "standardized")
+#' mod1=flipscores(Y~Z*X,data=dt,family="poisson")
 #' summary(mod1)
 #' anova(mod0,model1 = mod1)
 #'

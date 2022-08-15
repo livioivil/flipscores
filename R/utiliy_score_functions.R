@@ -128,7 +128,10 @@ socket_compute_scores <- function(i,model,score_type){
   }
   model$call$score_type=NULL
   model$call$perms = NULL
-  model$call[[1]]=quote(glm)
+
+  if(length(grep("Negative Binomial",model$family$family))==1)
+    model$call[[1]]=quote(glm.nb) else
+      model$call[[1]]=quote(glm)
   model_i <-update(model)
   # print(flip_param_call$score_type)
   # browser()

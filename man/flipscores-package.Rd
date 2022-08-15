@@ -12,18 +12,18 @@ set.seed(1)
 dt=data.frame(X=rnorm(20),
    Z=factor(rep(LETTERS[1:3],length.out=20)))
 dt$Y=rpois(n=20,lambda=exp(dt$X))
-mod=flipscores(Y~Z+X,data=dt,family="poisson",score_type = "effective",x=TRUE,)
+mod=flipscores(Y~Z+X,data=dt,family="poisson",x=TRUE,)
 summary(mod)
 
 # Anova test
 anova(mod)
 # or
-mod0=flipscores(Y~Z,data=dt,family="poisson",score_type = "standardized",x=TRUE)
+mod0=flipscores(Y~Z,data=dt,family="poisson",x=TRUE)
 anova(mod0,mod)
 # and
-mod0=flipscores(Y~X,data=dt,family="poisson",score_type = "standardized")
+mod0=flipscores(Y~X,data=dt,family="poisson")
 anova(mod0,mod)
 }
 \author{
-Livio Finos, Jelle Goeman and Jesse Hemerik, with contribution of Vittorio Giatti.
+Livio Finos, Jelle Goeman and Jesse Hemerik, with contribution of Riccardo De Santis.
 }

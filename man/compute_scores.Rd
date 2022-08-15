@@ -4,7 +4,7 @@
 \alias{compute_scores}
 \title{compute_scores}
 \usage{
-compute_scores(model0, model1, score_type)
+compute_scores(model0, model1, score_type = "standardized")
 }
 \arguments{
 \item{model0}{a \code{glm} object with the model under the null hypothesis (i.e. the covariates, the nuisance parameters).}
@@ -27,7 +27,7 @@ X=Z+rnorm(20)
 Y=rpois(n=20,lambda=exp(Z+X))
 mod0=glm(Y~Z,family="poisson")
 X=data.frame(X=X)
-scr0=compute_scores(model0 = mod0, model1 = X, score_type = "standardized")
+scr0=compute_scores(model0 = mod0, model1 = X)
 head(scr0)
 }
 \author{
