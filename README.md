@@ -36,11 +36,11 @@ summary(mod)
 #> -1.6910  -0.5792   0.1012   0.4900   1.0440  
 #> 
 #> Coefficients:
-#>             Estimate   Score Std. Error z value eff_size Pr(>|z|)  
-#> (Intercept)  -0.1026 -0.1616     0.4751 -0.3402   -0.088   0.7532  
-#> ZB           -0.1501 -0.1593     0.3108 -0.5127   -0.104   0.6494  
-#> ZC            0.1633  0.1813     0.3989  0.4544    0.117   0.6844  
-#> X             0.9439  3.6238     1.4409  2.5149    0.671   0.0104 *
+#>             Estimate   Score Std. Error z value eff_size Pr(>|z|)   
+#> (Intercept)  -0.1026 -0.1616     0.4751 -0.3402   -0.088   0.7588   
+#> ZB           -0.1501 -0.1593     0.3108 -0.5127   -0.104   0.6544   
+#> ZC            0.1633  0.1813     0.3989  0.4544    0.117   0.6974   
+#> X             0.9439  3.6238     1.4409  2.5149    0.671   0.0092 **
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -61,9 +61,9 @@ anova(mod)
 #> Inference is provided by FlipScores approach (5000 sign flips).
 #> 
 #> Model: Y ~ Z + X
-#>   Df   Score Pr(>Score)  
-#> Z  2 0.74487     0.7046  
-#> X  1 0.02948     0.0104 *
+#>   Df   Score Pr(>Score)   
+#> Z  2 0.80075     0.6904   
+#> X  1 0.02974     0.0092 **
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 # or
@@ -78,7 +78,7 @@ anova(mod0,mod)
 #> Model 1: Y ~ Z
 #> Model 2: Y ~ Z + X
 #>                    Df    Score Pr(>Score)  
-#> Model 2 vs Model 1  1 0.029323     0.0108 *
+#> Model 2 vs Model 1  1 0.029084      0.011 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 # and
@@ -93,7 +93,7 @@ anova(mod0,mod)
 #> Model 1: Y ~ X
 #> Model 2: Y ~ Z + X
 #>                    Df  Score Pr(>Score)
-#> Model 2 vs Model 1  2 1.3954     0.5226
+#> Model 2 vs Model 1  2 1.4679      0.506
 ```
 
 ### Negative Binomial
@@ -147,9 +147,9 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value eff_size Pr(>|t|)    
-#> (Intercept) -0.15365 -0.29119    0.50440 -0.57729   -0.087   0.5644    
+#> (Intercept) -0.15365 -0.29119    0.50440 -0.57729   -0.087   0.5712    
 #> x            0.92089  2.36084    0.78171  3.02011    0.547   0.0008 ***
-#> z           -0.01282 -0.11457    1.31945 -0.08683   -0.016   0.9570    
+#> z           -0.01282 -0.11457    1.31945 -0.08683   -0.016   0.9588    
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -169,12 +169,6 @@ linear models by sign-flipping score contributions, Submitted, arXiv:
 1909.03796
 
 <https://arxiv.org/abs/1909.03796>
-
-## Bug reports
-
-If you encounter a bug, please file a
-[reprex](https://github.com/tidyverse/reprex) (minimal reproducible
-example) on [github](https://github.com/livioivil/flipscores/issues).
 
 ## Bug reports
 
