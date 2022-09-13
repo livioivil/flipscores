@@ -16,6 +16,7 @@
 #for effective and others:
 .score <- function(Y,flp) flp%*%Y
 
+
 #transform sum stat into t stat
 .sum2t <- function(stat,sumY2,n){
   # sumY2=sum(Y^2,na.rm = TRUE)
@@ -42,6 +43,35 @@
   if(alternative=="two.sided") ff <- function(Tspace) abs(Tspace) else
     if(alternative=="less") ff <- function(Tspace) -Tspace else
       if(alternative=="greater") ff <- function(Tspace) Tspace
+
+      ############### only for internal experiments
+      #######START
+      if(score_type=="my_lab") {
+        .score_fun <- function(Y,flp,Xt) Xt%*%flp%*%Y
+        nobs=nrow(Y)
+        Xt=attributes(Y)$scale_objects$Xt
+        
+        Tobs=  .score_fun(Y,diag(nobs),Xt=Xt)
+        set.seed(seed)
+        Tspace=data.frame(as.vector(c(Tobs,replicate(n_flips-1,{
+          flp<-flip::rom(nobs)
+          .score_fun(Y,flp,Xt)
+        }))))
+        set.seed(NULL)
+       # Tspace=.sum2t(Tspace,
+        #                sumY2 = sum(Y^2,na.rm = TRUE),
+         #               n=sum(!is.na(Y)))
+        
+        p.values=.t2p(ff(unlist(Tspace)))
+        # named vector?
+        
+        out=list(Tspace=Tspace,p.values=p.values)
+        names(out$p.values)=names(Y)
+        return(out)  
+      }
+      ######### END
+      ##########################################
+      
       
       score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
       if(score_type=="standardized") .score_fun <- .score_std else
@@ -51,8 +81,8 @@
       Tobs=  .score_fun(Y,rep(1,nobs))
       set.seed(seed)
       Tspace=data.frame(as.vector(c(Tobs,replicate(n_flips-1,{
-        flp<-sample(c(-1,1),nobs, replace = T)
-        .score_fun(Y,flp)
+       flp<-sample(c(-1,1),nobs, replace = T)
+       .score_fun(Y,flp)
       }))))
       set.seed(NULL)
        if(score_type=="effective"||score_type=="orthogonalized") 

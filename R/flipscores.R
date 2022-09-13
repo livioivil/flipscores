@@ -67,7 +67,7 @@ flipscores<-function(formula, family, data,
   # catturo la call,
   fs_call <- mf <- match.call()
   
-  score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
+  score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic","my_lab"))
   if(missing(score_type))
     stop("test type is not specified or recognized")
   
