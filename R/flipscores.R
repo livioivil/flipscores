@@ -135,8 +135,14 @@ flipscores<-function(formula, family, data,
   
   #compute H0s models
   if(is.null(to_be_tested))
-    to_be_tested=colnames(model[["x"]]) else
+    to_be_tested=colnames(model[["x"]]) else{
+      to_be_tested = ifelse(is.numeric(to_be_tested),
+                         colnames(model[["x"]])[to_be_tested],
+                         to_be_tested)
+
       to_be_tested=eval(to_be_tested,parent.frame())
+      }
+  
   
   if(is.null(flip_param_call$seed)) flip_param_call$seed=Sys.time() #eval(.Random.seed[1], envir=.GlobalEnv)
   results=lapply(to_be_tested,socket_compute_scores_and_flip,
