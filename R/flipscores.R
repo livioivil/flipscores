@@ -153,7 +153,7 @@ flipscores<-function(formula, family, data,
 
     if(is.matrix(flip_param_call$n_flips)){
       flip_param_call$flips=flip_param_call$n_flips
-      flip_param_call$n_flips=ncol(flips)
+      flip_param_call$n_flips=ncol(flip_param_call$flips)
     } else
       flip_param_call$flips=.make_flips(nrow(model$model),flip_param_call$n_flips)
   

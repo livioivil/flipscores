@@ -52,8 +52,8 @@ compute_flips<- function(scores,alternative="two.sided",
       #      set.seed(seed)
       
       Tspace=as.vector(c(Tobs,
-                         apply(flips,1,
-                               .score_fun,scores)))
+                         sapply(1:nrow(flips),
+                               function(i).score_fun(flips[i,],scores))))
       #      set.seed(NULL)
       # TODO: decidere se meglio standardizzare così o con fisher stimata (credo questa seconda)
       # if(score_type=="effective"||score_type=="orthogonalized") 

@@ -18,19 +18,19 @@
 
 
 #transform sum stat into t stat
-# .sum2t <- function(stat,sumY2,n){
-#   # sumY2=sum(Y^2,na.rm = TRUE)
-#   # n=sum(!is.na(Y))
-#   # print(sumY2)
-#   # print(stat)
-#   # stat0=stat
-#   sumY2=sumY2*(n**0.5)
-#   if(any((sumY2-(stat^2)/n)*(n/(n-1))<0)) browser()
-#   stat=stat/sqrt((sumY2-(stat^2)/n)*(n/(n-1)))
-#   # print(stat)
-# # if(any(is.na(stat))) browser()
-#     stat
-# }
+.sum2t <- function(stat,sumY2,n){
+  # sumY2=sum(Y^2,na.rm = TRUE)
+  # n=sum(!is.na(Y))
+  # print(sumY2)
+  # print(stat)
+  # stat0=stat
+  sumY2=sumY2*(n**0.5)
+  if(any((sumY2-(stat^2)/n)*(n/(n-1))<0)) browser()
+  stat=stat/sqrt((sumY2-(stat^2)/n)*(n/(n-1)))
+  # print(stat)
+# if(any(is.na(stat))) browser()
+    stat
+}
 
 #### compute p-value
 .t2p  <- function(pvls){
