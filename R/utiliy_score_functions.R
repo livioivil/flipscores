@@ -1,5 +1,5 @@
 # for standardized:
-.score_std=function(scr_eff,flp) {
+.score_std=function(flp,scr_eff) {
   # scr_eff # un vettore
   numerator=crossprod(flp,scr_eff) #t(scr_eff)%*%flp
   # A<- attributes(scr_eff)$scale_objects$A
@@ -14,88 +14,27 @@
 }
 
 #for effective and others:
-.score <- function(Y,flp) flp%*%Y
+.score <- function(flp,Y) flp%*%Y
 
 
 #transform sum stat into t stat
-.sum2t <- function(stat,sumY2,n){
-  # sumY2=sum(Y^2,na.rm = TRUE)
-  # n=sum(!is.na(Y))
-  # print(sumY2)
-  # print(stat)
-  # stat0=stat
-  stat=stat/sqrt((sumY2-(stat^2)/n)*(n/(n-1)))
-  # print(stat)
-# if(any(is.na(stat))) browser()
-    stat
-}
+# .sum2t <- function(stat,sumY2,n){
+#   # sumY2=sum(Y^2,na.rm = TRUE)
+#   # n=sum(!is.na(Y))
+#   # print(sumY2)
+#   # print(stat)
+#   # stat0=stat
+#   sumY2=sumY2*(n**0.5)
+#   if(any((sumY2-(stat^2)/n)*(n/(n-1))<0)) browser()
+#   stat=stat/sqrt((sumY2-(stat^2)/n)*(n/(n-1)))
+#   # print(stat)
+# # if(any(is.na(stat))) browser()
+#     stat
+# }
 
 #### compute p-value
 .t2p  <- function(pvls){
   mean(as.vector(pvls)>=pvls[1])
-}
-#################
-.flip_test<- function(Y,score_type="standardized",alternative="two.sided",
-                      n_flips=5000,
-                      seed=NULL,
-                      statTest="sum",...){
-  
-  if(alternative=="two.sided") ff <- function(Tspace) abs(Tspace) else
-    if(alternative=="less") ff <- function(Tspace) -Tspace else
-      if(alternative=="greater") ff <- function(Tspace) Tspace
-
-      ############### only for internal experiments
-      #######START
-      if(score_type=="my_lab") {
-        .score_fun <- function(Y,flp,Xt) Xt%*%flp%*%Y
-        nobs=nrow(Y)
-        Xt=attributes(Y)$scale_objects$Xt
-        
-        Tobs=  .score_fun(Y,diag(nobs),Xt=Xt)
-        set.seed(seed)
-        Tspace=data.frame(as.vector(c(Tobs,replicate(n_flips-1,{
-          flp<-flip::rom(nobs)
-          .score_fun(Y,flp,Xt)
-        }))))
-        set.seed(NULL)
-       # Tspace=.sum2t(Tspace,
-        #                sumY2 = sum(Y^2,na.rm = TRUE),
-         #               n=sum(!is.na(Y)))
-        
-        p.values=.t2p(ff(unlist(Tspace)))
-        # named vector?
-        
-        out=list(Tspace=Tspace,p.values=p.values)
-        names(out$p.values)=names(Y)
-        return(out)  
-      }
-      ######### END
-      ##########################################
-      
-      
-      score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
-      if(score_type=="standardized") .score_fun <- .score_std else
-        .score_fun <- .score
-      
-      nobs=nrow(Y)
-      Tobs=  .score_fun(Y,rep(1,nobs))
-      set.seed(seed)
-      Tspace=data.frame(as.vector(c(Tobs,replicate(n_flips-1,{
-       flp<-sample(c(-1,1),nobs, replace = T)
-       .score_fun(Y,flp)
-      }))))
-      set.seed(NULL)
-       if(score_type=="effective"||score_type=="orthogonalized") 
-        Tspace=.sum2t(Tspace,
-                      sumY2 = sum(Y^2,na.rm = TRUE),
-                      n=sum(!is.na(Y)))
-
-      p.values=.t2p(ff(unlist(Tspace)))
-      # named vector?
-      
-      out=list(Tspace=Tspace,p.values=p.values)
-      names(out$p.values)=names(Y)
-      return(out)
 }
 
 #################################
@@ -171,24 +110,31 @@ socket_compute_scores <- function(i,model,score_type){
 
 #####################
 # i and exclude are indices of the columns of model.frame x
-socket_compute_flip <- function(scores,flip_param_call,score_type){
-  ############### fit the H1 model and append the scores (refitted under H0s)
-  
-  ###############################
-  ## compute flips
-  
-  ### TODO RENDERE PI AGILE INPUT DI id (es formula se possibile?) 
-  # + quality check
-  id=NULL
-  if(!is.null(flip_param_call$id)&&
-     (!(flip_param_call$score_type%in%c("orthogonalized"))))
-    scores=lapply(scores,rowsum,id)
-  # scores=as.matrix(unlist(scores[,]))
+socket_compute_flip <- function(scores,flip_param_call){
 
+#  flip_param_call$score_type=attributes(scores)$score_type
+  
+  
+  # scores=as.matrix(unlist(scores[,]))
+  if(is.null(flip_param_call$alternative)) flip_param_call$alternative = "two.sided"
+  if(flip_param_call$alternative=="two.sided") flip_param_call$ftail <- function(Tspace) abs(Tspace) else
+    if(flip_param_call$alternative=="less") flip_param_call$ftail <- function(Tspace) -Tspace else
+      if(flip_param_call$alternative=="greater") flip_param_call$ftail <- function(Tspace) Tspace
+      flip_param_call$alternative=NULL
+      
+      score_type=attributes(scores)$score_type
+      score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
+      if(score_type=="standardized") flip_param_call$.score_fun <- .score_std else
+        flip_param_call$.score_fun <- .score
+      
+      if(is.null(flip_param_call$flips)) flip_param_call$flips=.make_flips(nrow(scores),n_flips)
+      
+      
   results=lapply(1:ncol(scores), function(id_col){
     score1=scores[,id_col,drop=FALSE]
     attributes(score1)$scale_objects=attributes(scores)$scale_objects[[id_col]]
-    flip_param_call$Y=score1
+    attributes(score1)$score_type=attributes(scores)$score_type
+    flip_param_call$scores=score1
     res=eval(flip_param_call, parent.frame())  
     res$scores=score1
     res
@@ -276,4 +222,9 @@ get_par_expo_fam <- function(model0){
     warning("Class of the model not detected, homoscedasticity and canonical link are assumed.")
     Dhat<-Vhat<-1
     return(list(D=Dhat, V=Vhat))}
+}
+
+#################
+.make_flips <- function(n_obs,n_flips){
+  matrix(c(-1,1)[sample(2,n_obs*(n_flips-1),replace=TRUE)],n_flips-1,n_obs)
 }

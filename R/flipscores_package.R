@@ -9,7 +9,7 @@
 #' dt=data.frame(X=rnorm(20),
 #'    Z=factor(rep(LETTERS[1:3],length.out=20)))
 #' dt$Y=rpois(n=20,lambda=exp(dt$X))
-#' mod=flipscores(Y~Z+X,data=dt,family="poisson",x=TRUE,)
+#' mod=flipscores(Y~Z+X,data=dt,family="poisson",x=TRUE)
 #' summary(mod)
 #' 
 #' # Anova test
