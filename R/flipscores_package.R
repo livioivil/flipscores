@@ -9,7 +9,7 @@
 #' dt=data.frame(X=rnorm(20),
 #'    Z=factor(rep(LETTERS[1:3],length.out=20)))
 #' dt$Y=rpois(n=20,lambda=exp(dt$X))
-#' mod=flipscores(Y~Z+X,data=dt,family="poisson",x=TRUE)
+#' mod=flipscores(Y~Z+X,data=dt,family="poisson",x=TRUE,)
 #' summary(mod)
 #' 
 #' # Anova test
@@ -23,5 +23,5 @@
 #' @docType package
 #'
 #' @author Livio Finos, Jelle Goeman and Jesse Hemerik, with contribution of Riccardo De Santis.
-#' @name flipscores-package
+#' @name flipscores_old-package
 NULL
