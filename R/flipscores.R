@@ -138,6 +138,7 @@ flipscores<-function(formula, family, data,
   
   #compute H0s models
   if(is.null(to_be_tested))
+<<<<<<< HEAD
     to_be_tested=colnames(model[["x"]]) else 
       {
         to_be_tested=eval(to_be_tested, parent.frame())
@@ -145,9 +146,10 @@ flipscores<-function(formula, family, data,
                          colnames(model[["x"]])[to_be_tested],
                          to_be_tested)
 
+=======
+    to_be_tested=colnames(model[["x"]]) else
+>>>>>>> parent of fc77099... to_be_tested
       to_be_tested=eval(to_be_tested,parent.frame())
-      }
-  
   
   
 
