@@ -66,7 +66,7 @@ flipscores<-function(formula, family, data,
   # temp=is(formula) #just a trick to avoid warnings in package building
   # catturo la call,
   fs_call <- mf <- match.call()
-  
+  # prova ad usare as.list(args(flipscores))
   score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic","my_lab"))
   if(missing(score_type))
     stop("test type is not specified or recognized")

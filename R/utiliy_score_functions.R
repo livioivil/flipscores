@@ -55,7 +55,7 @@
         
         Tobs=  .score_fun(Y,diag(nobs),Xt=Xt)
         set.seed(seed)
-        Tspace=data.frame(as.vector(c(Tobs,replicate(n_flips-1,{
+        Tspace=(as.vector(c(Tobs,replicate(n_flips-1,{
           flp<-flip::rom(nobs)
           .score_fun(Y,flp,Xt)
         }))))
@@ -82,7 +82,7 @@
       nobs=nrow(Y)
       Tobs=  .score_fun(Y,rep(1,nobs))
       set.seed(seed)
-      Tspace=data.frame(as.vector(c(Tobs,replicate(n_flips-1,{
+      Tspace=(as.vector(c(Tobs,replicate(n_flips-1,{
        flp<-sample(c(-1,1),nobs, replace = T)
        .score_fun(Y,flp)
       }))))
