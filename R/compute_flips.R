@@ -12,8 +12,11 @@ compute_flips<- function(scores,alternative="two.sided",
 #################
 .flip_test<- function(scores,ftail,
                       flips=NULL,
+                      n_flips=NULL,
                       .score_fun,
                       output_flips=FALSE,
+                      seed=NULL,
+                      precompute_flips=TRUE,
                       ...){
   
        
@@ -45,16 +48,22 @@ compute_flips<- function(scores,alternative="two.sided",
       ######### END
       ##########################################
       
-      
-      
+#      browser()
       n_obs=nrow(scores)
       Tobs=  .score_fun(rep(1,n_obs),scores)
       #      set.seed(seed)
-      
-      Tspace=as.vector(c(Tobs,
-                         sapply(1:nrow(flips),
-                               function(i).score_fun(flips[i,],scores))))
-      #      set.seed(NULL)
+      if(precompute_flips){
+      #  browser()
+        Tspace=as.vector(c(Tobs,
+                           sapply(1:(n_flips-1),
+                                  function(i).score_fun(flips[i,],scores))))
+        
+      } else {
+        set.seed(seed)
+        Tspace=as.vector(c(Tobs,replicate(n_flips-1,{
+          .score_fun(sample(c(-1,1),n_obs, replace = T),scores)
+        })))
+      }
       # TODO: decidere se meglio standardizzare così o con fisher stimata (credo questa seconda)
       # if(score_type=="effective"||score_type=="orthogonalized") 
       #  Tspace=.sum2t(Tspace,

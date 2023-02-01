@@ -171,6 +171,7 @@ compute_scores <- function(model0, model1,score_type = "standardized"){
   
 #  scale_objects$df.residual <- df.residual(model0)
   attr(scores,"scale_objects")=scale_objects
+  attr(scores,"score_type")=score_type
   rownames(scores)=names(model0$fitted.values)
   return(scores)
 }
