@@ -156,7 +156,7 @@ flipscores<-function(formula, family, data,
       flip_param_call$n_flips=nrow(flip_param_call$flips)
     } else if(flip_param_call$precompute_flips){
       set.seed(seed)
-      flip_param_call$flips=.make_flips(nrow(model$model),flip_param_call$n_flips)
+      flip_param_call$flips=.make_flips(nrow(model$model),flip_param_call$n_flips-1)
 }  
 #  if(is.null(flip_param_call$seed)) flip_param_call$seed=Sys.time() #eval(.Random.seed[1], envir=.GlobalEnv)
   results=lapply(to_be_tested,socket_compute_scores_and_flip,
