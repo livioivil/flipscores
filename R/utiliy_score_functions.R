@@ -227,5 +227,5 @@ get_par_expo_fam <- function(model0){
 
 #################
 .make_flips <- function(n_obs,n_flips){
-  matrix(3-2*sample(2,(n_flips-1)*n_obs,replace=TRUE),n_flips-1,n_obs)
+  matrix(3-2*sample(2,(n_flips)*n_obs,replace=TRUE),n_flips,n_obs)
 }
