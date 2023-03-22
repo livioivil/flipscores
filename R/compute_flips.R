@@ -20,6 +20,30 @@ compute_flips<- function(scores,alternative="two.sided",
                       ...){
   
   
+  Tspace=.flip_test_no_pval(scores,flips=flips,
+                                       n_flips=n_flips,
+                                       .score_fun=.score_fun,
+                                       output_flips=output_flips,
+                                       seed=seed,
+                                       precompute_flips=precompute_flips)
+  p.values=.t2p(ftail(unlist(Tspace)))
+  # named vector?
+  
+  out=list(Tspace=Tspace,p.values=p.values)
+  names(out$p.values)=colnames(scores)
+  return(out)
+}
+
+.flip_test_no_pval<- function(scores,
+                      flips=NULL,
+                      n_flips=NULL,
+                      .score_fun,
+                      output_flips=FALSE,
+                      seed=NULL,
+                      precompute_flips=TRUE,
+                      ...){
+  
+  
   ############### only for internal experiments
   #######START
   if(attributes(scores)$score_type=="my_lab") {
@@ -64,16 +88,6 @@ compute_flips<- function(scores,alternative="two.sided",
       .score_fun(sample(c(-1,1),n_obs, replace = T),scores)
     })))
   }
-  # TODO: decidere se meglio standardizzare così o con fisher stimata (credo questa seconda)
-  # if(score_type=="effective"||score_type=="orthogonalized") 
-  #  Tspace=.sum2t(Tspace,
-  #                sumY2 = sum(Y^2,na.rm = TRUE),
-  #                n=attributes(Y)$scale_objects$df.residual)
-  
-  p.values=.t2p(ftail(unlist(Tspace)))
-  # named vector?
-  
-  out=list(Tspace=Tspace,p.values=p.values)
-  names(out$p.values)=colnames(scores)
-  return(out)
+
+  return(Tspace)
 }
