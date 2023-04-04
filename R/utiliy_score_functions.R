@@ -93,7 +93,7 @@ socket_compute_scores <- function(i,model,score_type){
   model$call$formula=as.formula(paste(yname,"~0+."))
   if(!is.null(model$offset)){
     offs<-model$offset
-    model$call$formula=update( model$call$formula,formula(paste("~.+offset(offs)")))
+    model$call$formula=update( model$call$formula,formula(paste("~+offset(offs)")))
   }
   model$call$score_type=NULL
   model$call$perms = NULL
