@@ -47,9 +47,9 @@ compute_scores <- function(model0, model1,score_type = "standardized"){
   # no variables in the null model
   if(ncol(model0$x)==0){
     scores=matrix(model0$y)
-    attr(scores,"scale_objects")=list(A=matrix(0,nrow(scores),1),
-                                      nrm=1)
     rownames(scores)=names(model0$fitted.values)
+    attr(scores,"scale_objects")=list(list(nrm = 1))
+    attr(scores,"score_type")="basic"
     return(scores)
   }
   

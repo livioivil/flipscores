@@ -45,7 +45,7 @@
 #' dt=data.frame(X=rnorm(20),
 #'    Z=factor(rep(LETTERS[1:3],length.out=20)))
 #' dt$Y=rpois(n=20,lambda=exp(dt$Z=="C"))
-#' mod=flipscores(Y~Z+X,data=dt,family="poisson",n_flips=10)
+#' mod=flipscores(Y~Z+X,data=dt,family="poisson",n_flips=1000)
 #' summary(mod)
 #' 
 #' # Equivalent to:
@@ -84,6 +84,7 @@ flipscores<-function(formula, family, data,
   # rinomino la funzione da chiamare:
   flip_param_call[[1L]]=.flip_test#quote(flipscores:::.flip_test) #
   
+  flip_param_call$id=eval(flip_param_call$id, parent.frame())
   flip_param_call$n_flips <- eval(flip_param_call$n_flips, parent.frame())
   if(is.null(flip_param_call$precompute_flips)) flip_param_call$precompute_flips=TRUE  
   if(is.null(flip_param_call$n_flips)) flip_param_call$n_flips=5000
@@ -101,7 +102,7 @@ flipscores<-function(formula, family, data,
   
   #####check id not null only with effective score:
   if(!is.null(flip_param_call$id)&&(score_type=="orthogonalized")){
-    print(warning("WARNING: Use of id is allowed only with score_type=='effective', yet. 
+    print(warning("WARNING: Use of id is not possible with score_type=='orthogonalized', yet. 
  Nothing done."))
     return(NULL)
   }
@@ -157,7 +158,7 @@ flipscores<-function(formula, family, data,
       flip_param_call$n_flips=nrow(flip_param_call$flips)
     } else if(flip_param_call$precompute_flips){
       set.seed(seed)
-      flip_param_call$flips=.make_flips(nrow(model$model),flip_param_call$n_flips-1)
+      flip_param_call$flips=.make_flips(nrow(model$model),flip_param_call$n_flips-1,flip_param_call$id)
 }  
 #  if(is.null(flip_param_call$seed)) flip_param_call$seed=Sys.time() #eval(.Random.seed[1], envir=.GlobalEnv)
   results=lapply(to_be_tested,socket_compute_scores_and_flip,
