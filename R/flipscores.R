@@ -171,13 +171,15 @@ flipscores<-function(formula, family, data,
   )
   model$scores=data.frame(lapply(results,function(x)x[[1]]$scores))
   nrm=sapply(results,function(x)attributes(x[[1]]$scores)$scale_objects$nrm)
+  std_dev=sapply(results,function(x)attributes(x[[1]]$scores)$sd)
   model$Tspace=data.frame(lapply(results,function(x)x[[1]]$Tspace)) 
   model$p.values=sapply(results,function(x)x[[1]]$p.values)
   if(!is.null(flip_param_call$output_flips)&&flip_param_call$output_flips)
     model$flips=flip_param_call$flips
   flip_param_call$flips=NULL
-  names(nrm) <- names(model$scores)<- names(model$Tspace) <- names(model$p.values) <-to_be_tested
+  names(nrm) <- names(std_dev) <- names(model$scores)<- names(model$Tspace) <- names(model$p.values) <-to_be_tested
   attr(model$scores,"nrm")=nrm
+  attr(model$scores,"sd")=std_dev
   
   ### output
   model$call=fs_call

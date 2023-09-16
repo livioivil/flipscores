@@ -67,7 +67,7 @@ compute_scores <- function(model0, model1,score_type = "standardized"){
   if (score_type == "basic") {
     .get_1score_basic <- function(X){
       B=t(t(X * D_vect) %*% (diag(sqrtinvV_vect**2, nrow = length(sqrtW))))
-      scores = B * (sqrtinvV_vect_times_residuals) * (1/sum(!is.na(model0$y))^0.5)
+      scores = B * (sqrtinvV_vect_times_residuals) #* (1/sum(!is.na(model0$y))^0.5)
       scale_objects=list(nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect_times_residuals)^2)/sum(!is.na(model0$y))))
       list(scores=scores, scale_objects=scale_objects)
     }
@@ -86,7 +86,7 @@ compute_scores <- function(model0, model1,score_type = "standardized"){
         B=(t(X*sqrtW)%*%OneMinusH*(sqrtinvV_vect))
         dinv=deco$d^-1
         Xt=(B%*%deco$u%*%diag(deco$d))
-        scores=(diag(dinv)%*%t(deco$u)%*%(residuals))[,]*(1/sum(!is.na(model0$y))**0.5)
+        scores=(diag(dinv)%*%t(deco$u)%*%(residuals))[,]#*(1/sum(!is.na(model0$y))**0.5)
         nrm=sqrt(sum(B^2)*sum(residuals^2)/sum(!is.na(model0$y)))
         scale_objects=list(U=deco$u,B=B,nrm=nrm,Xt=Xt)
        
@@ -113,7 +113,7 @@ compute_scores <- function(model0, model1,score_type = "standardized"){
     if(score_type=="effective"){
       .get_1score_effective <- function(X){
         B<-X*(sqrtW)-t(crossprod(crossprod(A,X*(sqrtW)),solve(crossprod(A),t(A))))
-        scores=B*sqrtinvV_vect_times_residuals/(sum(!is.na(model0$y))**0.5)
+        scores=B*sqrtinvV_vect_times_residuals#/(sum(!is.na(model0$y))**0.5)
         scale_objects=list(nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect_times_residuals)^2)/sum(!is.na(model0$y))))
         list(scores=scores, scale_objects=scale_objects)
       }
@@ -133,7 +133,7 @@ compute_scores <- function(model0, model1,score_type = "standardized"){
           m = sum(b^2)
           # we divide it by sqrt(m) which is the sd scaling factor of the observed test stat (i.e. effective and standardized have the same observed test stat)
           A=b[,]*U/sqrt(m)
-          scores=b*sqrtinvV_vect_times_residuals/(sum(!is.na(model0$y))**0.5)
+          scores=b*sqrtinvV_vect_times_residuals#/(sum(!is.na(model0$y))**0.5)
           nrm=sqrt(sum(b^2)*sum((sqrtinvV_vect_times_residuals)^2)/sum(!is.na(model0$y)))
           scale_objects=list(A=A,nrm=nrm)
           list(scores=scores, scale_objects=scale_objects)
@@ -151,7 +151,7 @@ compute_scores <- function(model0, model1,score_type = "standardized"){
         if(score_type=="orthogonalized"){
           .get_1score_orthogonalized <- function(X){
             B=(t(X*sqrtW)%*%OneMinusH*(sqrtinvV_vect))
-            scores=t(B%*%deco$u)*(t(deco$u)%*%(residuals))[,]*(1/sum(!is.na(model0$y))**0.5)
+            scores=t(B%*%deco$u)*(t(deco$u)%*%(residuals))[,]#*(1/sum(!is.na(model0$y))**0.5)
             nrm=sqrt(sum(B^2)*sum(residuals^2)/sum(!is.na(model0$y)))
             scale_objects=list(U=deco$u,B=B,nrm=nrm)
             list(scores=scores, scale_objects=scale_objects)
@@ -168,8 +168,9 @@ compute_scores <- function(model0, model1,score_type = "standardized"){
           
  
         }
-  
+  std_dev=get_std_dev_score(model0,X)
 #  scale_objects$df.residual <- df.residual(model0)
+  attr(scores,"sd")=std_dev
   attr(scores,"scale_objects")=scale_objects
   attr(scores,"score_type")=score_type
   rownames(scores)=names(model0$fitted.values)

@@ -16,6 +16,27 @@
 #for effective and others:
 .score <- function(flp,Y) flp%*%Y
 
+get_std_dev_score <- function(fit,x2){
+  # see also statmod::glm.scoretest()
+  w <- fit$weights
+  r <- fit$residuals
+  if (any(w <= 0)) {
+    r <- r[w > 0]
+    x2 <- x2[w > 0]
+    w <- w[w > 0]
+  }
+  fixed.dispersion <- (fit$family$family %in% c("poisson", 
+                                                "binomial"))
+  if (fixed.dispersion) 
+    dispersion <- 1
+  else if (fit$df.residual > 0) {
+    dispersion <- sum(w * fit$residuals^2)/fit$df.residual
+  }
+  
+  ws <- sqrt(w)
+  x2.1w <- qr.resid(fit$qr, ws * x2)
+  sqrt(colSums(as.matrix(x2.1w * x2.1w))*dispersion)
+}
 
 #transform sum stat into t stat
 .sum2t <- function(stat,sumY2,n){
@@ -135,6 +156,7 @@ socket_compute_flip <- function(scores,flip_param_call){
     score1=scores[,id_col,drop=FALSE]
     attributes(score1)$scale_objects=attributes(scores)$scale_objects[[id_col]]
     attributes(score1)$score_type=attributes(scores)$score_type
+    attributes(score1)$sd=attributes(scores)$sd
     flip_param_call$scores=score1
     res=eval(flip_param_call, parent.frame())  
     res$scores=score1
