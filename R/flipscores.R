@@ -7,7 +7,7 @@
 #' "orthogonalized effective score" gives a solution for this issue.
 #' Note that in case of a big model matrix, the "orthogonalized" may take a long time.
 #'
-#' @param n_flips The number of random flips of the score contributions.
+#' @param n_flips The number of random flips of the score contributions. Overwritten with the \code{nrow(flips)} when \code{flips} is not \code{NULL} (see parameter \code{flips} for more details).
 #' When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed.
 #'
 #' @param id a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. If \code{id} is not \code{NULL}, only \code{score_type=="effective"} is allowed, yet.
@@ -18,6 +18,10 @@
 #' @param data see \code{glm} function.
 #' @param model can be a model (e.g. \code{lm} or \code{glm}). In this case other parameters used to fit a \code{glm} 
 #' (i.e. \code{formula}, \code{family}, \code{data}, etc) are not considered.  It is \code{NULL} by default (i.e. not used). 
+#' @param to_be_tested vector of indices or names of coefficients of the glm model to be tested (it is faster than computing every scores and p-values of course).
+#' @param precompute_flips \code{TRUE} by default. Overwritten if \code{flips} is not \code{NULL}. If \code{FALSE} the matrix of flips is not computed and the flips are made 'on-the-fly' before computing the test statistics; it may be usefull when \code{flips} is very large (see parameter \code{flips} for more details).
+#' @param flips matrix fo +1 or -1, the matrix has \code{n_flips} rows and n (number of observations) columns
+#' @param output_flips \code{FALSE} by default. If \code{TRUE} the \code{flips} matrix is returned. Useful when the same flips are needed for more glms, for example in the case of multivariate glms where the joint distribution of test statistis if used for multivariate inference. 
 #' @param ... see \code{glm} function.
 #' 
 #'
@@ -63,7 +67,8 @@ flipscores<-function(formula, family, data,
                      alternative ="two.sided", 
                      id = NULL,
                      seed=NULL,
-                     output_flips=FALSE,
+                     to_be_tested=NULL,
+                     flips=NULL,
                      precompute_flips=TRUE,
                      ...){
   # if(FALSE) flip() #just a trick to avoid warnings in package building
@@ -77,7 +82,7 @@ flipscores<-function(formula, family, data,
   
   
   # individuo i parametri specifici di flip score
-  m <- match(c("score_type","n_flips","alternative","id","output_flips","seed","precompute_flips"), names(mf), 0L)
+  m <- match(c("score_type","n_flips","alternative","id","output_flips","seed","flips","precompute_flips"), names(mf), 0L)
   m <- m[m>0]
   flip_param_call= mf[c(1L,m)]
   
@@ -152,14 +157,14 @@ flipscores<-function(formula, family, data,
       to_be_tested=eval(to_be_tested,parent.frame())
       }
   
-  
-      if(is.matrix(flip_param_call$n_flips)){
-      flip_param_call$flips=flip_param_call$n_flips
-      flip_param_call$n_flips=nrow(flip_param_call$flips)
-    } else if(flip_param_call$precompute_flips){
+  if(!is.null(flip_param_call$flips)){
+    flip_param_call$precompute_flips=FALSE
+    flip_param_call$n_flips=nrow(eval(flip_param_call$flips,parent.frame()))+1
+  } else if(flip_param_call$precompute_flips){
       set.seed(seed)
       flip_param_call$flips=.make_flips(nrow(model$model),flip_param_call$n_flips-1,flip_param_call$id)
-}  
+    }  
+  
 #  if(is.null(flip_param_call$seed)) flip_param_call$seed=Sys.time() #eval(.Random.seed[1], envir=.GlobalEnv)
   results=lapply(to_be_tested,socket_compute_scores_and_flip,
                  model,
