@@ -141,7 +141,7 @@ flipscores<-function(formula, family, data,
     model <- eval(mf, parent.frame())
   } else { # input is a model
     param_x_ORIGINAL <- TRUE
-    model <- update(model,x=TRUE,family=model$family)
+    model <- update(model,x=TRUE)
   }
   
   if(is.null(model$y)) model$y=model$model[,1]
