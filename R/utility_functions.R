@@ -40,7 +40,7 @@ summary.flipscores <- function (object, ...) {
   sum_model=summary.glm(object = object)
   sum_model$coefficients=sum_model$coefficients[,c(1,1:4,4),drop=FALSE]
   sum_model$coefficients[,-1]=NA
-  temp=sum_model$coefficients
+  # temp=sum_model$coefficients
   # matrix(NA,length(sum_model$coefficients),6)
   # rownames(temp)=rownames(sum_model$coefficients)
   # colnames(temp)=colnames(sum_model$coefficients)

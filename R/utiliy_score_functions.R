@@ -34,7 +34,8 @@ get_std_dev_score <- function(fit,x2){
   }
   
   ws <- sqrt(w)
-  x2.1w <- qr.resid(fit$qr, ws * x2)
+  if(!is.null(fit$qr)) {x2.1w <- qr.resid(fit$qr, ws * x2)
+  } else  x2.1w = ws * x2
   sqrt(colSums(as.matrix(x2.1w * x2.1w))*dispersion)
 }
 
