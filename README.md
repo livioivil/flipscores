@@ -24,7 +24,7 @@ set.seed(1)
 dt=data.frame(X=rnorm(20),
    Z=factor(rep(LETTERS[1:3],length.out=20)))
 dt$Y=rpois(n=20,lambda=exp(dt$X))
-mod=flipscores(Y~Z+X,data=dt,family="poisson",x=TRUE,)
+mod=flipscores(Y~Z+X,data=dt,family="poisson",x=TRUE)
 summary(mod)
 #> 
 #> Call:
@@ -36,11 +36,11 @@ summary(mod)
 #> -1.6910  -0.5792   0.1012   0.4900   1.0440  
 #> 
 #> Coefficients:
-#>             Estimate   Score Std. Error z value eff_size Pr(>|z|)   
-#> (Intercept)  -0.1026 -0.1616     0.4751 -0.3402   -0.088   0.7588   
-#> ZB           -0.1501 -0.1593     0.3108 -0.5127   -0.104   0.6544   
-#> ZC            0.1633  0.1813     0.3989  0.4544    0.117   0.6974   
-#> X             0.9439  3.6238     1.4409  2.5149    0.671   0.0092 **
+#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)  
+#> (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7588  
+#> ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6546  
+#> ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6964  
+#> X             0.9439 16.2062     4.7272  3.4283     0.671   0.0108 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -58,12 +58,12 @@ anova(mod)
 #> 
 #> Model: poisson, link: log
 #> 
-#> Inference is provided by FlipScores approach (5000 sign flips).
+#> Inference is provided by FlipScores approach ( sign flips).
 #> 
 #> Model: Y ~ Z + X
-#>   Df   Score Pr(>Score)   
-#> Z  2 0.80075     0.6904   
-#> X  1 0.02974     0.0092 **
+#>   Df   Score Pr(>Score)  
+#> Z  2 0.75567     0.7110  
+#> X  1 0.02953     0.0108 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 # or
@@ -73,12 +73,12 @@ anova(mod0,mod)
 #> 
 #> Model: poisson, link: log
 #> 
-#> Inference is provided by FlipScores approach (5000 sign flips).
+#> Inference is provided by FlipScores approach ( sign flips).
 #> 
 #> Model 1: Y ~ Z
 #> Model 2: Y ~ Z + X
 #>                    Df    Score Pr(>Score)  
-#> Model 2 vs Model 1  1 0.029084      0.011 *
+#> Model 2 vs Model 1  1 0.029785     0.0104 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 # and
@@ -88,12 +88,12 @@ anova(mod0,mod)
 #> 
 #> Model: poisson, link: log
 #> 
-#> Inference is provided by FlipScores approach (5000 sign flips).
+#> Inference is provided by FlipScores approach ( sign flips).
 #> 
 #> Model 1: Y ~ X
 #> Model 2: Y ~ Z + X
 #>                    Df  Score Pr(>Score)
-#> Model 2 vs Model 1  2 1.4679      0.506
+#> Model 2 vs Model 1  2 1.4022     0.5306
 ```
 
 ### Negative Binomial
@@ -146,10 +146,10 @@ summary(mod)
 #> -2.0746  -0.7748  -0.1086   0.4617   2.0435  
 #> 
 #> Coefficients:
-#>             Estimate    Score Std. Error  z value eff_size Pr(>|t|)    
-#> (Intercept) -0.15365 -0.29119    0.50440 -0.57729   -0.087   0.5712    
-#> x            0.92089  2.36084    0.78171  3.02011    0.547   0.0008 ***
-#> z           -0.01282 -0.11457    1.31945 -0.08683   -0.016   0.9588    
+#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|t|)    
+#> (Intercept) -0.15365 -1.84162    3.42399 -0.53786    -0.087   0.5592    
+#> x            0.92089 14.93128    4.42610  3.37346     0.547   0.0008 ***
+#> z           -0.01282 -0.72457    7.24491 -0.10001    -0.016   0.9576    
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -165,10 +165,15 @@ summary(mod)
 ## References
 
 J Hemerik, JJ Goeman and L Finos (2019) Robust testing in generalized
-linear models by sign-flipping score contributions, Submitted, arXiv:
-1909.03796
+linear models by sign-flipping score contributions. Journal of the Royal
+Statistical Society Series B: Statistical Methodology, Volume 82, Issue
+3, July 2020, Pages 841–864.  
+<https://doi.org/10.1111/rssb.12369>
 
-<https://arxiv.org/abs/1909.03796>
+R De Santis, J Goeman, J Hemerik, L Finos (2022) Inference in
+generalized linear models with robustness to misspecified variances
+arXiv: 2209.13918.  
+<https://arxiv.org/abs/2209.13918>
 
 ## Bug reports
 
