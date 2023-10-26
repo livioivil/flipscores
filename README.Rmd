@@ -13,9 +13,9 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 ```
-# Welcome to the dev-version of the 
 
-#[library flipscores on CRAN](http://cran.r-project.org/web/packages/flipscores/index.html)
+# Dev-version of the flipscores package
+[On CRAN version](http://cran.r-project.org/web/packages/flipscores/index.html)
 
 
 * * *
@@ -28,6 +28,20 @@ To **install** this github version type (in R):
     ## install.packages("devtools") 
     library(devtools)
     install_github("livioivil/flipscores")
+
+
+## References
+
+J Hemerik, JJ Goeman and L Finos (2019) Robust testing in generalized
+linear models by sign-flipping score contributions. Journal of the Royal
+Statistical Society Series B: Statistical Methodology, Volume 82, Issue
+3, July 2020, Pages 841–864.  
+<https://doi.org/10.1111/rssb.12369>
+
+R De Santis, J Goeman, J Hemerik, L Finos (2022) Inference in
+generalized linear models with robustness to misspecified variances
+arXiv: 2209.13918.  
+<https://arxiv.org/abs/2209.13918>
 
 
 ## Some examples
@@ -66,16 +80,6 @@ mod=flipscores(y~x+z, data=D, family = "negbinom")
 summary(mod)
 ```
 
-
-
-## References
-
-J Hemerik, JJ Goeman and L Finos (2019) Robust testing in generalized linear models by sign-flipping score contributions. Journal of the Royal Statistical Society Series B: Statistical Methodology, Volume 82, Issue 3, July 2020, Pages 841–864.  
-<https://doi.org/10.1111/rssb.12369>
-
-R De Santis, J Goeman, J Hemerik, L Finos (2022)
-Inference in generalized linear models with robustness to misspecified variances arXiv: 2209.13918.  
-<https://arxiv.org/abs/2209.13918>
 
 ## Bug reports
 If you encounter a bug, please file a

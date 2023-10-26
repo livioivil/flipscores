@@ -97,6 +97,6 @@ anova.flipscores <- function(object, model1=NULL,
   
   
   attr(out_param,"heading")[[1]]=  paste(attr(out_param,"heading")[[1]],sep="",
-          "\nInference is provided by FlipScores approach (",object$n_flips," sign flips).\n")
+          "\nInference is provided by FlipScores approach (",object$flip_param_call$n_flips," sign flips).\n")
   return(out_param)
 }

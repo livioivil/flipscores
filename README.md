@@ -1,9 +1,9 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Welcome to the dev-version of the
+# Dev-version of the flipscores package
 
-\#[library flipscores on
-CRAN](http://cran.r-project.org/web/packages/flipscores/index.html)
+[On CRAN
+version](http://cran.r-project.org/web/packages/flipscores/index.html)
 
 ------------------------------------------------------------------------
 
@@ -15,6 +15,19 @@ To **install** this github version type (in R):
     ## install.packages("devtools") 
     library(devtools)
     install_github("livioivil/flipscores")
+
+## References
+
+J Hemerik, JJ Goeman and L Finos (2019) Robust testing in generalized
+linear models by sign-flipping score contributions. Journal of the Royal
+Statistical Society Series B: Statistical Methodology, Volume 82, Issue
+3, July 2020, Pages 841–864.  
+<https://doi.org/10.1111/rssb.12369>
+
+R De Santis, J Goeman, J Hemerik, L Finos (2022) Inference in
+generalized linear models with robustness to misspecified variances
+arXiv: 2209.13918.  
+<https://arxiv.org/abs/2209.13918>
 
 ## Some examples
 
@@ -37,10 +50,10 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)  
-#> (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7588  
-#> ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6546  
-#> ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6964  
-#> X             0.9439 16.2062     4.7272  3.4283     0.671   0.0108 *
+#> (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7578  
+#> ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6700  
+#> ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6928  
+#> X             0.9439 16.2062     4.7272  3.4283     0.671   0.0118 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -58,12 +71,12 @@ anova(mod)
 #> 
 #> Model: poisson, link: log
 #> 
-#> Inference is provided by FlipScores approach ( sign flips).
+#> Inference is provided by FlipScores approach (5000 sign flips).
 #> 
 #> Model: Y ~ Z + X
 #>   Df   Score Pr(>Score)  
-#> Z  2 0.75567     0.7110  
-#> X  1 0.02953     0.0108 *
+#> Z  2 0.76757     0.6946  
+#> X  1 0.02942     0.0118 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 # or
@@ -73,12 +86,12 @@ anova(mod0,mod)
 #> 
 #> Model: poisson, link: log
 #> 
-#> Inference is provided by FlipScores approach ( sign flips).
+#> Inference is provided by FlipScores approach (5000 sign flips).
 #> 
 #> Model 1: Y ~ Z
 #> Model 2: Y ~ Z + X
 #>                    Df    Score Pr(>Score)  
-#> Model 2 vs Model 1  1 0.029785     0.0104 *
+#> Model 2 vs Model 1  1 0.029502     0.0114 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 # and
@@ -88,12 +101,12 @@ anova(mod0,mod)
 #> 
 #> Model: poisson, link: log
 #> 
-#> Inference is provided by FlipScores approach ( sign flips).
+#> Inference is provided by FlipScores approach (5000 sign flips).
 #> 
 #> Model 1: Y ~ X
 #> Model 2: Y ~ Z + X
 #>                    Df  Score Pr(>Score)
-#> Model 2 vs Model 1  2 1.4022     0.5306
+#> Model 2 vs Model 1  2 1.4314     0.5128
 ```
 
 ### Negative Binomial
@@ -147,9 +160,9 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value Part. Cor Pr(>|t|)    
-#> (Intercept) -0.15365 -1.84162    3.42399 -0.53786    -0.087   0.5592    
+#> (Intercept) -0.15365 -1.84162    3.42399 -0.53786    -0.087   0.5766    
 #> x            0.92089 14.93128    4.42610  3.37346     0.547   0.0008 ***
-#> z           -0.01282 -0.72457    7.24491 -0.10001    -0.016   0.9576    
+#> z           -0.01282 -0.72457    7.24491 -0.10001    -0.016   0.9610    
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -161,19 +174,6 @@ summary(mod)
 #> 
 #> Number of Fisher Scoring iterations: 1
 ```
-
-## References
-
-J Hemerik, JJ Goeman and L Finos (2019) Robust testing in generalized
-linear models by sign-flipping score contributions. Journal of the Royal
-Statistical Society Series B: Statistical Methodology, Volume 82, Issue
-3, July 2020, Pages 841–864.  
-<https://doi.org/10.1111/rssb.12369>
-
-R De Santis, J Goeman, J Hemerik, L Finos (2022) Inference in
-generalized linear models with robustness to misspecified variances
-arXiv: 2209.13918.  
-<https://arxiv.org/abs/2209.13918>
 
 ## Bug reports
 
