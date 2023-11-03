@@ -44,32 +44,6 @@ compute_flips<- function(scores,alternative="two.sided",
                       ...){
   
   
-  ############### only for internal experiments
-  #######START
-  if(attributes(scores)$score_type=="my_lab") {
-    .score_fun <- function(flp,Y,Xt) Xt%*%flp%*%Y
-    n_obs=nrow(scores)
-    Xt=attributes(scores)$scale_objects$Xt
-    
-    Tobs=  .score_fun(diag(n_obs),scores,Xt=Xt)
-    #        set.seed(seed)
-    Tspace=as.vector(c(Tobs,replicate(n_flips-1,{
-      flp<-flip::rom(n_obs)
-      .score_fun(flp,scores,Xt)
-    })))
-    #       set.seed(NULL)
-    # Tspace=.sum2t(Tspace,
-    #                sumY2 = sum(Y^2,na.rm = TRUE),
-    #               n=sum(!is.na(Y)))
-    
-    p.values=.t2p(ftail(unlist(Tspace)))
-    # named vector?
-    
-    out=list(Tspace=Tspace,p.values=p.values)
-    names(out$p.values)=names(scores)
-    return(out)  
-  }
-  ######### END
   ##########################################
   
   #      browser()
