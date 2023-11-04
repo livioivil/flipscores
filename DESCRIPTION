@@ -1,5 +1,5 @@
 Package: flipscores
-Version: 1.3.0
+Version: 1.3.1
 Date: 2023-01-31
 Title: Robust Score Testing in GLMs, by Sign-Flip Contributions 
 Author: Livio Finos, Jelle Goeman and Jesse Hemerik, with contribution of Riccardo De Santis.
