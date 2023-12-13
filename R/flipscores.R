@@ -89,9 +89,15 @@ flipscores<-function(formula, family, data,
   flip_param_call[[1L]]=.flip_test
   
   flip_param_call$id=eval(flip_param_call$id, parent.frame())
-  flip_param_call$n_flips <- eval(flip_param_call$n_flips, parent.frame())
+  
+  flip_param_call$flips <- eval(flip_param_call$flips, parent.frame())
+  if(!is.null(flip_param_call$flips)) 
+    flip_param_call$n_flips=nrow(flip_param_call$flips) else{
+      flip_param_call$n_flips <- eval(flip_param_call$n_flips, parent.frame())
+      if(is.null(flip_param_call$n_flips)) flip_param_call$n_flips=5000
+    }
+  
   if(is.null(flip_param_call$precompute_flips)) flip_param_call$precompute_flips=TRUE  
-  if(is.null(flip_param_call$n_flips)) flip_param_call$n_flips=5000
   flip_param_call$score_type <- eval(flip_param_call$score_type, parent.frame()) 
   if(is.null(flip_param_call$score_type)) flip_param_call$score_type = "standardized"
   flip_param_call$seed <- eval(flip_param_call$seed, parent.frame())

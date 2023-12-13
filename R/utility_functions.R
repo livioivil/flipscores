@@ -53,7 +53,7 @@ summary.flipscores <- function (object, ...) {
   sum_model$coefficients[names(object$p.values),5]=(sum_model$coefficients[names(object$p.values),2]/attributes(object$scores)$nrm)[]
   sum_model$coefficients[names(object$p.values),6]=object$p.values
   # sum_model$coefficients=sum_model$coefficients[,c(1,4)]
-  colnames(sum_model$coefficients)[c(2,4,5)]=c("Score","z value","Part. Cor")
+  colnames(sum_model$coefficients)[c(2,4,5,6)]=c("Score","z value","Part. Cor","Pr(>|z|)")
   
   sum_model$aliased=rep(FALSE,length(sum_model$aliased))
   structure(sum_model, heading = get_head_flip_out(object), class = c("data.frame"))

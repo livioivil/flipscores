@@ -50,7 +50,7 @@ compute_flips<- function(scores,alternative="two.sided",
   n_obs=nrow(scores)
   Tobs=  .score_fun(rep(1,n_obs),scores)
   #      set.seed(seed)
-  if(precompute_flips){
+  if(!is.null(flips)){
     #  browser()
     Tspace=as.vector(c(Tobs,
                        sapply(1:(n_flips-1),
