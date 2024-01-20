@@ -187,9 +187,11 @@ flipscores<-function(formula, family, data,
   if(!is.null(flip_param_call$output_flips)&&flip_param_call$output_flips)
     model$flips=flip_param_call$flips
   flip_param_call$flips=NULL
-  names(nrm) <- names(std_dev) <- names(model$scores)<- names(model$Tspace) <- names(model$p.values) <-to_be_tested
   attr(model$scores,"nrm")=nrm
   attr(model$scores,"sd")=std_dev
+  attr(model$scores,"resid_std")=data.frame(lapply(results,function(x)attr(x[[1]]$scores,"resid_std"))) 
+  names(attributes(model$scores)$resid_std) <-names(nrm) <- names(std_dev) <- names(model$scores)<- names(model$Tspace) <- names(model$p.values) <-to_be_tested
+  
   
   ### output
   model$call=fs_call

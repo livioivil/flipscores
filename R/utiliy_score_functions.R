@@ -158,6 +158,7 @@ socket_compute_flip <- function(scores,flip_param_call){
     attributes(score1)$scale_objects=attributes(scores)$scale_objects[[id_col]]
     attributes(score1)$score_type=attributes(scores)$score_type
     attributes(score1)$sd=attributes(scores)$sd
+    attributes(score1)$resid_std=attributes(scores)$resid_std
     flip_param_call$scores=score1
     res=eval(flip_param_call, parent.frame())  
     res$scores=score1

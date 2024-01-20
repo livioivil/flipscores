@@ -172,6 +172,7 @@ compute_scores <- function(model0, model1,score_type = "standardized"){
   attr(scores,"sd")=std_dev
   attr(scores,"scale_objects")=scale_objects
   attr(scores,"score_type")=score_type
+  attr(scores,"resid_std")=sqrtinvV_vect_times_residuals
   rownames(scores)=names(model0$fitted.values)
   return(scores)
 }
