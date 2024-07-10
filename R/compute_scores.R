@@ -50,6 +50,7 @@ compute_scores <- function(model0, model1,score_type = "standardized"){
     rownames(scores)=names(model0$fitted.values)
     scale_objects=list(list(nrm = 1))
     score_type="basic"
+    sqrtinvV_vect_times_residuals = rep(1,nrow(model0$x))
   } else { # at least one covariate
     if(is.null(model0$y)) model0$y=model0$model[,1]
     Z=model0$x
