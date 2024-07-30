@@ -151,10 +151,10 @@ flipscores<-function(formula, family, data,
   if(is.null(model$y)) model$y=model$model[,1]
   
   #compute H0s models
+  to_be_tested=eval(to_be_tested, parent.frame())
   if(is.null(to_be_tested))
     to_be_tested=colnames(model[["x"]]) else 
       {
-        to_be_tested=eval(to_be_tested, parent.frame())
       to_be_tested = ifelse(is.numeric(to_be_tested),
                          colnames(model[["x"]])[to_be_tested],
                          to_be_tested)

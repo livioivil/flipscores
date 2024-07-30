@@ -62,7 +62,9 @@ get_std_dev_score <- function(fit,x2){
 #################################
 mahalanobis_npc <- function(permT){
   if(ncol(permT)==0) return(rep(0,nrow(permT)))
+  permT=as.matrix(permT)
   dimnames(permT)=NULL
+  
   if(ncol(permT)==1) {
     permT=as.vector(permT)
     return(abs(permT)/(sum(permT^2)^.5))}
