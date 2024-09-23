@@ -155,9 +155,8 @@ flipscores<-function(formula, family, data,
   if(is.null(to_be_tested))
     to_be_tested=colnames(model[["x"]]) else 
       {
-      to_be_tested = ifelse(is.numeric(to_be_tested),
-                         colnames(model[["x"]])[to_be_tested],
-                         to_be_tested)
+        if(is.numeric(to_be_tested))
+          to_be_tested = colnames(model[["x"]])[to_be_tested]
 
       to_be_tested=eval(to_be_tested,parent.frame())
       }
