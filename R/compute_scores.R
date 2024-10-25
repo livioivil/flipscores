@@ -21,7 +21,7 @@
 #' head(scr0)
 #' @export
 
-compute_scores <- function(model0, model1,score_type = "standardized"){
+compute_scores <- function(model0, model1,score_type = "standardized",...){
   score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic","my_lab"))
   if(missing(score_type))
     stop("test type is not specified or recognized")
@@ -127,7 +127,7 @@ compute_scores <- function(model0, model1,score_type = "standardized"){
       } else
         ##  STANDARDIZED SCORE
         if(score_type=="standardized"){
-          .get_1score_standardized <- function(X){
+          .get_1score_standardized <- function(X,U){
             b=crossprod(diag(nrow(Z))-tcrossprod(U),X*sqrtW)
             m = sum(b^2)
             # we divide it by sqrt(m) which is the sd scaling factor of the observed test stat (i.e. effective and standardized have the same observed test stat)
@@ -139,7 +139,7 @@ compute_scores <- function(model0, model1,score_type = "standardized"){
           }
           
           U=svd((sqrtW*Z),nv=0)$u
-          temp=apply(X,2,.get_1score_standardized)
+          temp=apply(X,2,.get_1score_standardized,U)
           scores=sapply(temp,function(obj) obj$scores)
           # print(names(scores))
           scale_objects=lapply(temp,function(obj) obj$scale_objects)
@@ -168,12 +168,39 @@ compute_scores <- function(model0, model1,score_type = "standardized"){
    
           }
   }
+  
+  rownames(scores)=names(sqrtinvV_vect_times_residuals)
+  
+  nobservations=list(...)$nobservations
+  if(!is.null(nobservations))
+    if(nrow(scores)<nobservations){
+      if(score_type=="standardized"){
+        for(i in 1:length(scale_objects)){
+          temp=matrix(0,nobservations,ncol(scale_objects[[i]]$A))
+          temp[as.numeric(rownames(scores)),]=scale_objects[[i]]$A
+          rownames(temp)=1:nobservations
+          scale_objects[[i]]$A=temp
+        }
+      }
+      
+      temp=matrix(0,nobservations,ncol(scores))
+      temp[as.numeric(rownames(scores)),]=scores
+      scores=temp
+      rownames(scores)=1:nobservations
+      
+      temp=rep(0,nobservations) 
+      names(temp)=1:nobservations
+      temp[as.numeric(names(sqrtinvV_vect_times_residuals))]=sqrtinvV_vect_times_residuals
+      sqrtinvV_vect_times_residuals=temp
+  
+    }
+  
   std_dev=get_std_dev_score(model0,X)
 #  scale_objects$df.residual <- df.residual(model0)
   attr(scores,"sd")=std_dev
   attr(scores,"scale_objects")=scale_objects
   attr(scores,"score_type")=score_type
   attr(scores,"resid_std")=sqrtinvV_vect_times_residuals
-  rownames(scores)=names(model0$fitted.values)
+  
   return(scores)
 }

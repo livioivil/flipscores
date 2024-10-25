@@ -101,6 +101,8 @@ flipscores<-function(formula, family, data,
   flip_param_call$score_type <- eval(flip_param_call$score_type, parent.frame()) 
   if(is.null(flip_param_call$score_type)) flip_param_call$score_type = "standardized"
   flip_param_call$seed <- eval(flip_param_call$seed, parent.frame())
+  flip_param_call$nobservations = mf$nobservations
+  mf$nobservations=NULL
   
   m2 <- match(c("to_be_tested"), names(mf), 0L)
   if(m2==0)
@@ -166,9 +168,11 @@ flipscores<-function(formula, family, data,
     flip_param_call$n_flips=nrow(eval(flip_param_call$flips,parent.frame()))+1
   } else if(flip_param_call$precompute_flips){
       set.seed(seed)
-      flip_param_call$flips=.make_flips(nrow(model$model),flip_param_call$n_flips-1,flip_param_call$id)
+      flip_param_call$flips=.make_flips(max(nrow(model$model),flip_param_call$nobservations),
+                                        flip_param_call$n_flips-1,flip_param_call$id)
     }  
   
+
 #  if(is.null(flip_param_call$seed)) flip_param_call$seed=Sys.time() #eval(.Random.seed[1], envir=.GlobalEnv)
   results=lapply(to_be_tested,socket_compute_scores_and_flip,
                  model,

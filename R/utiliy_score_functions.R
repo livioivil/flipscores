@@ -87,7 +87,7 @@ mahalanobis_npc_multi <- function(ids_list,permT){
 
 
 # i and exclude are indices of the columns of model.frame x
-socket_compute_scores <- function(i,model,score_type){
+socket_compute_scores <- function(i,model,score_type,nobservations=NULL){
   if(is.numeric(i)) {
     i=colnames(model$x)[i]
   }
@@ -128,7 +128,7 @@ socket_compute_scores <- function(i,model,score_type){
   model_i <-update(model)
   # print(flip_param_call$score_type)
   # browser()
-  scores=compute_scores(model0 = model_i,model1 = tested_X,score_type=score_type)
+  scores=compute_scores(model0 = model_i,model1 = tested_X,score_type=score_type,nobservations=nobservations)
 }
 
 
@@ -183,7 +183,7 @@ socket_compute_flip <- function(scores,flip_param_call){
 # i and exclude are indices of the columns of model.frame x
 socket_compute_scores_and_flip <- function(i,model,exclude=NULL,
                                            flip_param_call){
-  scores  <- socket_compute_scores(i,model,score_type=flip_param_call$score_type)
+  scores  <- socket_compute_scores(i,model,score_type=flip_param_call$score_type,nobservations=flip_param_call$nobservations)
   results <- socket_compute_flip (scores,flip_param_call)
 }
 
