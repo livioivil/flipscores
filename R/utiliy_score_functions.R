@@ -47,7 +47,7 @@ get_std_dev_score <- function(fit,x2){
   # print(stat)
   # stat0=stat
   sumY2=sumY2*(n**0.5)
-  if(any((sumY2-(stat^2)/n)*(n/(n-1))<0)) browser()
+  # if(any((sumY2-(stat^2)/n)*(n/(n-1))<0)) browser()
   stat=stat/sqrt((sumY2-(stat^2)/n)*(n/(n-1)))
   # print(stat)
 # if(any(is.na(stat))) browser()

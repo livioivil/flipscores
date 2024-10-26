@@ -90,6 +90,7 @@ flipscores<-function(formula, family, data,
   
   flip_param_call$id=eval(flip_param_call$id, parent.frame())
   
+  flip_param_call$alternative=eval(flip_param_call$alternative, parent.frame())
   flip_param_call$flips <- eval(flip_param_call$flips, parent.frame())
   if(!is.null(flip_param_call$flips)) 
     flip_param_call$n_flips=nrow(flip_param_call$flips) else{
@@ -101,7 +102,7 @@ flipscores<-function(formula, family, data,
   flip_param_call$score_type <- eval(flip_param_call$score_type, parent.frame()) 
   if(is.null(flip_param_call$score_type)) flip_param_call$score_type = "standardized"
   flip_param_call$seed <- eval(flip_param_call$seed, parent.frame())
-  flip_param_call$nobservations = mf$nobservations
+  flip_param_call$nobservations = eval(mf$nobservations, parent.frame())
   mf$nobservations=NULL
   
   m2 <- match(c("to_be_tested"), names(mf), 0L)
