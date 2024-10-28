@@ -122,6 +122,7 @@ flipscores<-function(formula, family, data,
   
   # mi tengo solo quelli buoni per glm
   if(length(m)>0) mf <- mf[-m] 
+  mf$offset = eval(mf$offset,parent.frame()) # most of the time it is not a model
   
   model = eval(mf$formula,parent.frame()) # most of the time it is not a model
   if("formula"%in%is(model)){ # usual input
