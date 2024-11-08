@@ -88,8 +88,8 @@ flipscores<-function(formula, family, data,
   # rinomino la funzione da chiamare:
   flip_param_call[[1L]]=.flip_test
   
-  flip_param_call$id=eval(flip_param_call$id, parent.frame())
   
+  flip_param_call$id=eval(flip_param_call$id, parent.frame())
   flip_param_call$alternative=eval(flip_param_call$alternative, parent.frame())
   flip_param_call$flips <- eval(flip_param_call$flips, parent.frame())
   if(!is.null(flip_param_call$flips)) 
@@ -99,6 +99,7 @@ flipscores<-function(formula, family, data,
     }
   
   if(is.null(flip_param_call$precompute_flips)) flip_param_call$precompute_flips=TRUE  
+  flip_param_call$family <- eval(flip_param_call$family, parent.frame()) 
   flip_param_call$score_type <- eval(flip_param_call$score_type, parent.frame()) 
   if(is.null(flip_param_call$score_type)) flip_param_call$score_type = "standardized"
   flip_param_call$seed <- eval(flip_param_call$seed, parent.frame())
