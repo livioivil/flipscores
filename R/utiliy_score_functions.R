@@ -120,8 +120,9 @@ socket_compute_scores <- function(i,model,score_type,nobservations=NULL){
   #   model$call$formula=update( model$call$formula,formula(paste("~+offset(offs)")))
   # }
   model$call$score_type=NULL
-  model$call$perms = NULL
-
+  model$call$n_flips = NULL
+  model$call$flips = NULL
+  
   if(length(grep("Negative Binomial",model$family$family))==1)
     model$call[[1]]=quote(glm.nb) else
       model$call[[1]]=quote(glm)
