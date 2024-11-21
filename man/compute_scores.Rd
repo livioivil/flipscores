@@ -4,7 +4,7 @@
 \alias{compute_scores}
 \title{compute_scores}
 \usage{
-compute_scores(model0, model1, score_type = "standardized")
+compute_scores(model0, model1, score_type = "standardized", ...)
 }
 \arguments{
 \item{model0}{a \code{glm} object with the model under the null hypothesis (i.e. the covariates, the nuisance parameters).}
@@ -14,6 +14,8 @@ compute_scores(model0, model1, score_type = "standardized")
 
 \item{score_type}{The type of score that is computed. It is "orthogonalized", "effective" or "basic".
 "effective" and "orthogonalized" take into account the nuisance estimation.}
+
+\item{...}{other arguments.}
 }
 \description{
 Same usage as \code{anova.glm}. 

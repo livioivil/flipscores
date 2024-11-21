@@ -252,20 +252,3 @@ get_par_expo_fam <- function(model0){
     return(list(D=Dhat, V=Vhat))}
 }
 
-#################
-.make_flips <- function(n_obs,n_flips,id=NULL){
-  if(is.null(id)){  
-    flips = matrix(3-2*sample(2,(n_flips)*n_obs,replace=TRUE),n_flips,n_obs)
-  } else {
-    unique_id=unique(id)
-    n_id=length(unique_id)
-    temp = matrix(3-2*sample(2,(n_flips)*n_id,replace=TRUE),n_flips,n_id)
-    flips=matrix(NA,n_flips,n_obs)
-    for(i in 1:n_id)
-      flips[,id==unique_id[i]]=temp[,i]
-    # for(i in unique(id))
-    #   for(j in which(id==i)) 
-    #     flips[,j]=temp[,i]
-  }
-  flips
-}

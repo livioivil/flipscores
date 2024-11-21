@@ -1,1 +1,1 @@
-(^\.github/.+$)|(^README.+$)
+(^\.github/.+$)|(^README.+$)|(^texput.+$)|(^docs$)

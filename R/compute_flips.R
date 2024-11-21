@@ -48,17 +48,15 @@ compute_flips<- function(scores,alternative="two.sided",
   
   #      browser()
   n_obs=nrow(scores)
-  Tobs=  .score_fun(rep(1,n_obs),scores)
   #      set.seed(seed)
   if(!is.null(flips)){
     #  browser()
-    Tspace=as.vector(c(Tobs,
-                       sapply(1:(n_flips-1),
+    Tspace=as.vector(c(sapply(1:(n_flips),
                               function(i).score_fun(flips[i,],scores))))
     
   } else {
     set.seed(seed)
-    Tspace=as.vector(c(Tobs,replicate(n_flips-1,{
+    Tspace=as.vector(c(.score_fun(rep(1,n_obs),scores),replicate(n_flips-1,{
       .score_fun(sample(c(-1,1),n_obs, replace = T),scores)
     })))
   }

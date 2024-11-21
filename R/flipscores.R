@@ -172,7 +172,7 @@ flipscores<-function(formula, family, data,
   } else if(flip_param_call$precompute_flips){
       set.seed(seed)
       flip_param_call$flips=.make_flips(max(nrow(model$model),flip_param_call$nobservations),
-                                        flip_param_call$n_flips-1,flip_param_call$id)
+                                        flip_param_call$n_flips,flip_param_call$id)
     }  
   
 

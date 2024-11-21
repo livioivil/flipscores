@@ -4,6 +4,7 @@
 #' \code{model1} is a \code{matrix}, it contains the tested variables column-wise.
 #' @param score_type The type of score that is computed. It is "orthogonalized", "effective" or "basic".
 #' "effective" and "orthogonalized" take into account the nuisance estimation.
+#' @param ... other arguments.
 #' @description 
 #' Same usage as \code{anova.glm}. 
 #' The parameter \code{id}  is used too, 
