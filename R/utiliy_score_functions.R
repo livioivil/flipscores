@@ -53,7 +53,10 @@ get_std_dev_score <- function(fit,x2){
 # if(any(is.na(stat))) browser()
     stat
 }
-
+# .sum2t <- function(Tvector, sumY2, n){
+#   dev_resid=(sumY2-(Tvector^2/n))
+#   Tvector/sqrt(dev_resid/(n-1)*n)
+# }
 #### compute p-value
 .t2p  <- function(pvls){
   mean(as.vector(pvls)>=pvls[1])
