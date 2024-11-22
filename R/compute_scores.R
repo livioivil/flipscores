@@ -5,9 +5,9 @@
 #' @param score_type The type of score that is computed. It is "orthogonalized", "effective" or "basic".
 #' "effective" and "orthogonalized" take into account the nuisance estimation.
 #' @param ... other arguments.
-#' @description 
-#' Same usage as \code{anova.glm}. 
-#' The parameter \code{id}  is used too, 
+#' @description
+#' Same usage as \code{anova.glm}.
+#' The parameter \code{id}  is used too,
 #' if present in \code{model0} (with priority) or in \code{model1}.
 #'
 #' @author Jesse Hemerik, Riccardo De Santis, Vittorio Giatti, Jelle Goeman and Livio Finos
@@ -27,14 +27,14 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
   if(missing(score_type))
     stop("test type is not specified or recognized")
   X=get_X(model0,model1)
-  if(!is.null(model0))  
-  {id_model1=if(is.list(model1)) eval(model1$flip_param_call$id) 
-  else 
+  if(!is.null(model0))
+  {id_model1=if(is.list(model1)) eval(model1$flip_param_call$id)
+  else
     NULL
   } else id_model1=NULL
-  
+
   rm(model1)
-  
+
   ###############
   if(is.null(model0$x)||is.null(ncol(model0$x))) {
     call <- getCall(model0)
@@ -43,8 +43,8 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
     env <- attr(term, ".Environment")
     model0=eval(call, env, parent.frame())
   }
-  
-  
+
+
   # no variables in the null model
   if(ncol(model0$x)==0){
     scores=matrix(model0$y)
@@ -57,12 +57,13 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
     Z=model0$x
     residuals=(model0$y-model0$fitted.values)
     if(is.null(model0$weights))  sqrtW=rep(1,length(residuals)) else sqrtW=(as.numeric(model0$weights)**0.5)
-    pars_score<-get_par_expo_fam(model0)
-    D_vect<-pars_score$D
-    V_vect<-pars_score$V
+    if(is.null(list(...)$parms_DV))
+      parms_DV<-get_par_expo_fam(model0) else parms_DV=list(...)$parms_DV
+    D_vect<-parms_DV$D
+    V_vect<-parms_DV$V
     sqrtinvV_vect<-V_vect**(-0.5)
     sqrtinvV_vect_times_residuals=sqrtinvV_vect*residuals
-    
+
     #BASIC SCORE
     if (score_type == "basic") {
       .get_1score_basic <- function(X){
@@ -71,14 +72,14 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
         scale_objects=list(nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect_times_residuals)^2)))
         list(scores=scores, scale_objects=scale_objects)
       }
-  
+
       temp=apply(X,2,.get_1score_basic)
       scores=sapply(temp,function(obj) obj$scores)
       # print(names(scores))
       scale_objects=lapply(temp,function(obj) obj$scale_objects)
       # print(names(scale_objects))
     } else
-      
+
       ###############################
       ######################## not a documented score type, just a place for experiments
       if (score_type == "my_lab") {
@@ -89,10 +90,10 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
           scores=(diag(dinv)%*%t(deco$u)%*%(residuals))[,]#*(1/sum(!is.na(model0$y))**0.5)
           nrm=sqrt(sum(B^2)*sum(residuals^2))
           scale_objects=list(U=deco$u,B=B,nrm=nrm,Xt=Xt)
-         
+
           list(scores=scores, scale_objects=scale_objects)
         }
-        
+
         OneMinusH = diag(nrow(Z)) - ((sqrtW)* Z) %*% solve(t(Z) %*% ((sqrtW**2) * Z)) %*% t(Z * (sqrtW))
         deco=svd((V_vect^0.5)*OneMinusH,nv = 0)
         deco$u=deco$u[,deco$d>1E-12]
@@ -102,14 +103,14 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
         # print(names(scores))
         scale_objects=lapply(temp,function(obj) obj$scale_objects)
         # print(names(scale_objects))
-  
-        
+
+
         attr(scores,"scale_objects")=scale_objects
         rownames(scores)=1:length(scores)
         return(scores)
-        
+
         } else
-      ##  EFFECTIVE SCORE 
+      ##  EFFECTIVE SCORE
       if(score_type=="effective"){
         .get_1score_effective <- function(X){
           B<-X*(sqrtW)-t(crossprod(crossprod(A,X*(sqrtW)),solve(crossprod(A),t(A))))
@@ -117,14 +118,14 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
           scale_objects=list(nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect_times_residuals)^2)))
           list(scores=scores, scale_objects=scale_objects)
         }
-        
+
         A<-(sqrtW)*Z
         temp=apply(X,2,.get_1score_effective)
         scores=sapply(temp,function(obj) obj$scores)
         # print(names(scores))
         scale_objects=lapply(temp,function(obj) obj$scale_objects)
         # print(names(scale_objects))
-        
+
       } else
         ##  STANDARDIZED SCORE
         if(score_type=="standardized"){
@@ -138,15 +139,15 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
             scale_objects=list(A=A,nrm=nrm)
             list(scores=scores, scale_objects=scale_objects)
           }
-          
+
           U=svd((sqrtW*Z),nv=0)$u
           temp=apply(X,2,.get_1score_standardized,U)
           scores=sapply(temp,function(obj) obj$scores)
           # print(names(scores))
           scale_objects=lapply(temp,function(obj) obj$scale_objects)
           # print(names(scale_objects))
-          
-        } else  
+
+        } else
           #ORTHO EFFECTIVE SCORE
           if(score_type=="orthogonalized"){
             .get_1score_orthogonalized <- function(X){
@@ -156,7 +157,7 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
               scale_objects=list(U=deco$u,B=B,nrm=nrm)
               list(scores=scores, scale_objects=scale_objects)
             }
-            
+
             OneMinusH = diag(nrow(Z)) - ((sqrtW)* Z) %*% solve(t(Z) %*% ((sqrtW**2) * Z)) %*% t(Z * (sqrtW))
             deco=svd((V_vect^0.5)*OneMinusH,nv = 0)
             deco$d[deco$d<1E-12]=0
@@ -165,13 +166,13 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
             # print(names(scores))
             scale_objects=lapply(temp,function(obj) obj$scale_objects)
             # print(names(scale_objects))
-            
-   
+
+
           }
   }
-  
+
   rownames(scores)=names(sqrtinvV_vect_times_residuals)
-  
+
   nobservations=list(...)$nobservations
   if(!is.null(nobservations))
     if(nrow(scores)<nobservations){
@@ -183,25 +184,25 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
           scale_objects[[i]]$A=temp
         }
       }
-      
+
       temp=matrix(0,nobservations,ncol(scores))
       temp[as.numeric(rownames(scores)),]=scores
       scores=temp
       rownames(scores)=1:nobservations
-      
-      temp=rep(0,nobservations) 
+
+      temp=rep(0,nobservations)
       names(temp)=1:nobservations
       temp[as.numeric(names(sqrtinvV_vect_times_residuals))]=sqrtinvV_vect_times_residuals
       sqrtinvV_vect_times_residuals=temp
-  
+
     }
-  
+
   std_dev=get_std_dev_score(model0,X)
 #  scale_objects$df.residual <- df.residual(model0)
   attr(scores,"sd")=std_dev
   attr(scores,"scale_objects")=scale_objects
   attr(scores,"score_type")=score_type
   attr(scores,"resid_std")=sqrtinvV_vect_times_residuals
-  
+
   return(scores)
 }
