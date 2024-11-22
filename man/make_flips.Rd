@@ -16,3 +16,8 @@ make_flips(n_obs, n_flips)
 It creates a \code{n_flips}x\code{n_obs} matrix of random +1 and -1. 
 The first row is made by ones (i.e. the observed test statistic is computed)
 }
+\examples{
+# example code
+make_flips(n_obs=10,n_flips=20)
+
+}

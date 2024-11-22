@@ -1,1 +1,3 @@
 (^\.github/.+$)|(^README.+$)|(^texput.+$)|(^docs$)
+^.*\.Rproj$
+^\.Rproj\.user$

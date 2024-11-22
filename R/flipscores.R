@@ -168,7 +168,7 @@ flipscores<-function(formula, family, data,
   
   if(!is.null(flip_param_call$flips)){
     flip_param_call$precompute_flips=FALSE
-    flip_param_call$n_flips=nrow(eval(flip_param_call$flips,parent.frame()))+1
+    flip_param_call$n_flips=nrow(eval(flip_param_call$flips,parent.frame()))
   } else if(flip_param_call$precompute_flips){
       set.seed(seed)
       flip_param_call$flips=.make_flips(max(nrow(model$model),flip_param_call$nobservations),

@@ -28,6 +28,16 @@ anova(mod0,mod)
 
 }
 \author{
+\strong{Maintainer}: Livio Finos \email{livio.finos@unipd.it} (\href{https://orcid.org/0000-0003-3181-8078}{ORCID})
+
+Other contributors:
+\itemize{
+  \item Jelle J. Goeman [contributor]
+  \item Jesse Hemerik [contributor]
+  \item Riccardo De Santis [contributor]
+}
+
+
 Livio Finos, Jelle Goeman and Jesse Hemerik, with contribution of Riccardo De Santis.
 }
 \keyword{internal}

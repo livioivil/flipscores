@@ -52,7 +52,8 @@ compute_flips<- function(scores,alternative="two.sided",
   if(!is.null(flips)){
     #  browser()
     Tspace=as.vector(c(sapply(1:(n_flips),
-                              function(i).score_fun(flips[i,],scores))))
+                              function(i).score_fun(flips[i,],scores)))
+                     )
     
   } else {
     set.seed(seed)

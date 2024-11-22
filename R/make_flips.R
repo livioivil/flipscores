@@ -3,6 +3,10 @@
 #' The first row is made by ones (i.e. the observed test statistic is computed)
 #' @param n_obs number of observations
 #' @param n_flips number of flips
+#' @examples
+#' # example code
+#' make_flips(n_obs=10,n_flips=20)
+#' 
 #' @export
 #' 
 make_flips <- function(n_obs,n_flips){
