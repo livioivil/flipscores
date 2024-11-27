@@ -89,7 +89,7 @@ flipscores<-function(formula, family, data,
   # rinomino la funzione da chiamare:
   flip_param_call[[1L]]=.flip_test
 
-
+  flip_param_call$formula=eval(flip_param_call$formula, parent.frame())
   flip_param_call$id=eval(flip_param_call$id, parent.frame())
   flip_param_call$alternative=eval(flip_param_call$alternative, parent.frame())
   flip_param_call$flips <- eval(flip_param_call$flips, parent.frame())
