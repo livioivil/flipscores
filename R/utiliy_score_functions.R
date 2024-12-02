@@ -110,13 +110,13 @@ socket_compute_scores <- function(i,model,score_type,nobservations=NULL,parms_DV
     colnames(model[["x"]])=paste0("V",1:ncol(model$x))
 
   model$call$data=data.frame(model[["y"]],model[["x"]][,-i_id,drop=FALSE])
-  yname=as.character(model$call$formula[[2]])
+  yname=all.vars( model$call$formula)[[1]]
   names(model$call$data)[1]=yname
 
   # frml=update(as.formula(model$call$formula), formula(paste(yname,"~0+",paste(colnames(model[["x"]]),collapse =" + "))))
   # model$call$formula=as.formula(frml)
   # model$call$formula=update( model$call$formula,formula(paste("~.",paste("-",colnames(model[["x"]])[i],collapse=""))))
-  frml=as.formula(paste(yname,"~0+."))
+  # frml=as.formula(paste(yname,"~0+."))
   model$call$formula=as.formula(paste(yname,"~0+."))
   # if(!is.null(model$offset)){
   #   offs<-model$offset
