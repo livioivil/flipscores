@@ -25,7 +25,7 @@
 #' @usage flipscores(formula, family, data, score_type = "standardized",
 #' n_flips = 5000, alternative = "two.sided", id = NULL,
 #' seed = NULL, to_be_tested = NULL, flips = NULL,
-#' output_flips = FALSE, ...)
+#' precompute_flips=TRUE, ...)
 #'
 #' @return an object of class \code{flipscores}.
 #' See also its methods (\code{summary.flipscores}, \code{anova.flipscores}, \code{print.flipscores}).
@@ -47,7 +47,7 @@
 #' dt=data.frame(X=rnorm(20),
 #'    Z=factor(rep(LETTERS[1:3],length.out=20)))
 #' dt$Y=rpois(n=20,lambda=exp(dt$Z=="C"))
-#' mod=flipscores(Y~Z+X,data=dt,family="poisson",n_flips=1000)
+#' mod=flipscores(X~Z+X,data=dt,family="poisson",n_flips=1000)
 #' summary(mod)
 #'
 #' # Equivalent to:
@@ -89,7 +89,7 @@ flipscores<-function(formula, family, data,
   # rinomino la funzione da chiamare:
   flip_param_call[[1L]]=.flip_test
 
-  
+
   flip_param_call$id=eval(flip_param_call$id, parent.frame())
   flip_param_call$alternative=eval(flip_param_call$alternative, parent.frame())
   flip_param_call$flips <- eval(flip_param_call$flips, parent.frame())
