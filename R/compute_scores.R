@@ -56,11 +56,11 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
     if(is.null(model0$y)) model0$y=model0$model[,1]
     Z=model0$x
     residuals=(model0$y-model0$fitted.values)
-    if(is.null(model0$weights))  sqrtW=rep(1,length(residuals)) else sqrtW=(as.numeric(model0$weights)**0.5)
     if(is.null(list(...)$parms_DV))
       parms_DV<-get_par_expo_fam(model0) else parms_DV=list(...)$parms_DV
     D_vect<-parms_DV$D
     V_vect<-parms_DV$V
+    if(is.null(model0$weights))  sqrtW=rep(1,length(residuals)) else sqrtW=(D_vect*V_vect^-0.5)
     sqrtinvV_vect<-V_vect**(-0.5)
     sqrtinvV_vect_times_residuals=sqrtinvV_vect*residuals
 
