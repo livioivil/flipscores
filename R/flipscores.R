@@ -47,7 +47,7 @@
 #' dt=data.frame(X=rnorm(20),
 #'    Z=factor(rep(LETTERS[1:3],length.out=20)))
 #' dt$Y=rpois(n=20,lambda=exp(dt$Z=="C"))
-#' mod=flipscores(X~Z+X,data=dt,family="poisson",n_flips=1000)
+#' mod=flipscores(Y~Z+X,data=dt,family="poisson",n_flips=1000)
 #' summary(mod)
 #'
 #' # Equivalent to:

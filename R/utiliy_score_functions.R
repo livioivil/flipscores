@@ -209,7 +209,7 @@ get_X <- function(model0,model1){
 
 get_par_expo_fam <- function(model0){
   if(("lm"%in%class(model0))&(!("glm"%in%class(model0)))){
-    Dhat<- Vhat <-1
+    Dhat<- Vhat <- rep(1,length(model0$fitted.values))
     return(list(D=Dhat, V=Vhat))
   } else if(("glm"%in%class(model0))){
 
@@ -253,7 +253,7 @@ get_par_expo_fam <- function(model0){
     #
   } else {
     warning("Class of the model not detected, homoscedasticity and canonical link are assumed.")
-    Dhat<-Vhat<-1
+    Dhat<-Vhat<-rep(1,length(model0$fitted.values))
     return(list(D=Dhat, V=Vhat))}
 }
 
