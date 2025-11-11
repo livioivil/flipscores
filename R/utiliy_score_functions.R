@@ -211,7 +211,7 @@ get_par_expo_fam <- function(model0){
   if(("lm"%in%class(model0))&(!("glm"%in%class(model0)))){
     Dhat<- Vhat <- rep(1,length(model0$fitted.values))
     return(list(D=Dhat, V=Vhat))
-  } else if(("glm"%in%class(model0))){
+  } else if(("glm"%in%class(model0))){ # negbinom is comprised in this condition
 
     #The following lines are taken from the mdscore package on CRAN
     #by Antonio Hermes M. da Silva-Junior, Damiao N. da Silva and Silvia L. P. Ferrari
@@ -239,18 +239,6 @@ get_par_expo_fam <- function(model0){
     Dhat<-as.vector(eval(Dmu, list(eta= eta.est)))
     Vhat<-as.vector(eval(V, list(mu= mu.est,.Theta=model0$theta)))
     return(list(D=Dhat, V=Vhat))
-
-    # } else if(("glm"%in%class(model0))&&("negbin"%in%class(model0))){
-    #
-    #   mu.est <- model0$fitted.values
-    #   eta.est <- model0$family$linkfun(mu.est)
-    #   V <- as.list(model0$family$variance)[[2]]
-    #   #TODO mettere le altre 2 link
-    #   mu <-quote(exp(eta))
-    #   Dmu <- D(mu,"eta")
-    #   a <- eval(V, list(mu= mu.est,.Theta=model0$theta)) / eval(Dmu, list(eta= eta.est))
-    #   return(a)
-    #
   } else {
     warning("Class of the model not detected, homoscedasticity and canonical link are assumed.")
     Dhat<-Vhat<-rep(1,length(model0$fitted.values))
