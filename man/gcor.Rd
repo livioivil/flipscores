@@ -9,9 +9,9 @@ gcor(full_glm, variables = NULL, intercept_too = FALSE)
 \arguments{
 \item{full_glm}{A fitted GLM object of class `glm`.}
 
-\item{variables}{Character vector of variable names (referred to the 
-model.matrix, that is pay attention for factors) for which to compute 
-generalized partial correlations. If `NULL` (default), computes for all 
+\item{variables}{Character vector of variable names (referred to the
+model.matrix, that is pay attention for factors) for which to compute
+generalized partial correlations. If `NULL` (default), computes for all
 non-intercept variables in the model.}
 }
 \value{
@@ -20,7 +20,7 @@ A data frame with two columns:
   \item{r}{The generalized partial correlation coefficient}
 }
 \description{
-This function computes the generalized partial correlation coefficient \eqn{r} 
+This function computes the generalized partial correlation coefficient \eqn{r}
 for each specified variable in a generalized linear model. For each variable,
 it refits the null model excluding that variable and computes the cosine similarity
 between the residualized predictor and standardized residuals.
@@ -28,7 +28,7 @@ between the residualized predictor and standardized residuals.
 \details{
 The generalized partial correlation \eqn{\r} measures the association between
 a predictor and response after adjusting for all other variables in the model.
-It is defined as the cosine similarity between the residualized predictor 
+It is defined as the cosine similarity between the residualized predictor
 \eqn{X_r} and standardized residuals \eqn{Y_r}:
 
 \deqn{\r = \frac{X_r^\top Y_r}{\|X_r\| \|Y_r\|}}
@@ -52,11 +52,14 @@ dt=data.frame(X=rnorm(20),
 dt$Y=rpois(n=20,lambda=exp(dt$Z=="C"))
 mod=flipscores(Y~Z+X,data=dt,family="poisson",n_flips=1000)
 summary(mod)
- 
+
 # Compute generalized partial correlations for all variables
 (results <- gcor(mod))
 
 # Compute for specific variables only
 gcor(mod, variables = c("X", "ZC"))
 
+}
+\author{
+Livio Finos and Paolo Girardi
 }

@@ -28,7 +28,7 @@
 #'
 #' This measures the proportion of the standardized residual sum of squares explained
 #' by the additional predictors in the full model.
-#'
+#' @author Livio Finos and Paolo Girardi
 #' @examples
 #' set.seed(1)
 #' dt=data.frame(X=rnorm(20),
@@ -41,7 +41,6 @@
 #' (results <- gR2(mod))
 #' # equivalente to
 #' gR2(mod, extra_terms = c( "Z"))
-
 #'
 #' # Compute for specific variables only
 #' gR2(mod, extra_terms = c( "Z"))

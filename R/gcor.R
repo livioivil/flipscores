@@ -1,14 +1,14 @@
 #' Compute Generalized Partial Correlations for GLM Variables
 #'
-#' This function computes the generalized partial correlation coefficient \eqn{r} 
+#' This function computes the generalized partial correlation coefficient \eqn{r}
 #' for each specified variable in a generalized linear model. For each variable,
 #' it refits the null model excluding that variable and computes the cosine similarity
 #' between the residualized predictor and standardized residuals.
 #'
 #' @param full_glm A fitted GLM object of class `glm`.
-#' @param variables Character vector of variable names (referred to the 
-#'   model.matrix, that is pay attention for factors) for which to compute 
-#'   generalized partial correlations. If `NULL` (default), computes for all 
+#' @param variables Character vector of variable names (referred to the
+#'   model.matrix, that is pay attention for factors) for which to compute
+#'   generalized partial correlations. If `NULL` (default), computes for all
 #'   non-intercept variables in the model.
 #'
 #' @return A data frame with two columns:
@@ -18,11 +18,11 @@
 #' @details
 #' The generalized partial correlation \eqn{\r} measures the association between
 #' a predictor and response after adjusting for all other variables in the model.
-#' It is defined as the cosine similarity between the residualized predictor 
+#' It is defined as the cosine similarity between the residualized predictor
 #' \eqn{X_r} and standardized residuals \eqn{Y_r}:
-#' 
+#'
 #' \deqn{\r = \frac{X_r^\top Y_r}{\|X_r\| \|Y_r\|}}
-#' 
+#'
 #' where:
 #' \itemize{
 #'   \item \eqn{X_r = (I - H)W^{1/2}X} is the residualized predictor
@@ -31,10 +31,11 @@
 #'   \item \eqn{W = DV^{-1}D} is the weight matrix
 #'   \item \eqn{V} is the variance matrix and \eqn{D} is the derivative matrix
 #' }
-#' 
+#'
 #' The function uses `flipscores:::get_par_expo_fam()` to compute \eqn{V} and \eqn{D}
 #' consistently with the flipscores package methodology.
 #'
+#' @author Livio Finos and Paolo Girardi
 #' @examples
 #' set.seed(1)
 #' dt=data.frame(X=rnorm(20),
@@ -42,13 +43,13 @@
 #' dt$Y=rpois(n=20,lambda=exp(dt$Z=="C"))
 #' mod=flipscores(Y~Z+X,data=dt,family="poisson",n_flips=1000)
 #' summary(mod)
-#'  
+#'
 #' # Compute generalized partial correlations for all variables
 #' (results <- gcor(mod))
-#' 
+#'
 #' # Compute for specific variables only
 #' gcor(mod, variables = c("X", "ZC"))
-#' 
+#'
 #' @export
 
 #library(flipscores)
@@ -56,17 +57,17 @@
 
 
 gcor <- function(full_glm, variables = NULL,intercept_too=FALSE) {
-  
+
   # Extract model components
   Y <- full_glm$y
   X_full <- model.matrix(full_glm)
   family <- full_glm$family
   n <- length(Y)
-  
+
   # Get all variable names (excluding intercept)
   all_vars <- colnames(X_full)
   if(!intercept_too) all_vars <- all_vars[all_vars != "(Intercept)"]
-  
+
   # If variables not specified, use all non-intercept variables
   if (is.null(variables)) {
     variables <- all_vars
@@ -77,7 +78,7 @@ gcor <- function(full_glm, variables = NULL,intercept_too=FALSE) {
       stop("Variables not found in model: ", paste(missing_vars, collapse = ", "))
     }
   }
-  # 
+  #
 
   results=lapply(variables,socket_compute_gcor,
                  full_glm)
@@ -87,7 +88,7 @@ gcor <- function(full_glm, variables = NULL,intercept_too=FALSE) {
     stringsAsFactors = FALSE
   )
 
-  
+
   return(results)
 }
 
@@ -107,6 +108,7 @@ gcor <- function(full_glm, variables = NULL,intercept_too=FALSE) {
 #' if present in \code{model0} (with priority) or in \code{model1}.
 #'
 #' @author Paolo Girardi and Livio Finos
+#' @noRd
 #' @examples
 #' library(rsq)
 #' set.seed(1)
@@ -149,7 +151,7 @@ gcor <- function(full_glm, variables = NULL,intercept_too=FALSE) {
 #' partial_r2(model1)
 #'
 #'
-#' 
+#'
 #' library(pima)
 #' data("pimads")
 #' summary(pimads)
@@ -158,7 +160,7 @@ gcor <- function(full_glm, variables = NULL,intercept_too=FALSE) {
 #' scr0=compute_gcor(model0 = mod,  pimads$npreg)
 #' scr0$part_cor^2
 #' plot(scr0$IHX,scr0$IHY)
-#' cor(scr0$IHX,scr0$IHY)^2 
+#' cor(scr0$IHX,scr0$IHY)^2
 #' # come mai sono diversi?
 #' # perchè i residui non hanno media 0. perchè?
 #' mean(scr0$IHX)
@@ -166,8 +168,8 @@ gcor <- function(full_glm, variables = NULL,intercept_too=FALSE) {
 #' mean(scr0$IHY)
 #' #[1] -2.90525e-15
 #' # negli lm invece mean(scr0$IHX) è sempre 0!
-#' 
-#' 
+#'
+#'
 #' #esempio 50% 1 in binomiale. vedi NAGELKERKE 1991
 #' X= Y = rep(0:1,2)
 #' model0=glm(Y~1,family="binomial")
@@ -178,16 +180,16 @@ gcor <- function(full_glm, variables = NULL,intercept_too=FALSE) {
 #' sapply(c('v','kl','sse','lr','n'),function(type) rsq.partial(model1,model0,type=type)$partial.rsq)
 #' plot(scr0$IHX,scr0$IHY)
 
-# @export
+
 
 compute_gcor <- function(model0, X, ...){
   X=get_X(model0,X)
   Z=model.matrix(model0)
-  
-  
+
+
   # no variables in the null model
   if(ncol(Z)==0){
-    IHY <- matrix(model0$y)        
+    IHY <- matrix(model0$y)
     IHY <- matrix(IHY)/sqrt(sum(IHY^2))
     IHX = rep(1,nrow(IHY))
     IHX <- IHX/sqrt(nrow(IHX))
@@ -206,7 +208,7 @@ compute_gcor <- function(model0, X, ...){
     sqrtW=diag(D_vect*sqrtinvV_vect)
     residuals=sqrtinvV_vect*residuals
     IHY <- matrix(residuals)
-    IH=diag(nrow(IHY))-sqrtW%*%Z%*%solve(t(Z)%*%sqrtW^2%*%Z)%*%t(Z)%*%sqrtW 
+    IH=diag(nrow(IHY))-sqrtW%*%Z%*%solve(t(Z)%*%sqrtW^2%*%Z)%*%t(Z)%*%sqrtW
     IHX <- t(t(X)%*%sqrtW%*%IH)
     H=sqrtW%*%Z%*%solve(t(Z)%*%(sqrtW^2)%*%Z)%*%t(Z)%*%sqrtW
     HsqrtinvV <- t(diag(sqrtinvV_vect)%*%H)
@@ -214,11 +216,11 @@ compute_gcor <- function(model0, X, ...){
     # ##  Alternativa
     # IHY <- residuals*(sqrtinvV_vect)
     # IHY <- matrix(IHY / sqrt(sum(IHY^2)))
-    # IH=diag(nrow(IHY))-sqrtW%*%Z%*%solve(t(Z)%*%diag(D_vect*V_vect^-1*D_vect)%*%Z)%*%t(Z)%*%sqrtW 
+    # IH=diag(nrow(IHY))-sqrtW%*%Z%*%solve(t(Z)%*%diag(D_vect*V_vect^-1*D_vect)%*%Z)%*%t(Z)%*%sqrtW
     # IHX <- t(t(X)%*%sqrtW%*%IH)
-    
+
   }
-  
+
   part_cor=as.vector(t(IHX)%*%IHY/ sqrt(sum(residuals^2)))
   if(ncol(IHX)>1)
     part_cor <-part_cor*(colSums(IHX^2)^-.5)

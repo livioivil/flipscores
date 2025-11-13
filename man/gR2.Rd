@@ -57,3 +57,6 @@ gR2(mod, extra_terms = c( "Z"))
 gR2(mod, extra_terms = c( "Z"))
 
 }
+\author{
+Livio Finos and Paolo Girardi
+}
