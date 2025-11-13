@@ -11,4 +11,4 @@ Description: Provides robust tests for testing in GLMs, by sign-flipping score c
 Imports: MASS, methods 
 Encoding: UTF-8
 License: GPL-2
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
