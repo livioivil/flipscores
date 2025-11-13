@@ -81,35 +81,6 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
     } else
 
       ###############################
-      ######################## not a documented score type, just a place for experiments
-      if (score_type == "my_lab") {
-      .get_1score_orthogonalized <- function(X){
-          B=(t(X*sqrtW)%*%OneMinusH*(sqrtinvV_vect))
-          dinv=deco$d^-1
-          Xt=(B%*%deco$u%*%diag(deco$d))
-          scores=(diag(dinv)%*%t(deco$u)%*%(residuals))[,]#*(1/sum(!is.na(model0$y))**0.5)
-          nrm=sqrt(sum(B^2)*sum(residuals^2))
-          scale_objects=list(U=deco$u,B=B,nrm=nrm,Xt=Xt)
-
-          list(scores=scores, scale_objects=scale_objects)
-        }
-
-        OneMinusH = diag(nrow(Z)) - ((sqrtW)* Z) %*% solve(t(Z) %*% ((sqrtW**2) * Z)) %*% t(Z * (sqrtW))
-        deco=svd((V_vect^0.5)*OneMinusH,nv = 0)
-        deco$u=deco$u[,deco$d>1E-12]
-        deco$d=deco$d[deco$d>1E-12]
-        temp=apply(X,2,.get_1score_orthogonalized)
-        scores=sapply(temp,function(obj) obj$scores)
-        # print(names(scores))
-        scale_objects=lapply(temp,function(obj) obj$scale_objects)
-        # print(names(scale_objects))
-
-
-        attr(scores,"scale_objects")=scale_objects
-        rownames(scores)=1:length(scores)
-        return(scores)
-
-        } else
       ##  EFFECTIVE SCORE
       if(score_type=="effective"){
         .get_1score_effective <- function(X){

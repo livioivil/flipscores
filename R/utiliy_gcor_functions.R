@@ -18,10 +18,10 @@ compute_rho_current <- function(Y, mu, Vd, Xr) {
   # mu: fitted probabilities (length n)
   # Vd: variances mu*(1-mu) (length n)
   # Xr: residualized predictor; must be a vector or n x 1 matrix
-  
+
   # standardize Yr
   Yr <- (Y - mu) / sqrt(Vd)
-  
+
   # Ensure Xr is a vector (scalar predictor)
   if (is.matrix(Xr)) {
     if (ncol(Xr) == 1) {
@@ -32,12 +32,12 @@ compute_rho_current <- function(Y, mu, Vd, Xr) {
   } else {
     Xr <- as.numeric(Xr)
   }
-  
+
   rho <- sum(.nrmz(Yr)*.nrmz(Xr))
   # Numerical safety: clip to [-1, 1]
   if(rho>1) browser()
   rho <- max(-1, min(1, rho))
-  
+
   rho
 }
 
@@ -95,7 +95,7 @@ socket_compute_gcor <- function(i,model){
   }
   if(is.character(i)) {
     #check if it is present
-    if(!any(i%in%all_vars_names)) 
+    if(!any(i%in%all_vars_names))
       warning("Variable(s) ",paste(sep=", ",setdiff(i,all_vars_names))," is(are) not present in the model")
   }
 
@@ -104,7 +104,7 @@ socket_compute_gcor <- function(i,model){
   #to avoid re-run a flipscores everytime:
   attributes(model)$class= attributes(model)$class[attributes(model)$class!="flipscores"]
 
-  
+
   model$call$data=data.frame(model[["y"]],mm[,-i_id,drop=FALSE])
   yname=all.vars( model$call$formula)[[1]]
   names(model$call$data)[1]=yname
@@ -126,12 +126,12 @@ socket_compute_gcor <- function(i,model){
 # i and exclude are indices of the columns of model.frame x
 socket_compute_gcor_normalized_binom <- function(i,model,algorithm="auto",
                                                  algorithm.control=list(
-                                                   n_exact = 15, 
+                                                   n_exact = 15,
                                                    thresholds = c(-.1, 0, .1),
-                                                   n_random = 10, 
-                                                   max_iter = 1000, 
+                                                   n_random = 10,
+                                                   max_iter = 1000,
                                                    topK = 10,
-                                                   tol = 1e-12, 
+                                                   tol = 1e-12,
                                                    patience = 10), ...){
   mm=model.matrix(model)
   all_vars_names=colnames(mm)
@@ -140,25 +140,25 @@ socket_compute_gcor_normalized_binom <- function(i,model,algorithm="auto",
   }
   if(is.character(i)) {
     #check if it is present
-    if(!any(i%in%all_vars_names)) 
+    if(!any(i%in%all_vars_names))
       warning("Variable(s) ",paste(sep=", ",setdiff(i,all_vars_names))," is(are) not present in the model")
   }
-  
+
   i_id=sapply(i,function(ii)which(all_vars_names==ii))
-  
+
   #to avoid re-run a flipscores everytime:
   attributes(model)$class= attributes(model)$class[attributes(model)$class!="flipscores"]
-  
-  
+
+
   model$call$data=data.frame(model[["y"]],mm[,-i_id,drop=FALSE])
   yname=all.vars( model$call$formula)[[1]]
   names(model$call$data)[1]=yname
-  
+
   model$call$formula=as.formula(paste(yname,"~0+."))
   model$call$score_type=NULL
   model$call$n_flips = NULL
   model$call$flips = NULL
-  
+
   if(length(grep("Negative Binomial",model$family$family))==1)
     model$call[[1]]=quote(glm.nb) else
       model$call[[1]]=quote(glm)
@@ -219,23 +219,24 @@ socket_compute_gcor_normalized_binom <- function(i,model,algorithm="auto",
 #        fit = fit)
 # }
 
-fit_null_glm <- function(Y, Z, X) {
+fit_null_glm <- function(Y, Z, X,link="logit") {
   # Y: 0/1 vector length n
   # Z: n x q matrix or data.frame of confounders (DO NOT include intercept column here)
   # X: n-vector (variable of interest)
   n <- length(Y)
   # fit null model Y ~ Z (intercept included)
-  fit <- glm(Y ~ Z-1, family = binomial(link = "logit"))
+  fit <- glm(Y ~ Z-1, family = binomial(link = link))
   mu <- fitted(fit)
   # numerical stability
   mu <- pmin(pmax(mu, 1e-12), 1 - 1e-12)
-  V_diag <- mu * (1 - mu)
-  W_sqrt <- sqrt(V_diag)
-  # Weighted Z (for H)
-  Wz <- sweep(as.matrix(Z), 1, W_sqrt, "*")
-  ZZ <- crossprod(Wz)   # Z^T W Z
-  invZZ <- tryCatch(solve(ZZ), error = function(e) solve(ZZ))
-  H <- tcrossprod(Wz %*% invZZ, Wz)  # n x n projection in W^{1/2}-space
-  X_r <- (diag(n) - H) %*% (W_sqrt * X)
-  list(mu = mu, V_diag = V_diag, X_r = X_r, fit = fit, H = H)
+  dv=get_par_expo_fam(fit)
+  if(is.null(fit$weights))  sqrtW=rep(1,length(mu)) else
+    sqrtW=(dv$D*dv$V^-0.5)
+
+  sv=svd((sqrtW)* Z,nv=0)
+  H= (sv$u) %*%  t(sv$u)
+  OneMinusH = diag(nrow(Z)) - H
+
+  X_r <-  OneMinusH %*% (sqrtW * X)
+  list(mu = mu, V_diag = dv$V, X_r = X_r, fit = fit, H = H)
 }
