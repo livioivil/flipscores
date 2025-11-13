@@ -16,14 +16,14 @@ gcor_normalized_binom(
 \arguments{
 \item{full_glm}{A fitted GLM object of class `glm` with binomial family.}
 
-\item{variables}{Character vector of variable names for which to compute 
+\item{variables}{Character vector of variable names for which to compute
 normalized correlations. If `NULL` (default), computes for all non-intercept
 variables in the model.}
 
 \item{intercept_too}{Logical indicating whether to include the intercept
 as a variable. Default is FALSE.}
 
-\item{algorithm.control}{`list` of coltrol parameters: 
+\item{algorithm.control}{`list` of coltrol parameters:
 `n_exact` Integer specifying the sample size threshold for using exact
   methods (brute force). Default is 15.
 `thresholds` Numeric vector of threshold values for multi-start initialization.
@@ -56,8 +56,8 @@ r_n = \begin{cases}
 }
 where \eqn{r_+} is the maximum possible correlation and \eqn{r_-} is the minimum.
 
-When the (full) model has only intercept and only one predictor X, the 
-generalized (non partial) correlation is computed and the normalization factor 
+When the (full) model has only intercept and only one predictor X, the
+generalized (non partial) correlation is computed and the normalization factor
 for X is exact.
 In the more general case with more predictors, for sample sizes \eqn{n \leq n_{\text{exact}}}, brute force search is used to find
 the exact extrema. For larger sample sizes, a greedy multi-start algorithm is employed:
@@ -77,7 +77,7 @@ dt=data.frame(X=rnorm(20),
 dt$Y=rbinom(n=20,prob=plogis((dt$Z=="C")*2),size=1)
 mod=flipscores(Y~Z+X,data=dt,family="binomial",n_flips=1000)
 summary(mod)
- 
+
 # Compute generalized partial correlations for all variables
 (results <- gcor(mod))
 
