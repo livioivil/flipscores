@@ -44,10 +44,11 @@
 #'
 #' # Compute for specific variables only
 #' gR2(mod, extra_terms = c( "Z"))
+#' gR2(mod, extra_terms = c( "X"))
+#' gR2(mod)
 #'
 #' @export
 gR2 <- function(full_glm, null_glm = NULL, extra_terms = NULL) {
-
   # Validate full model
   if (!inherits(full_glm, "glm")) {
     stop("full_glm must be a glm object")
@@ -141,15 +142,23 @@ create_null_from_extra_terms <- function(full_glm, extra_terms) {
   if (length(null_terms) == 0) {
     if (has_intercept) {
       null_formula <- as.formula(paste(response_var, "~ 1"))
-    } else {
       null_formula <- as.formula(paste(response_var, "~ 0"))
     }
   } else {
     null_formula <- as.formula(paste(response_var, "~", paste(null_terms, collapse = " + ")))
   }
 
+  # Avoid to re-run the flipscores if it is a flipscores-object
+  attributes(full_glm)$class= attributes(full_glm)$class[attributes(full_glm)$class!="flipscores"]
+  full_glm$call$score_type=NULL
+  full_glm$call$n_flips = NULL
+  full_glm$call$flips = NULL
+
+  if(length(grep("Negative Binomial",full_glm$family$family))==1)
+    full_glm$call[[1]]=quote(glm.nb) else
+      full_glm$call[[1]]=quote(glm)
   # Fit null model
-  null_glm <- glm(null_formula, data = full_data, family = full_family)
+  null_glm <-update(full_glm,formula. = null_formula)
   return(null_glm)
 }
 
@@ -198,13 +207,20 @@ compute_gR2_from_models <- function(full_glm, null_glm) {
   # Extract components from both models
   Y <- full_glm$y
   X_full <- model.matrix(full_glm)
-  X_null <- model.matrix(null_glm)
+  Z <- model.matrix(null_glm)
   family <- full_glm$family
 
   # Identify additional terms in full model
   full_terms <- colnames(X_full)
-  null_terms <- colnames(X_null)
+  null_terms <- colnames(Z)
   extra_terms <- setdiff(full_terms, null_terms)
+
+  # Remove any NA/NaN values
+  valid_idx <- complete.cases(Y, Z,X_full)
+  Z <- Z[valid_idx, , drop = FALSE]
+  X_full <- X_full[valid_idx, , drop = FALSE]
+  Y <- Y[valid_idx]
+
 
   if (length(extra_terms) == 0) {
     warning("No additional terms in full model compared to null model. Returning 0.")
@@ -213,7 +229,6 @@ compute_gR2_from_models <- function(full_glm, null_glm) {
 
   # Get null model fitted values and components
   mu_null <- fitted(null_glm)
-  eta_null <- predict(null_glm, type = "link")
 
   # Use flipscores internal function to get V and D under null model
   par_list <- get_par_expo_fam(null_glm)
@@ -221,47 +236,43 @@ compute_gR2_from_models <- function(full_glm, null_glm) {
   D <- par_list$D
 
   # Compute weights without creating diagonal matrices
-  w_vals <- D^2 / V  # Vector of weights
-  w_sqrt <- sqrt(w_vals)  # Vector of square roots
+  w_sqrt <- D / V^.5  # Vector of square roots
 
   # Standardized residual vector from null model
   Y_r <- (Y - mu_null) / sqrt(V)
 
   # Weighted design matrices using element-wise multiplication
-  if (ncol(X_null) == 0) {
-    H <- matrix(0, nrow = length(Y), ncol = length(Y))
+  if (ncol(Z) == 0) {
+    IH <- diag(length(Y))
   } else {
-    Z_weighted <- X_null * w_sqrt  # Equivalent to diag(w_sqrt) %*% X_null
-    H <- Z_weighted %*% solve(t(Z_weighted) %*% Z_weighted) %*% t(Z_weighted)
+    Z_weighted <- Z * w_sqrt  # Equivalent to diag(w_sqrt) %*% Z
+    IH <- .get_IH(Z_weighted)
   }
 
   # Residualized additional predictors matrix
   X_extra <- X_full[, extra_terms, drop = FALSE]
   X_weighted <- X_extra * w_sqrt  # Equivalent to diag(w_sqrt) %*% X_extra
-  X_r <- (diag(length(Y)) - H) %*% X_weighted
+  X_r <- IH %*% X_weighted
 
-  # Remove any NA/NaN values
-  valid_idx <- complete.cases(X_r, Y_r)
-  X_r_clean <- X_r[valid_idx, , drop = FALSE]
-  Y_r_clean <- Y_r[valid_idx]
 
   # Compute generalized R-squared using the correct formula
-  if (length(Y_r_clean) == 0 || nrow(X_r_clean) == 0) {
+  if (length(Y_r) == 0 || nrow(X_r) == 0) {
     return(NA)
   }
 
   # gR^2 = Y_r^T X_r (X_r^T X_r)^{-1} X_r^T Y_r / (Y_r^T Y_r)
-  YtX <- t(Y_r_clean) %*% X_r_clean
-  XtX <- t(X_r_clean) %*% X_r_clean
-  XtY <- t(X_r_clean) %*% Y_r_clean
-  YtY <- t(Y_r_clean) %*% Y_r_clean
+  # YtX <- t(Y_r_clean) %*% X_r_clean
+  X_r <- IH%*%X_extra
+  XtX <- t(X_r)%*%X_r
+  # XtY <- t(X_r_clean) %*% Y_r_clean
+  YtY <- t(Y_r) %*% Y_r
 
   # Handle case where XtX is singular
   if (rcond(XtX) < .Machine$double.eps) {
     warning("Design matrix of additional terms is singular. Generalized R-squared may be unreliable.")
   }
 
-  gR2 <- as.numeric((YtX %*% solve(XtX) %*% XtY) / YtY)
+  gR2 <- as.numeric(t(Y_r) %*% X_r  %*% solve(XtX) %*% t(X_r) %*% Y_r / (YtY))
 
   return(gR2)
 }

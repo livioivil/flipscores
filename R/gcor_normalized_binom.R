@@ -92,6 +92,18 @@ gcor_normalized_binom <- function(full_glm, variables = NULL,
   if (full_glm$family$family != "binomial") {
     stop("Model must be from binomial family")
   }
+  # Extract control parameters with defaults
+  control <- list(
+    n_exact = 15,
+    thresholds = c(-.1, 0, .1),
+    n_random = 10,
+    max_iter = 1000,
+    topK = 10,
+    tol = 1e-12,
+    patience = 10
+  )
+  control[names(algorithm.control)] <- algorithm.control
+
 
 
   # Extract model components
