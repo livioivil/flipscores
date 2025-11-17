@@ -4,9 +4,9 @@
 #' The normalization scales the correlation by its maximum possible absolute value.
 #'
 #' @param full_glm A fitted GLM object of class `glm` with binomial family.
-#' @param variables Character vector of variable names for which to compute
+#' @param terms Character vector of variable names for which to compute
 #'   normalized correlations. If `NULL` (default), computes for all non-intercept
-#'   variables in the model.
+#'   terms in the model.
 #' @param intercept_too Logical indicating whether to include the intercept
 #'   as a variable. Default is FALSE.
 #' @param algorith `"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`
@@ -20,10 +20,11 @@
 #' `tol` Numeric tolerance for convergence.
 #' `patience` Integer number of iterations without improvement before stopping.
 #'
-#' @return A data frame with two columns:
-#'   \item{variable}{The variable name}
+#' @return A data frame with five columns:
+#'   \item{terms}{The variable name}
 #'   \item{r}{The generalized partial correlation coefficient}
 #'   \item{r_n}{The normalized generalized partial correlation coefficient}
+#'   \item{null_model}{The null model used to compute the generalized (partial) correlation}
 #'   \item{algorithm}{The algorithm used to compute the upper/lower bounds of the generalized partial correlation coefficient (to compute its normalized version)}
 #'
 #' @details
@@ -58,29 +59,14 @@
 #' mod=flipscores(Y~Z+X,data=dt,family="binomial",n_flips=1000)
 #' summary(mod)
 #'
-#' # Compute generalized partial correlations for all variables
-#' (results <- gcor(mod))
-#'
-#' # Compute for specific variables only
-#' gcor(mod, variables = c("X", "ZC"))
-#'
-#' # Compute generalized partial correlations for all variables
 #' (results <- gcor_normalized_binom(mod))
+#' # Compute for specific terms only
+#' gcor_normalized_binom(mod, terms = c("X", "ZC"))
 #'
-#' # Compute for specific variables only
-#' gcor_normalized_binom(mod, variables = c("X", "ZC"))
-#'
-#'
-#' mod=glm(Y~1+X,data=dt,family="binomial")
-#' summary(mod)
-#' # Compute generalized partial correlations for all variables
-#' (results <- gcor(mod))
-#' # Compute generalized partial correlations for all variables
-#' (results <- gcor_normalized_binom(mod))
 #'
 
 #' @export
-gcor_normalized_binom <- function(full_glm, variables = NULL,
+gcor_normalized_binom <- function(full_glm, terms = NULL,
                                   intercept_too = FALSE,
                                   algorithm = "auto",
                                   algorithm.control=list(n_exact = 15, thresholds = c(-.1, 0, .1),
@@ -116,26 +102,30 @@ gcor_normalized_binom <- function(full_glm, variables = NULL,
   all_vars <- colnames(X_full)
   if(!intercept_too) all_vars <- all_vars[all_vars != "(Intercept)"]
 
-  # If variables not specified, use all non-intercept variables
-  if (is.null(variables)) {
-    variables <- all_vars
+  # If terms not specified, use all non-intercept terms
+  if (is.null(terms)) {
+    terms <- all_vars
   } else {
-    # Validate specified variables
-    missing_vars <- setdiff(variables, all_vars)
+    # Validate specified terms
+    missing_vars <- setdiff(terms, all_vars)
     if (length(missing_vars) > 0) {
-      stop("Variables not found in model: ", paste(missing_vars, collapse = ", "))
+      stop("terms not found in model: ", paste(missing_vars, collapse = ", "))
     }
   }
   #
 
-  results=lapply(variables,socket_compute_gcor_normalized_binom,
+  results=lapply(terms,socket_compute_gcor_normalized_binom,
                  full_glm,algorithm=algorithm,
                  algorithm.control=algorithm.control)
-  results = do.call(rbind,results)
-  results <- cbind(
-    variable = as.character(variables),
-    results)
-  rownames(results)=NULL
+  results=do.call(rbind,results)
+  results <- data.frame(
+    terms = paste0("~ ",terms),
+    r=results$r,
+    r_n=results$r_n,
+    null_model = paste0("~ ",
+                        sapply(terms,function(i) paste0(setdiff(all_vars,i),collapse   ="+"))
+    ),
+    algorithm=results$algorithm)
   return(results)
 }
 
@@ -202,6 +192,7 @@ compute_gcor_normalized_binom <- function(model0, X,
   } else {
     normalized_r <- 0
   }
+
   out=data.frame(r=r,r_n=normalized_r,algorithm=algorithm)
   return(out)
 }

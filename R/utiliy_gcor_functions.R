@@ -99,7 +99,7 @@ socket_compute_gcor <- function(i,model){
       warning("Variable(s) ",paste(sep=", ",setdiff(i,all_vars_names))," is(are) not present in the model")
   }
 
-  i_id=sapply(i,function(ii)which(all_vars_names==ii))
+  i_id=which(all_vars_names==i)
 
   #to avoid re-run a flipscores everytime:
   attributes(model)$class= attributes(model)$class[attributes(model)$class!="flipscores"]
@@ -118,7 +118,7 @@ socket_compute_gcor <- function(i,model){
     model$call[[1]]=quote(glm.nb) else
       model$call[[1]]=quote(glm)
   model_i <-update(model)
-    gcor=compute_gcor(model0 = model_i,X = mm[,i_id,drop=FALSE])
+    gcor=compute_gcor(model0 = model_i,X = mm[,i,drop=FALSE])
 }
 
 

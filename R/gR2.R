@@ -7,7 +7,7 @@
 #' @param full_glm A fitted GLM object of class `glm` (the full model).
 #' @param null_glm A fitted GLM object of class `glm` (the null model). If `NULL` (default),
 #'   uses an empty model (intercept-only if intercept is present, otherwise no predictors).
-#' @param extra_terms A character vector of variable names or a formula specifying
+#' @param terms A character vector of variable names or a formula specifying
 #'   the additional terms in the full model compared to the null. If provided,
 #'   this overrides `null_glm` and the null model is refitted excluding these terms.
 #'
@@ -39,16 +39,37 @@
 #'
 #' # Compute generalized partial correlations for all variables
 #' (results <- gR2(mod))
-#' # equivalente to
-#' gR2(mod, extra_terms = c( "Z"))
+#' # equivalent to
+#' mod0=glm(Y~1,data=dt,family="poisson")
+#' (results <- gR2(mod, mod0))
 #'
 #' # Compute for specific variables only
-#' gR2(mod, extra_terms = c( "Z"))
-#' gR2(mod, extra_terms = c( "X"))
-#' gR2(mod)
+#' (results <- gR2(mod,terms = c("X","Z")))
 #'
 #' @export
-gR2 <- function(full_glm, null_glm = NULL, extra_terms = NULL) {
+
+gR2 <- function(full_glm, null_glm = NULL, terms = NULL) {
+  .socket_compute_gR2 <- function(terms,full_glm, null_glm = NULL){
+    temp=.prepare_for_gR2(full_glm,null_glm,terms)
+    # Compute generalized R-squared
+    gR2=compute_gR2(temp$null_glm, temp$X)
+    data.frame(
+      terms = paste0("~ ",paste(temp$terms,collapse = " + ")),
+      gR2 = gR2,
+      null_model = deparse(temp$null_glm$formula),
+      stringsAsFactors = FALSE
+    )
+  }
+
+    if(length(terms)>1){
+   temp=lapply(terms,.socket_compute_gR2,full_glm, null_glm)
+   return(do.call(rbind,temp))
+  } else
+  return(.socket_compute_gR2(terms,full_glm, null_glm))
+}
+
+
+.prepare_for_gR2 <- function(full_glm,null_glm,terms){
   # Validate full model
   if (!inherits(full_glm, "glm")) {
     stop("full_glm must be a glm object")
@@ -58,9 +79,9 @@ gR2 <- function(full_glm, null_glm = NULL, extra_terms = NULL) {
   full_family <- full_glm$family
   full_formula <- formula(full_glm)
 
-  # Case 1: extra_terms provided - refit null model
-  if (!is.null(extra_terms)) {
-    null_glm <- create_null_from_extra_terms(full_glm, extra_terms)
+  # Case 1: terms provided - refit null model
+  if (!is.null(terms)) {
+    null_glm <- create_null_from_terms(full_glm, terms)
   }
 
   # Case 2: null_glm not provided - use empty model (intercept-only if intercept present)
@@ -76,10 +97,13 @@ gR2 <- function(full_glm, null_glm = NULL, extra_terms = NULL) {
   # Check model compatibility
   check_model_compatibility(full_glm, null_glm)
 
-  # Compute generalized R-squared
-  compute_gR2_from_models(full_glm, null_glm)
-}
 
+  # Identify additional terms in full model
+
+  temp=get_X(null_glm,full_glm,return_extra_terms=TRUE)
+
+  return(list(null_glm=null_glm, X=temp$X,terms=temp$terms))
+}
 #' Create empty model (intercept-only if intercept present)
 #'
 #' @param full_glm The full GLM model
@@ -109,10 +133,10 @@ create_empty_model <- function(full_glm) {
 #' Create null model from extra terms specification
 #'
 #' @param full_glm The full GLM model
-#' @param extra_terms Character vector or formula specifying extra terms
+#' @param terms Character vector or formula specifying extra terms
 #' @return A fitted null GLM model
 #' @noRd
-create_null_from_extra_terms <- function(full_glm, extra_terms) {
+create_null_from_terms <- function(full_glm, terms) {
   full_data <- full_glm$data
   full_family <- full_glm$family
   full_formula <- formula(full_glm)
@@ -123,14 +147,14 @@ create_null_from_extra_terms <- function(full_glm, extra_terms) {
   # Get all terms from full model
   full_terms <- attr(terms(full_formula), "term.labels")
 
-  # Convert extra_terms to character vector if it's a formula
-  if (inherits(extra_terms, "formula")) {
-    extra_terms <- all.vars(extra_terms)[-1]  # Remove response if present
+  # Convert terms to character vector if it's a formula
+  if (inherits(terms, "formula")) {
+    terms <- all.vars(terms)[-1]  # Remove response if present
   }
 
-  # Remove terms that contain extra_terms (to handle factor variables)
+  # Remove terms that contain terms (to handle factor variables)
   null_terms <- full_terms
-  for (term in extra_terms) {
+  for (term in terms) {
     # Remove terms that start with the variable name (handles factors like "factor_varlevel")
     null_terms <- null_terms[!grepl(paste0("^", term), null_terms)]
   }
@@ -203,29 +227,19 @@ check_model_compatibility <- function(full_glm, null_glm) {
 #' @param null_glm Null GLM model
 #' @return Generalized R-squared value
 #' @noRd
-compute_gR2_from_models <- function(full_glm, null_glm) {
+compute_gR2 <- function(null_glm,X) {
   # Extract components from both models
-  Y <- full_glm$y
-  X_full <- model.matrix(full_glm)
+  Y <- null_glm$y
   Z <- model.matrix(null_glm)
-  family <- full_glm$family
+  family <- null_glm$family
 
-  # Identify additional terms in full model
-  full_terms <- colnames(X_full)
-  null_terms <- colnames(Z)
-  extra_terms <- setdiff(full_terms, null_terms)
 
   # Remove any NA/NaN values
-  valid_idx <- complete.cases(Y, Z,X_full)
+  valid_idx <- complete.cases(Y, Z,X)
   Z <- Z[valid_idx, , drop = FALSE]
-  X_full <- X_full[valid_idx, , drop = FALSE]
+  X <- X[valid_idx, , drop = FALSE]
   Y <- Y[valid_idx]
 
-
-  if (length(extra_terms) == 0) {
-    warning("No additional terms in full model compared to null model. Returning 0.")
-    return(0)
-  }
 
   # Get null model fitted values and components
   mu_null <- fitted(null_glm)
@@ -250,8 +264,7 @@ compute_gR2_from_models <- function(full_glm, null_glm) {
   }
 
   # Residualized additional predictors matrix
-  X_extra <- X_full[, extra_terms, drop = FALSE]
-  X_weighted <- X_extra * w_sqrt  # Equivalent to diag(w_sqrt) %*% X_extra
+  X_weighted <- X * w_sqrt  # Equivalent to diag(w_sqrt) %*% X
   X_r <- IH %*% X_weighted
 
 
@@ -262,7 +275,7 @@ compute_gR2_from_models <- function(full_glm, null_glm) {
 
   # gR^2 = Y_r^T X_r (X_r^T X_r)^{-1} X_r^T Y_r / (Y_r^T Y_r)
   # YtX <- t(Y_r_clean) %*% X_r_clean
-  X_r <- IH%*%X_extra
+  X_r <- IH%*%X
   XtX <- t(X_r)%*%X_r
   # XtY <- t(X_r_clean) %*% Y_r_clean
   YtY <- t(Y_r) %*% Y_r
@@ -275,4 +288,5 @@ compute_gR2_from_models <- function(full_glm, null_glm) {
   gR2 <- as.numeric(t(Y_r) %*% X_r  %*% solve(XtX) %*% t(X_r) %*% Y_r / (YtY))
 
   return(gR2)
+
 }

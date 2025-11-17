@@ -1,4 +1,4 @@
-#' Compute Generalized Partial Correlations for GLM Variables
+#' Compute Generalized Partial Correlations for GLM terms
 #'
 #' This function computes the generalized partial correlation coefficient \eqn{r}
 #' for each specified variable in a generalized linear model. For each variable,
@@ -6,10 +6,10 @@
 #' between the residualized predictor and standardized residuals.
 #'
 #' @param full_glm A fitted GLM object of class `glm`.
-#' @param variables Character vector of variable names (referred to the
+#' @param terms Character vector of variable names (referred to the
 #'   model.matrix, that is pay attention for factors) for which to compute
 #'   generalized partial correlations. If `NULL` (default), computes for all
-#'   non-intercept variables in the model.
+#'   non-intercept terms in the model.
 #'
 #' @return A data frame with two columns:
 #'   \item{variable}{The variable name}
@@ -17,7 +17,7 @@
 #'
 #' @details
 #' The generalized partial correlation \eqn{\r} measures the association between
-#' a predictor and response after adjusting for all other variables in the model.
+#' a predictor and response after adjusting for all other terms in the model.
 #' It is defined as the cosine similarity between the residualized predictor
 #' \eqn{X_r} and standardized residuals \eqn{Y_r}:
 #'
@@ -44,11 +44,11 @@
 #' mod=flipscores(Y~Z+X,data=dt,family="poisson",n_flips=1000)
 #' summary(mod)
 #'
-#' # Compute generalized partial correlations for all variables
+#' # Compute generalized partial correlations for all terms
 #' (results <- gcor(mod))
 #'
-#' # Compute for specific variables only
-#' gcor(mod, variables = c("X", "ZC"))
+#' # Compute for specific terms only
+#' gcor(mod, terms = c("X", "ZC"))
 #'
 #' @export
 
@@ -56,7 +56,7 @@
 #sapply(dir("./to_flipscores/",pattern = ".R$",full.names = TRUE),source)
 
 
-gcor <- function(full_glm, variables = NULL,intercept_too=FALSE) {
+gcor <- function(full_glm, terms = NULL,intercept_too=FALSE) {
 
   # Extract model components
   Y <- full_glm$y
@@ -68,37 +68,43 @@ gcor <- function(full_glm, variables = NULL,intercept_too=FALSE) {
   all_vars <- colnames(X_full)
   if(!intercept_too) all_vars <- all_vars[all_vars != "(Intercept)"]
 
-  # If variables not specified, use all non-intercept variables
-  if (is.null(variables)) {
-    variables <- all_vars
+  # If terms not specified, use all non-intercept terms
+  if (is.null(terms)) {
+    terms <- all_vars
   } else {
-    # Validate specified variables
-    missing_vars <- setdiff(variables, all_vars)
+    # Validate specified terms
+    missing_vars <- setdiff(terms, all_vars)
     if (length(missing_vars) > 0) {
-      stop("Variables not found in model: ", paste(missing_vars, collapse = ", "))
+      stop("terms not found in model: ", paste(missing_vars, collapse = ", "))
     }
   }
   #
 
-  results=lapply(variables,socket_compute_gcor,
+
+  results=sapply(terms,socket_compute_gcor,
                  full_glm)
+
   results <- data.frame(
-    variable = as.character(variables),
-    r = as.numeric(results),
+    terms = paste0("~ ",terms),
+    gcor = results,
+    null_model = paste0("~ ",
+                        sapply(terms,function(i) paste0(setdiff(all_vars,i),collapse   ="+"))
+    ),
+
     stringsAsFactors = FALSE
   )
 
-
+  rownames(results)=NULL
   return(results)
-}
+  }
 
 
 
 #################
 #' compute_gcor
 #' @param model0 a \code{glm} object with the model under the null hypothesis (i.e. the covariates, the nuisance parameters).
-#' @param model1 a \code{glm} or a \code{matrix} (or \code{vector}). If it is a \code{glm} object, it has the model under the alternative hypothesis. The variables in \code{model1} are the same variables in \code{model0} plus one or more variables to be tested.  Alternatively, if
-#' \code{model1} is a \code{matrix}, it contains the tested variables column-wise.
+#' @param model1 a \code{glm} or a \code{matrix} (or \code{vector}). If it is a \code{glm} object, it has the model under the alternative hypothesis. The terms in \code{model1} are the same terms in \code{model0} plus one or more terms to be tested.  Alternatively, if
+#' \code{model1} is a \code{matrix}, it contains the tested terms column-wise.
 #' @param score_type The type of score that is computed. It is "orthogonalized", "effective" or "basic".
 #' "effective" and "orthogonalized" take into account the nuisance estimation.
 #' @param ... other arguments.
@@ -187,7 +193,7 @@ compute_gcor <- function(model0, X, ...){
   Z=model.matrix(model0)
 
 
-  # no variables in the null model
+  # no terms in the null model
   if(ncol(Z)==0){
     IHY <- matrix(model0$y)
     IHY <- matrix(IHY)/sqrt(sum(IHY^2))

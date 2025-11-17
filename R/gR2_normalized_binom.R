@@ -2,14 +2,14 @@
 #'
 #' Computes the normalized generalized R-squared coefficient for binomial GLMs.
 #' The normalization scales the R-squared by its maximum possible value for
-#' the specified set of extra_terms.
+#' the specified set of terms.
 #'
 #' @param full_glm A fitted GLM object of class `glm` with binomial family.
 #' @param null_glm A fitted GLM object of class `glm` (the null model). If `NULL` (default),
 #'   uses an empty model (intercept-only if intercept is present, otherwise no predictors).
-#' @param extra_terms Character vector of variable names for which to compute
+#' @param terms Character vector of variable names for which to compute
 #'   normalized R-squared. If `NULL` (default), computes for all non-intercept
-#'   extra_terms in the model.
+#'   terms in the model.
 #' @param algorithm `"auto"` by default. It chooses between `"brute_force"` and `"multi_start"`
 #' @param algorithm.control `list` of control parameters:
 #'   \itemize{
@@ -24,10 +24,10 @@
 #'   }
 #'
 #' @return A list with components:
-#'   \item{R2}{The generalized R-squared coefficient for the set of extra_terms}
+#'   \item{R2}{The generalized R-squared coefficient for the set of terms}
 #'   \item{R2_n}{The normalized generalized R-squared coefficient}
 #'   \item{algorithm}{The algorithm used to compute the maximum R-squared}
-#'   \item{extra_terms_tested}{The names of the extra_terms included in the test}
+#'   \item{terms_tested}{The names of the terms included in the test}
 #'
 #' @details
 #' The normalized generalized R-squared is computed as:
@@ -35,7 +35,7 @@
 #' R^2_n = \frac{R^2}{R^2_{\max}}
 #' }
 #' where \eqn{R^2_{\max}} is the maximum possible R-squared value for the specified
-#' set of extra_terms.
+#' set of terms.
 #'
 #' Different algorithms are used based on sample size:
 #' \itemize{
@@ -51,29 +51,18 @@
 #' dt$Y <- rbinom(n = 20, prob = plogis((dt$Z == "C") * 2), size = 1)
 #' mod <- glm(Y ~ Z + X, data = dt, family = binomial)
 #'
-#' # Compute normalized generalized R-squared for all extra_terms together
-#' results <- gR2_normalized_binom(mod)
-#' print(results)
-#' results <- gR2_normalized_binom(mod,"X")
+#' # Compute generalized partial correlations for all variables
+#' (results <-  gR2_normalized_binom(mod))
+#' # equivalent to
+#' mod0=glm(Y~1,data=dt,family=binomial)
+#' (results <-  gR2_normalized_binom(mod, mod0))
 #'
-#' #################################
-#' # Compute for specific set of extra_terms
-#' gR2_normalized_binom(mod, extra_terms = c("X", "ZC"))
-#'
-#' #' # Example with logistic regression
-#' n <- 50
-#' X1 <- rnorm(n)
-#' X2 <- rnorm(n)
-#' Z <- rnorm(n)
-#' Y <- rbinom(n, 1, plogis(0.5 + 0.3*X1 + 0.2*X2 + 0.1*Z))
-#' full_glm <- glm(Y ~ X1 + X2 + Z, family = binomial)
-#'
-#' # Test extra_terms X1 and X2
-#' result <- gR2_normalized_binom(full_glm, extra_terms = c("X1", "X2"))
+#' # Compute for specific variables only
+#' (results <-  gR2_normalized_binom(mod,terms = c("X","Z")))
 #' }
 #'
 #' @export
-gR2_normalized_binom <- function(full_glm, null_glm = NULL, extra_terms = NULL,
+gR2_normalized_binom <- function(full_glm, null_glm = NULL, terms = NULL,
                                  algorithm = "auto",
                                  algorithm.control = list(n_exact = 15,
                                                           thresholds = c(-.1, 0, .1),
@@ -100,87 +89,68 @@ gR2_normalized_binom <- function(full_glm, null_glm = NULL, extra_terms = NULL,
   )
   control[names(algorithm.control)] <- algorithm.control
 
-  # Extract model components
-  Y <- full_glm$y
-  X_full <- model.matrix(full_glm)
-  n <- length(Y)
+  .socket_compute_gR2_n <- function(terms,full_glm, null_glm = NULL){
+    temp=.prepare_for_gR2(full_glm,null_glm,terms)
+    Z=model.matrix(temp$null_glm)
+    Y=temp$null_glm$y
+    X=temp$X
+    n=length(Y)
+    # Compute generalized R-squared
+    gR2=compute_gR2(temp$null_glm, X)
 
-  # Get all variable names
-  all_vars <- colnames(X_full)
 
-  # If extra_terms not specified, use all non-intercept extra_terms
-  if (is.null(extra_terms)) {
-    extra_terms <- all_vars[all_vars != "(Intercept)"]
-  } else {
-    # Validate specified extra_terms
-    missing_vars <- setdiff(extra_terms, all_vars)
-    if (length(missing_vars) > 0) {
-      stop("extra_terms not found in model: ", paste(missing_vars, collapse = ", "))
-    }
-  }
-
-  # Create null model if not provided
-  if (is.null(null_glm)) {
-    null_glm <- create_empty_model(full_glm)
-  }
-
-  # Validate null model
-  if (!inherits(null_glm, "glm")) {
-    stop("null_glm must be a glm object")
-  }
-
-  # Check model compatibility
-  check_model_compatibility(full_glm, null_glm)
-
-  # Extract design matrices
-  Z <- model.matrix(null_glm)
-  X <- X_full[, extra_terms, drop = FALSE]
-
-  # Compute observed R-squared for the set of extra_terms
-  R2_obs <- gR2(full_glm, null_glm = null_glm)
-
-  # Determine algorithm to use
-  if (algorithm == "auto") {
-    if (n <= control$n_exact) {
-      algorithm_used <- "brute_force"
+    # Determine algorithm to use
+    if (algorithm == "auto") {
+      if (n <= control$n_exact) {
+        algorithm_used <- "brute_force"
+      } else {
+        algorithm_used <- "multi_start"
+      }
     } else {
-      algorithm_used <- "multi_start"
+      algorithm_used <- algorithm
     }
-  } else {
-    algorithm_used <- algorithm
-  }
 
-  # Compute maximum R-squared for the set of extra_terms
-  if (algorithm_used == "brute_force") {
-    if (n > 20) {
-      warning("Brute force with n > 20 may be computationally expensive")
+    # Compute maximum R-squared for the set of terms
+    if (algorithm_used == "brute_force") {
+      if (n > 20) {
+        warning("Brute force with n > 20 may be computationally expensive")
+      }
+      max_result <- bruteforce_R2(Z, X)
+      gR2_max <- max_result$R2
+    } else {
+      max_result <- multi_start_R2(Z, X, Y_user = Y,
+                                   thresholds = control$thresholds,
+                                   n_random = control$n_random,
+                                   max_iter = control$max_iter,
+                                   topK = control$topK,
+                                   tol = control$tol,
+                                   patience = control$patience,
+                                   verbose = FALSE)
+      gR2_max <- max_result$R2
     }
-    max_result <- bruteforce_R2(Z, X)
-    R2_max <- max_result$R2
-  } else {
-    max_result <- multi_start_R2(Z, X, Y_user = Y,
-                                 thresholds = control$thresholds,
-                                 n_random = control$n_random,
-                                 max_iter = control$max_iter,
-                                 topK = control$topK,
-                                 tol = control$tol,
-                                 patience = control$patience,
-                                 verbose = FALSE)
-    R2_max <- max_result$R2
+
+    # Compute normalized R-squared
+    if (gR2_max > 0) {
+      gR2_n <- gR2 / gR2_max
+    } else {
+      gR2_n <- 0
+    }
+
+
+    data.frame(
+      terms = paste0("~ ",paste(temp$terms,collapse = " + ")),
+      gR2 = gR2,
+      gR2_n = gR2_n,
+      algorithm = algorithm_used,
+      null_model = deparse(temp$null_glm$formula),
+      stringsAsFactors = FALSE
+    )
   }
 
-  # Compute normalized R-squared
-  if (R2_max > 0) {
-    R2_n <- R2_obs / R2_max
-  } else {
-    R2_n <- 0
-  }
+  if(length(terms)>1){
+    temp=lapply(terms,.socket_compute_gR2_n,full_glm, null_glm)
+    return(do.call(rbind,temp))
+  } else
+    return(.socket_compute_gR2_n(terms,full_glm, null_glm))
 
-  data.frame(
-    R2 = R2_obs,
-    R2_n = R2_n,
-    algorithm = algorithm_used,
-    null_model = deparse(null_glm$formula),
-    extra_terms_tested = paste0("~ ",paste(extra_terms,collapse = " + "))
-  )
 }

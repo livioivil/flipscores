@@ -2,17 +2,17 @@
 % Please edit documentation in R/gcor.R
 \name{gcor}
 \alias{gcor}
-\title{Compute Generalized Partial Correlations for GLM Variables}
+\title{Compute Generalized Partial Correlations for GLM terms}
 \usage{
-gcor(full_glm, variables = NULL, intercept_too = FALSE)
+gcor(full_glm, terms = NULL, intercept_too = FALSE)
 }
 \arguments{
 \item{full_glm}{A fitted GLM object of class `glm`.}
 
-\item{variables}{Character vector of variable names (referred to the
+\item{terms}{Character vector of variable names (referred to the
 model.matrix, that is pay attention for factors) for which to compute
 generalized partial correlations. If `NULL` (default), computes for all
-non-intercept variables in the model.}
+non-intercept terms in the model.}
 }
 \value{
 A data frame with two columns:
@@ -27,7 +27,7 @@ between the residualized predictor and standardized residuals.
 }
 \details{
 The generalized partial correlation \eqn{\r} measures the association between
-a predictor and response after adjusting for all other variables in the model.
+a predictor and response after adjusting for all other terms in the model.
 It is defined as the cosine similarity between the residualized predictor
 \eqn{X_r} and standardized residuals \eqn{Y_r}:
 
@@ -53,11 +53,11 @@ dt$Y=rpois(n=20,lambda=exp(dt$Z=="C"))
 mod=flipscores(Y~Z+X,data=dt,family="poisson",n_flips=1000)
 summary(mod)
 
-# Compute generalized partial correlations for all variables
+# Compute generalized partial correlations for all terms
 (results <- gcor(mod))
 
-# Compute for specific variables only
-gcor(mod, variables = c("X", "ZC"))
+# Compute for specific terms only
+gcor(mod, terms = c("X", "ZC"))
 
 }
 \author{

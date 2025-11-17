@@ -206,21 +206,33 @@ socket_compute_scores_and_flip <- function(i,model,exclude=NULL,
 #   model1
 # }
 
-get_X <- function (model0, model1)
+get_X <- function (model0, model1,return_extra_terms=FALSE)
 {
   if (is(model1, "glm")) {
     mm = model.matrix(model1)
     vars1 = colnames(mm)
     vars0 = colnames(model.matrix(model0))
-    model1 = mm[, setdiff(vars1, vars0), drop = FALSE]
+    extra_terms=setdiff(vars1, vars0)
+    X = mm[, extra_terms, drop = FALSE]
   }
   else if (is.character(model1)) {
     vars0 = colnames(model.matrix(model0))
-    model1 = mm[, setdiff(model1, vars0), drop = FALSE]
+    extra_terms=setdiff(model1, vars0)
+    X = mm[,   extra_terms, drop = FALSE]
+  } else X=model1
+
+  if (!is.matrix(X))
+    X = as.matrix(X)
+
+
+  if (ncol(X) == 0) {
+    warning("No additional terms in full model compared to null model. Returning 0.")
+    return(0)
   }
-  else if (!is.matrix(model1))
-    model1 = as.matrix(model1)
-  model1
+
+ if(return_extra_terms)
+   return(list(X=X,extra_terms=extra_terms)) else
+   return(X)
 }
 ######### get the matrices D, V of glm model (for compute_scores) and also dispersion parameter
 

@@ -6,7 +6,7 @@
 \usage{
 gcor_normalized_binom(
   full_glm,
-  variables = NULL,
+  terms = NULL,
   intercept_too = FALSE,
   algorithm = "auto",
   algorithm.control = list(n_exact = 15, thresholds = c(-0.1, 0, 0.1), n_random = 10,
@@ -16,9 +16,9 @@ gcor_normalized_binom(
 \arguments{
 \item{full_glm}{A fitted GLM object of class `glm` with binomial family.}
 
-\item{variables}{Character vector of variable names for which to compute
+\item{terms}{Character vector of variable names for which to compute
 normalized correlations. If `NULL` (default), computes for all non-intercept
-variables in the model.}
+terms in the model.}
 
 \item{intercept_too}{Logical indicating whether to include the intercept
 as a variable. Default is FALSE.}
@@ -36,10 +36,11 @@ as a variable. Default is FALSE.}
 \item{algorith}{`"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`}
 }
 \value{
-A data frame with two columns:
-  \item{variable}{The variable name}
+A data frame with five columns:
+  \item{terms}{The variable name}
   \item{r}{The generalized partial correlation coefficient}
   \item{r_n}{The normalized generalized partial correlation coefficient}
+  \item{null_model}{The null model used to compute the generalized (partial) correlation}
   \item{algorithm}{The algorithm used to compute the upper/lower bounds of the generalized partial correlation coefficient (to compute its normalized version)}
 }
 \description{
@@ -78,24 +79,9 @@ dt$Y=rbinom(n=20,prob=plogis((dt$Z=="C")*2),size=1)
 mod=flipscores(Y~Z+X,data=dt,family="binomial",n_flips=1000)
 summary(mod)
 
-# Compute generalized partial correlations for all variables
-(results <- gcor(mod))
-
-# Compute for specific variables only
-gcor(mod, variables = c("X", "ZC"))
-
-# Compute generalized partial correlations for all variables
 (results <- gcor_normalized_binom(mod))
+# Compute for specific terms only
+gcor_normalized_binom(mod, terms = c("X", "ZC"))
 
-# Compute for specific variables only
-gcor_normalized_binom(mod, variables = c("X", "ZC"))
-
-
-mod=glm(Y~1+X,data=dt,family="binomial")
-summary(mod)
-# Compute generalized partial correlations for all variables
-(results <- gcor(mod))
-# Compute generalized partial correlations for all variables
-(results <- gcor_normalized_binom(mod))
 
 }

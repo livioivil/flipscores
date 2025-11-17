@@ -4,7 +4,7 @@
 \alias{gR2}
 \title{Generalized R-squared for GLM Models}
 \usage{
-gR2(full_glm, null_glm = NULL, extra_terms = NULL)
+gR2(full_glm, null_glm = NULL, terms = NULL)
 }
 \arguments{
 \item{full_glm}{A fitted GLM object of class `glm` (the full model).}
@@ -12,7 +12,7 @@ gR2(full_glm, null_glm = NULL, extra_terms = NULL)
 \item{null_glm}{A fitted GLM object of class `glm` (the null model). If `NULL` (default),
 uses an empty model (intercept-only if intercept is present, otherwise no predictors).}
 
-\item{extra_terms}{A character vector of variable names or a formula specifying
+\item{terms}{A character vector of variable names or a formula specifying
 the additional terms in the full model compared to the null. If provided,
 this overrides `null_glm` and the null model is refitted excluding these terms.}
 }
@@ -50,11 +50,12 @@ summary(mod)
 
 # Compute generalized partial correlations for all variables
 (results <- gR2(mod))
-# equivalente to
-gR2(mod, extra_terms = c( "Z"))
+# equivalent to
+mod0=glm(Y~1,data=dt,family="poisson")
+(results <- gR2(mod, mod0))
 
 # Compute for specific variables only
-gR2(mod, extra_terms = c( "Z"))
+(results <- gR2(mod,terms = c("X","Z")))
 
 }
 \author{
