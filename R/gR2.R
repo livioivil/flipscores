@@ -40,7 +40,7 @@
 #' # Compute generalized partial correlations for all variables
 #' (results <- gR2(mod))
 #' # equivalent to
-#' mod0=glm(Y~1,data=dt,family="poisson")
+#' mod0=glm(Y~1,data=dt,family="binomial")
 #' (results <- gR2(mod, mod0))
 #'
 #' # Compute for specific variables only
@@ -51,10 +51,13 @@
 gR2 <- function(full_glm, null_glm = NULL, terms = NULL) {
   .socket_compute_gR2 <- function(terms,full_glm, null_glm = NULL){
     temp=.prepare_for_gR2(full_glm,null_glm,terms)
+    terms=colnames(temp$X)
+    terms=gsub("\\(Intercept\\)","1",terms)
+
     # Compute generalized R-squared
     gR2=compute_gR2(temp$null_glm, temp$X)
     data.frame(
-      terms = paste0("~ ",paste(temp$terms,collapse = " + ")),
+      terms = paste0("~ ",paste(terms,collapse = " + ")),
       gR2 = gR2,
       null_model = deparse(temp$null_glm$formula),
       stringsAsFactors = FALSE
@@ -100,9 +103,9 @@ gR2 <- function(full_glm, null_glm = NULL, terms = NULL) {
 
   # Identify additional terms in full model
 
-  temp=get_X(null_glm,full_glm,return_extra_terms=TRUE)
+  X=get_X(null_glm,full_glm)
 
-  return(list(null_glm=null_glm, X=temp$X,terms=temp$terms))
+  return(list(null_glm=null_glm, X=X))
 }
 #' Create empty model (intercept-only if intercept present)
 #'

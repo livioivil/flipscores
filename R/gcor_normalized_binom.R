@@ -98,6 +98,16 @@ gcor_normalized_binom <- function(full_glm, terms = NULL,
   family <- full_glm$family
   #n <- length(Y)
 
+  # Check if intercept is present in full model
+  has_intercept <- attr(terms(full_glm$formula), "intercept") == 1
+
+  if (has_intercept) {
+    null_frml <- "~1"
+  } else {
+    null_frml <- "~0"
+  }
+
+
   # Get all variable names (excluding intercept)
   all_vars <- colnames(X_full)
   if(!intercept_too) all_vars <- all_vars[all_vars != "(Intercept)"]
@@ -118,13 +128,15 @@ gcor_normalized_binom <- function(full_glm, terms = NULL,
                  full_glm,algorithm=algorithm,
                  algorithm.control=algorithm.control)
   results=do.call(rbind,results)
+
+
+  all_vars= c(null_frml,all_vars)
+
   results <- data.frame(
-    terms = paste0("~ ",terms),
+    terms = paste0("~",terms),
     r=results$r,
     r_n=results$r_n,
-    null_model = paste0("~ ",
-                        sapply(terms,function(i) paste0(setdiff(all_vars,i),collapse   ="+"))
-    ),
+    null_model = sapply(terms,function(i) paste0(setdiff(all_vars,i),collapse   ="+")),
     algorithm=results$algorithm)
   return(results)
 }
