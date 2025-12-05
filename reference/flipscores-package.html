@@ -3,7 +3,7 @@
 .
 It provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables."><meta property="og:description" content="Provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables. See Hemerik, Goeman and Finos (2020) doi:10.1111/rssb.12369
 .
-It provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables."></head><body>
+It provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables."><meta property="og:image" content="https://livioivil.github.io/flipscores/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -29,8 +29,7 @@ It provides robust tests for testing in GLMs, by sign-flipping score contributio
 </nav><div class="container template-reference-topic">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>flipscores: Robust Score Testing in GLMs, by Sign-Flip Contributions</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>flipscores: Robust Score Testing in GLMs, by Sign-Flip Contributions</h1>
 
       <div class="d-none name"><code>flipscores-package.Rd</code></div>
     </div>
@@ -65,11 +64,11 @@ It provides robust tests for testing in GLMs, by sign-flipping score contributio
 <span class="r-out co"><span class="r-pr">#&gt;</span>     x = TRUE)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate   Score Std. Error z value Part. Cor Pr(&gt;|z|)  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7508  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6544  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6996  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X             0.9439 16.2058     4.7272  3.4282     0.671   0.0124 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate   Score Std. Error z value Part. Cor Pr(&gt;|z|)   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7564   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6618   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6904   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X             0.9439 16.2058     4.7272  3.4282     0.671   0.0094 **</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -91,9 +90,9 @@ It provides robust tests for testing in GLMs, by sign-flipping score contributio
 <span class="r-out co"><span class="r-pr">#&gt;</span> Inference is provided by FlipScores approach (5000 sign flips).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model: Y ~ Z + X</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Df   Score Pr(&gt;Score)  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Z  2 0.75152     0.7016  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X  1 0.02951     0.0124 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Df   Score Pr(&gt;Score)   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Z  2 0.74245     0.7070   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X  1 0.02997     0.0094 **</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span><span class="co"># or</span></span></span>
@@ -108,7 +107,7 @@ It provides robust tests for testing in GLMs, by sign-flipping score contributio
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model 1: Y ~ Z</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model 2: Y ~ Z + X</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                    Df    Score Pr(&gt;Score)   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model 2 vs Model 1  1 0.029174     0.0098 **</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model 2 vs Model 1  1 0.029299     0.0098 **</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span><span class="co"># and</span></span></span>
