@@ -10,6 +10,16 @@ It provides robust tests for testing in GLMs, by sign-flipping score
 contributions. The tests are often robust against overdispersion,
 heteroscedasticity and, in some cases, ignored nuisance variables.
 
+## See also
+
+Useful links:
+
+- <https://livioivil.github.io/flipscores/>
+
+Useful links:
+
+- <https://livioivil.github.io/flipscores/>
+
 ## Author
 
 **Maintainer**: Livio Finos <livio.finos@unipd.it>
@@ -41,11 +51,11 @@ summary(mod)
 #>     x = TRUE)
 #> 
 #> Coefficients:
-#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)   
-#> (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7694   
-#> ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6526   
-#> ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.7026   
-#> X             0.9439 16.2058     4.7272  3.4282     0.671   0.0098 **
+#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)  
+#> (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7508  
+#> ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6610  
+#> ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6976  
+#> X             0.9439 16.2058     4.7272  3.4282     0.671   0.0108 *
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
@@ -67,9 +77,9 @@ anova(mod)
 #> Inference is provided by FlipScores approach (5000 sign flips).
 #> 
 #> Model: Y ~ Z + X
-#>   Df   Score Pr(>Score)   
-#> Z  2 0.75195     0.7056   
-#> X  1 0.02935     0.0098 **
+#>   Df   Score Pr(>Score)  
+#> Z  2 0.74515     0.7050  
+#> X  1 0.02956     0.0108 *
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # or
@@ -83,8 +93,8 @@ anova(mod0,mod)
 #> 
 #> Model 1: Y ~ Z
 #> Model 2: Y ~ Z + X
-#>                    Df    Score Pr(>Score)   
-#> Model 2 vs Model 1  1 0.029559     0.0098 **
+#>                    Df    Score Pr(>Score)  
+#> Model 2 vs Model 1  1 0.028972     0.0128 *
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # and

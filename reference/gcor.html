@@ -108,10 +108,10 @@ consistently with the flipscores package methodology.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) -0.14256 -0.91360    2.62144 -0.34851    -0.127    0.745   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) -0.14256 -0.91360    2.62144 -0.34851    -0.127    0.726   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -0.18558 -0.50868    1.65785 -0.30683    -0.108    0.642   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ZC           1.40981  8.55380    2.58950  3.30326     0.765    0.002 **</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X           -0.06964 -1.56935    4.70999 -0.33320    -0.117    0.655   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X           -0.06964 -1.56935    4.70999 -0.33320    -0.117    0.669   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -130,7 +130,37 @@ consistently with the flipscores package methodology.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1   ~ZB -0.1080979    ~1+ZC+X</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2   ~ZC  0.7651942    ~1+ZB+X</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3    ~X -0.1174534   ~1+ZB+ZC</span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># equivalent to</span></span></span>
+<span class="r-in"><span><span class="va">mod0</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">Y</span><span class="op">~</span><span class="fl">1</span>,data<span class="op">=</span><span class="va">dt</span>,family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">gcor</span><span class="op">(</span><span class="va">mod</span>, <span class="va">mod0</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in gcor(mod, mod0):</span> terms not found in model: c(`(Intercept)` = 0.470003629247622), c(`1` = 0.249999999997642, `2` = -0.375000000001179, `3` = 1.49999999999528, `4` = -0.375000000001179, `5` = -0.375000000001179, `6` = 1.49999999999528, `7` = -1, `8` = -0.375000000001179, `9` = 1.49999999999528, `10` = -0.375000000001179, `11` = -0.375000000001179, `12` = 2.1249999999941, `13` = -0.375000000001179, `14` = -1, `15` = -0.375000000001179, `16` = -1, `17` = -1, `18` = 0.874999999996462, `19` = -0.375000000001179, `20` = -0.375000000001179), c(`1` = 1.60000000000302, `2` = 1.60000000000302, `3` = 1.60000000000302, `4` = 1.60000000000302, `5` = 1.60000000000302, `6` = 1.60000000000302, `7` = 1.60000000000302, `8` = 1.60000000000302, `9` = 1.60000000000302, `10` = 1.60000000000302, `11` = 1.60000000000302, `12` = 1.60000000000302, `13` = 1.60000000000302, `14` = 1.60000000000302, `15` = 1.60000000000302, `16` = 1.60000000000302, `17` = 1.60000000000302, `18` = 1.60000000000302, `19` = 1.60000000000302, `20` = 1.60000000000302), c(`(Intercept)` = -2.6587446098628, -0.53212985828345, 1.8395760831688, -0.53212985828345, -0.53212985828345, 1.8395760831688, -1.3226985054342, -0.53212985828345, 1.8395760831688, -0.53212985828345, -0.53212985828345, 2.63014473031955, -0.53212985828345, -1.3226985054342, -0.53212985828345, -1.3226985054342, -1.3226985054342, 1.04900743601805, -0.53212985828345, -0.53212985828345), -5.6568597440809, 1, list(qr = c(-5.6568597440809, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979), rank = 1, qraux = 1.22360679774998, pivot = 1, tol = 1e-11), list(family = "poisson", link = "log", linkfun = function (mu) </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> log(mu), linkinv = function (eta) </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> pmax(exp(eta), .Machine$double.eps), variance = function (mu) </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> mu, dev.resids = function (y, mu, wt) </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> {</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>     r &lt;- mu * wt</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>     p &lt;- which(y &gt; 0)</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>     r[p] &lt;- (wt * (y * log(y/mu) - (y - mu)))[p]</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>     2 * r</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> }, aic = function (y, n, mu, wt, dev) </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> -2 * sum(dpois(y, mu, log = TRUE) * wt), mu.eta = function (eta) </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> pmax(exp(eta), .Machine$double.eps), initialize = expression({</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>     if (any(y &lt; 0)) </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>         stop("negative values not allowed for the 'Poisson' family")</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>     n &lt;- rep.int(1, nobs)</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>     mustart &lt;- y + 0.1</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> }), validmu = function (mu) </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> all(is.finite(mu)) &amp;&amp; all(mu &gt; 0), valideta = function (eta) </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> TRUE, simulate = function (object, nsim) </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> {</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>     wts &lt;- object$prior.weights</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>     if (any(wts != 1)) </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>         warning("ignoring prior weights")</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>     ftd &lt;- fitted(object)</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>     rpois(nsim * length(ftd), ftd)</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> }, dispersion = 1), c(`1` = 0.470003629247622, `2` = 0.470003629247622, `3` = 0.470003629247622, `4` = 0.470003629247622, `5` = 0.470003629247622, `6` = 0.470003629247622, `7` = 0.470003629247622, `8` = 0.470003629247622, `9` = 0.470003629247622, `10` = 0.470003629247622, `11` = 0.470003629247622, `12` = 0.470003629247622, `13` = 0.470003629247622, `14` = 0.470003629247622, `15` = 0.470003629247622, `16` = 0.470003629247622, `17` = 0.470003629247622, `18` = 0.470003629247622, `19` = 0.470003629247622, `20` = 0.470003629247622</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> ), 28.6494739737397, 69.5328874955007, 5, c(`1` = 1.60000310821015, `2` = 1.60000310821015, `3` = 1.60000310821015, `4` = 1.60000310821015, `5` = 1.60000310821015, `6` = 1.60000310821015, `7` = 1.60000310821015, `8` = 1.60000310821015, `9` = 1.60000310821015, `10` = 1.60000310821015, `11` = 1.60000310821015, `12` = 1.60000310821015, `13` = 1.60000310821015, `14` = 1.60000310821015, `15` = 1.60000310821015, `16` = 1.60000310821015, `17` = 1.60000310821015, `18` = 1.60000310821015, `19` = 1.60000310821015, `20` = 1.60000310821015), c(`1` = 1, `2` = 1, `3` = 1, `4` = 1, `5` = 1, `6` = 1, `7` = 1, `8` = 1, `9` = 1, `10` = 1, `11` = 1, `12` = 1, `13` = 1, `14` = 1, `15` = 1, `16` = 1, `17` = 1, `18` = 1, `19` = 1, `20` = 1), 19, c(`1` = 2, `2` = 1, `3` = 4, `4` = 1, `5` = 1, `6` = 4, `7` = 0, `8` = 1, `9` = 4, `10` = 1, `11` = 1, `12` = 5, `13` = 1, `14` = 0, `15` = 1, `16` = 0, `17` = 0, `18` = 3, `19` = 1, `20` = 1), TRUE, FALSE, list(Y = c(2, 1, 4, 1, 1, 4, 0, 1, 4, 1, 1, 5, 1, 0, 1, 0, 0, 3, 1, 1)), glm(formula = Y ~ 1, family = "poisson", data = dt), Y ~ 1, Y ~ 1, list(X = c(-0.626453810742332, 0.183643324222082, -0.835628612410047, 1.59528080213779, 0.329507771815361, -0.820468384118015, 0.487429052428485, 0.738324705129217, 0.575781351653492, -0.305388387156356, 1.51178116845085, 0.389843236411431, -0.621240580541804, -2.2146998871775, 1.12493091814311, -0.0449336090152309, -0.0161902630989461, 0.943836210685299, 0.821221195098089, 0.593901321217509), Z = c(1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2), Y = c(2, 1, 4, 1, 1, 4, 0, 1, 4, 1, 1, </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> 5, 1, 0, 1, 0, 0, 3, 1, 1)), NULL, list(epsilon = 1e-08, maxit = 25, trace = FALSE), glm.fit</span>
 <span class="r-in"><span><span class="co"># Compute for specific terms only</span></span></span>
 <span class="r-in"><span><span class="fu">gcor</span><span class="op">(</span><span class="va">mod</span>, terms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="st">"ZC"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   terms       gcor null_model</span>

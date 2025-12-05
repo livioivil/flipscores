@@ -100,7 +100,6 @@ Different algorithms are used based on sample size:
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
 set.seed(123)
 dt <- data.frame(X = rnorm(20),
                  Z = factor(rep(LETTERS[1:3], length.out = 20)))
@@ -109,11 +108,16 @@ mod <- glm(Y ~ Z + X, data = dt, family = binomial)
 
 # Compute generalized partial correlations for all variables
 (results <-  gR2_normalized_binom(mod))
+#>           terms       gR2     gR2_n   algorithm null_model
+#> 1 ~ ZB + ZC + X 0.6553299 0.6553299 multi_start      Y ~ 1
 # equivalent to
 mod0=glm(Y~1,data=dt,family=binomial)
 (results <-  gR2_normalized_binom(mod, mod0))
+#>           terms       gR2     gR2_n   algorithm null_model
+#> 1 ~ ZB + ZC + X 0.6553299 0.6553299 multi_start      Y ~ 1
 
 # Compute for specific variables only
 (results <-  gR2_normalized_binom(mod,terms = c("X","Z")))
-} # }
+#> Error in model.frame.default(formula = Y ~ Z, data = dt, drop.unused.levels = TRUE): 'data' must be a data.frame, environment, or list
+
 ```
