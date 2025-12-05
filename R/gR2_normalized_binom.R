@@ -44,7 +44,6 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
 #' set.seed(123)
 #' dt <- data.frame(X = rnorm(20),
 #'                  Z = factor(rep(LETTERS[1:3], length.out = 20)))
@@ -59,7 +58,7 @@
 #'
 #' # Compute for specific variables only
 #' (results <-  gR2_normalized_binom(mod,terms = c("X","Z")))
-#' }
+#'
 #'
 #' @export
 gR2_normalized_binom <- function(full_glm, null_glm = NULL, terms = NULL,
@@ -138,7 +137,7 @@ gR2_normalized_binom <- function(full_glm, null_glm = NULL, terms = NULL,
 
 
     data.frame(
-      terms = paste0("~ ",paste(temp$terms,collapse = " + ")),
+      terms = paste0("~ ",paste(colnames(temp$X),collapse = " + ")),
       gR2 = gR2,
       gR2_n = gR2_n,
       algorithm = algorithm_used,

@@ -55,7 +55,9 @@ summary(mod)
 
 # Compute generalized partial correlations for all terms
 (results <- gcor(mod))
-
+# equivalent to
+mod0=glm(Y~1,data=dt,family="poisson")
+(results <- gcor(mod, mod0))
 # Compute for specific terms only
 gcor(mod, terms = c("X", "ZC"))
 

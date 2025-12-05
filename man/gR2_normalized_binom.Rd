@@ -64,7 +64,6 @@ Different algorithms are used based on sample size:
 }
 }
 \examples{
-\dontrun{
 set.seed(123)
 dt <- data.frame(X = rnorm(20),
                  Z = factor(rep(LETTERS[1:3], length.out = 20)))
@@ -79,6 +78,6 @@ mod0=glm(Y~1,data=dt,family=binomial)
 
 # Compute for specific variables only
 (results <-  gR2_normalized_binom(mod,terms = c("X","Z")))
-}
+
 
 }

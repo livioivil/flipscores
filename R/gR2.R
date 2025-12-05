@@ -40,7 +40,7 @@
 #' # Compute generalized partial correlations for all variables
 #' (results <- gR2(mod))
 #' # equivalent to
-#' mod0=glm(Y~1,data=dt,family="binomial")
+#' mod0=glm(Y~1,data=dt,family="poisson")
 #' (results <- gR2(mod, mod0))
 #'
 #' # Compute for specific variables only
