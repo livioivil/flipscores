@@ -1,6 +1,8 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Dev-version of the flipscores package
+# flipscores <a href="https://livioivil.github.io/flipscores/"><img src="man/figures/logo.png" align="right" height="139" alt="flipscores website" /></a>
+
+# The flipscores package
 
 [On CRAN
 version](http://cran.r-project.org/web/packages/flipscores/index.html)
@@ -44,16 +46,12 @@ summary(mod)
 #> flipscores(formula = Y ~ Z + X, family = "poisson", data = dt, 
 #>     x = TRUE)
 #> 
-#> Deviance Residuals: 
-#>     Min       1Q   Median       3Q      Max  
-#> -1.6910  -0.5792   0.1012   0.4900   1.0440  
-#> 
 #> Coefficients:
-#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)   
-#> (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7460   
-#> ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6564   
-#> ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6924   
-#> X             0.9439 16.2062     4.7272  3.4283     0.671   0.0098 **
+#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)  
+#> (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7560  
+#> ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6558  
+#> ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6850  
+#> X             0.9439 16.2058     4.7272  3.4282     0.671   0.0124 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -74,9 +72,9 @@ anova(mod)
 #> Inference is provided by FlipScores approach (5000 sign flips).
 #> 
 #> Model: Y ~ Z + X
-#>   Df   Score Pr(>Score)   
-#> Z  2 0.77184     0.6984   
-#> X  1 0.02977     0.0098 **
+#>   Df   Score Pr(>Score)  
+#> Z  2 0.73451     0.6938  
+#> X  1 0.02932     0.0124 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 # or
@@ -91,7 +89,7 @@ anova(mod0,mod)
 #> Model 1: Y ~ Z
 #> Model 2: Y ~ Z + X
 #>                    Df    Score Pr(>Score)  
-#> Model 2 vs Model 1  1 0.029586     0.0108 *
+#> Model 2 vs Model 1  1 0.029331     0.0118 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 # and
@@ -106,7 +104,7 @@ anova(mod0,mod)
 #> Model 1: Y ~ X
 #> Model 2: Y ~ Z + X
 #>                    Df  Score Pr(>Score)
-#> Model 2 vs Model 1  2 1.4245     0.5244
+#> Model 2 vs Model 1  2 1.4191     0.5216
 ```
 
 ### Negative Binomial
@@ -122,10 +120,6 @@ summary(mod_par)
 #> 
 #> Call:
 #> glm.nb(formula = y ~ x + z, data = D, link = "log", init.theta = 7.972747099)
-#> 
-#> Deviance Residuals: 
-#>     Min       1Q   Median       3Q      Max  
-#> -2.0746  -0.7748  -0.1086   0.4617   2.0435  
 #> 
 #> Coefficients:
 #>             Estimate Std. Error z value Pr(>|z|)    
@@ -154,15 +148,11 @@ summary(mod)
 #> Call:
 #> flipscores(formula = y ~ x + z, family = "negbinom", data = D)
 #> 
-#> Deviance Residuals: 
-#>     Min       1Q   Median       3Q      Max  
-#> -2.0746  -0.7748  -0.1086   0.4617   2.0435  
-#> 
 #> Coefficients:
-#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|t|)   
-#> (Intercept) -0.15365 -1.84162    3.42399 -0.53786    -0.087   0.5808   
-#> x            0.92089 14.93128    4.42610  3.37346     0.547   0.0014 **
-#> z           -0.01282 -0.72457    7.24491 -0.10001    -0.016   0.9612   
+#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)   
+#> (Intercept) -0.15365 -1.84162    3.42399 -0.53786    -0.087   0.5824   
+#> x            0.92089 14.93128    4.42610  3.37346     0.547   0.0012 **
+#> z           -0.01282 -0.72457    7.24491 -0.10001    -0.016   0.9610   
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
