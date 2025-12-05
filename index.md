@@ -1,5 +1,3 @@
-# flipscores
-
 # The flipscores package
 
 [On CRAN
@@ -26,10 +24,10 @@ Statistical Society Series B: Statistical Methodology, Volume 82, Issue
 3, July 2020, Pages 841–864.  
 <https://doi.org/10.1111/rssb.12369>
 
-R De Santis, J Goeman, J Hemerik, L Finos (2022) Inference in
-generalized linear models with robustness to misspecified variances
-arXiv: 2209.13918.  
-<https://arxiv.org/abs/2209.13918>
+De Santis, R., Goeman, J. J., Hemerik, J., Davenport, S., & Finos, L.
+(2025). Inference in Generalized Linear Models with Robustness to
+Misspecified Variances. Journal of the American Statistical Association,
+1–10. <https://doi.org/10.1080/01621459.2025.2491775>
 
 ## Some examples
 
@@ -48,10 +46,10 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)  
-#> (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7560  
-#> ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6558  
-#> ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6850  
-#> X             0.9439 16.2058     4.7272  3.4282     0.671   0.0124 *
+#> (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7454  
+#> ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6456  
+#> ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6908  
+#> X             0.9439 16.2058     4.7272  3.4282     0.671   0.0104 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -73,8 +71,8 @@ anova(mod)
 #> 
 #> Model: Y ~ Z + X
 #>   Df   Score Pr(>Score)  
-#> Z  2 0.73451     0.6938  
-#> X  1 0.02932     0.0124 *
+#> Z  2 0.74371     0.6986  
+#> X  1 0.02941     0.0104 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 # or
@@ -89,7 +87,7 @@ anova(mod0,mod)
 #> Model 1: Y ~ Z
 #> Model 2: Y ~ Z + X
 #>                    Df    Score Pr(>Score)  
-#> Model 2 vs Model 1  1 0.029331     0.0118 *
+#> Model 2 vs Model 1  1 0.029274     0.0114 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 # and
@@ -103,8 +101,8 @@ anova(mod0,mod)
 #> 
 #> Model 1: Y ~ X
 #> Model 2: Y ~ Z + X
-#>                    Df  Score Pr(>Score)
-#> Model 2 vs Model 1  2 1.4191     0.5216
+#>                    Df Score Pr(>Score)
+#> Model 2 vs Model 1  2 1.445      0.514
 ```
 
 ### Negative Binomial
@@ -150,9 +148,9 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)   
-#> (Intercept) -0.15365 -1.84162    3.42399 -0.53786    -0.087   0.5824   
-#> x            0.92089 14.93128    4.42610  3.37346     0.547   0.0012 **
-#> z           -0.01282 -0.72457    7.24491 -0.10001    -0.016   0.9610   
+#> (Intercept) -0.15365 -1.84162    3.42399 -0.53786    -0.087   0.5864   
+#> x            0.92089 14.93128    4.42610  3.37346     0.547   0.0016 **
+#> z           -0.01282 -0.72457    7.24491 -0.10001    -0.016   0.9584   
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 

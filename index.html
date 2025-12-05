@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Robust Score Testing in GLMs, by Sign-Flip Contributions • flipscores</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" sizes="any" href="favicon.ico">
+<link rel="manifest" href="site.webmanifest">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -47,14 +52,10 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header">
-<img src="logo.png" class="logo" alt=""><h1 id="flipscores-">flipscores 
-<a class="anchor" aria-label="anchor" href="#flipscores-"></a>
+<img src="logo.png" class="logo" alt=""><h1 id="the-flipscores-package-">The flipscores package 
+<a class="anchor" aria-label="anchor" href="#the-flipscores-package-"></a>
 </h1>
 </div>
-</div>
-<div class="section level1">
-<h1 id="the-flipscores-package">The flipscores package<a class="anchor" aria-label="anchor" href="#the-flipscores-package"></a>
-</h1>
 <p><a href="http://cran.r-project.org/web/packages/flipscores/index.html" class="external-link">On CRAN version</a></p>
 <hr>
 <div class="section level2">
@@ -70,7 +71,7 @@
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <p>J Hemerik, JJ Goeman and L Finos (2019) Robust testing in generalized linear models by sign-flipping score contributions. Journal of the Royal Statistical Society Series B: Statistical Methodology, Volume 82, Issue 3, July 2020, Pages 841–864.<br><a href="https://doi.org/10.1111/rssb.12369" class="external-link uri">https://doi.org/10.1111/rssb.12369</a></p>
-<p>R De Santis, J Goeman, J Hemerik, L Finos (2022) Inference in generalized linear models with robustness to misspecified variances arXiv: 2209.13918.<br><a href="https://arxiv.org/abs/2209.13918" class="external-link uri">https://arxiv.org/abs/2209.13918</a></p>
+<p>De Santis, R., Goeman, J. J., Hemerik, J., Davenport, S., &amp; Finos, L. (2025). Inference in Generalized Linear Models with Robustness to Misspecified Variances. Journal of the American Statistical Association, 1–10. <a href="https://doi.org/10.1080/01621459.2025.2491775" class="external-link uri">https://doi.org/10.1080/01621459.2025.2491775</a></p>
 </div>
 <div class="section level2">
 <h2 id="some-examples">Some examples<a class="anchor" aria-label="anchor" href="#some-examples"></a>
@@ -90,10 +91,10 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate   Score Std. Error z value Part. Cor Pr(&gt;|z|)  </span></span>
-<span><span class="co">#&gt; (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7560  </span></span>
-<span><span class="co">#&gt; ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6558  </span></span>
-<span><span class="co">#&gt; ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6850  </span></span>
-<span><span class="co">#&gt; X             0.9439 16.2058     4.7272  3.4282     0.671   0.0124 *</span></span>
+<span><span class="co">#&gt; (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7454  </span></span>
+<span><span class="co">#&gt; ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6456  </span></span>
+<span><span class="co">#&gt; ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6908  </span></span>
+<span><span class="co">#&gt; X             0.9439 16.2058     4.7272  3.4282     0.671   0.0104 *</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -115,8 +116,8 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model: Y ~ Z + X</span></span>
 <span><span class="co">#&gt;   Df   Score Pr(&gt;Score)  </span></span>
-<span><span class="co">#&gt; Z  2 0.73451     0.6938  </span></span>
-<span><span class="co">#&gt; X  1 0.02932     0.0124 *</span></span>
+<span><span class="co">#&gt; Z  2 0.74371     0.6986  </span></span>
+<span><span class="co">#&gt; X  1 0.02941     0.0104 *</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co"># or</span></span>
@@ -131,7 +132,7 @@
 <span><span class="co">#&gt; Model 1: Y ~ Z</span></span>
 <span><span class="co">#&gt; Model 2: Y ~ Z + X</span></span>
 <span><span class="co">#&gt;                    Df    Score Pr(&gt;Score)  </span></span>
-<span><span class="co">#&gt; Model 2 vs Model 1  1 0.029331     0.0118 *</span></span>
+<span><span class="co">#&gt; Model 2 vs Model 1  1 0.029274     0.0114 *</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co"># and</span></span>
@@ -145,8 +146,8 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model 1: Y ~ X</span></span>
 <span><span class="co">#&gt; Model 2: Y ~ Z + X</span></span>
-<span><span class="co">#&gt;                    Df  Score Pr(&gt;Score)</span></span>
-<span><span class="co">#&gt; Model 2 vs Model 1  2 1.4191     0.5216</span></span></code></pre></div>
+<span><span class="co">#&gt;                    Df Score Pr(&gt;Score)</span></span>
+<span><span class="co">#&gt; Model 2 vs Model 1  2 1.445      0.514</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="negative-binomial">Negative Binomial<a class="anchor" aria-label="anchor" href="#negative-binomial"></a>
 </h3>
@@ -191,9 +192,9 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)   </span></span>
-<span><span class="co">#&gt; (Intercept) -0.15365 -1.84162    3.42399 -0.53786    -0.087   0.5824   </span></span>
-<span><span class="co">#&gt; x            0.92089 14.93128    4.42610  3.37346     0.547   0.0012 **</span></span>
-<span><span class="co">#&gt; z           -0.01282 -0.72457    7.24491 -0.10001    -0.016   0.9610   </span></span>
+<span><span class="co">#&gt; (Intercept) -0.15365 -1.84162    3.42399 -0.53786    -0.087   0.5864   </span></span>
+<span><span class="co">#&gt; x            0.92089 14.93128    4.42610  3.37346     0.547   0.0016 **</span></span>
+<span><span class="co">#&gt; z           -0.01282 -0.72457    7.24491 -0.10001    -0.016   0.9584   </span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -212,7 +213,6 @@
 <p>If you encounter a bug, please file a <a href="https://github.com/tidyverse/reprex" class="external-link">reprex</a> (minimal reproducible example) on <a href="https://github.com/livioivil/flipscores/issues" class="external-link">github</a>.</p>
 </div>
 </div>
-
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
