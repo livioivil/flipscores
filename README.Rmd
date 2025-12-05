@@ -5,7 +5,7 @@ output:
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-# flipscores <a href="https://livioivil.github.io/flipscores/"><img src="man/figures/logo.png" align="right" height="139" alt="flipscores website" /></a>
+# The flipscores package <a href="https://livioivil.github.io/flipscores/"><img src="man/figures/logo.png" align="right" height="139" alt="flipscores website" /></a>
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(
@@ -15,7 +15,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-# The flipscores package
 [On CRAN version](http://cran.r-project.org/web/packages/flipscores/index.html)
 
 
@@ -39,10 +38,7 @@ Statistical Society Series B: Statistical Methodology, Volume 82, Issue
 3, July 2020, Pages 841–864.  
 <https://doi.org/10.1111/rssb.12369>
 
-R De Santis, J Goeman, J Hemerik, L Finos (2022) Inference in
-generalized linear models with robustness to misspecified variances
-arXiv: 2209.13918.  
-<https://arxiv.org/abs/2209.13918>
+De Santis, R., Goeman, J. J., Hemerik, J., Davenport, S., & Finos, L. (2025). Inference in Generalized Linear Models with Robustness to Misspecified Variances. Journal of the American Statistical Association, 1–10. <https://doi.org/10.1080/01621459.2025.2491775>
 
 
 ## Some examples
