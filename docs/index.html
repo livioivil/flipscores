@@ -71,13 +71,13 @@
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <p>J Hemerik, JJ Goeman and L Finos (2019) Robust testing in generalized linear models by sign-flipping score contributions. Journal of the Royal Statistical Society Series B: Statistical Methodology, Volume 82, Issue 3, July 2020, Pages 841–864.<br><a href="https://doi.org/10.1111/rssb.12369" class="external-link uri">https://doi.org/10.1111/rssb.12369</a></p>
-<p>R De Santis, J Goeman, J Hemerik, L Finos (2022) Inference in generalized linear models with robustness to misspecified variances arXiv: 2209.13918.<br><a href="https://arxiv.org/abs/2209.13918" class="external-link uri">https://arxiv.org/abs/2209.13918</a></p>
+<p>De Santis, R., Goeman, J. J., Hemerik, J., Davenport, S., &amp; Finos, L. (2025). Inference in Generalized Linear Models with Robustness to Misspecified Variances. Journal of the American Statistical Association, 1–10. <a href="https://doi.org/10.1080/01621459.2025.2491775" class="external-link uri">https://doi.org/10.1080/01621459.2025.2491775</a></p>
 </div>
 <div class="section level2">
 <h2 id="some-examples">Some examples<a class="anchor" aria-label="anchor" href="#some-examples"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">flipscores</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://livioivil.github.io/flipscores/">flipscores</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">dt</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>X<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span>,</span>
 <span>   Z<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>,length.out<span class="op">=</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -91,10 +91,10 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate   Score Std. Error z value Part. Cor Pr(&gt;|z|)  </span></span>
-<span><span class="co">#&gt; (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7708  </span></span>
-<span><span class="co">#&gt; ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6620  </span></span>
-<span><span class="co">#&gt; ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.7062  </span></span>
-<span><span class="co">#&gt; X             0.9439 16.2058     4.7272  3.4282     0.671   0.0124 *</span></span>
+<span><span class="co">#&gt; (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7454  </span></span>
+<span><span class="co">#&gt; ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6456  </span></span>
+<span><span class="co">#&gt; ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6908  </span></span>
+<span><span class="co">#&gt; X             0.9439 16.2058     4.7272  3.4282     0.671   0.0104 *</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -116,8 +116,8 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model: Y ~ Z + X</span></span>
 <span><span class="co">#&gt;   Df   Score Pr(&gt;Score)  </span></span>
-<span><span class="co">#&gt; Z  2 0.76452     0.7044  </span></span>
-<span><span class="co">#&gt; X  1 0.02945     0.0124 *</span></span>
+<span><span class="co">#&gt; Z  2 0.74371     0.6986  </span></span>
+<span><span class="co">#&gt; X  1 0.02941     0.0104 *</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co"># or</span></span>
@@ -132,7 +132,7 @@
 <span><span class="co">#&gt; Model 1: Y ~ Z</span></span>
 <span><span class="co">#&gt; Model 2: Y ~ Z + X</span></span>
 <span><span class="co">#&gt;                    Df    Score Pr(&gt;Score)  </span></span>
-<span><span class="co">#&gt; Model 2 vs Model 1  1 0.029503     0.0102 *</span></span>
+<span><span class="co">#&gt; Model 2 vs Model 1  1 0.029274     0.0114 *</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co"># and</span></span>
@@ -146,8 +146,8 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model 1: Y ~ X</span></span>
 <span><span class="co">#&gt; Model 2: Y ~ Z + X</span></span>
-<span><span class="co">#&gt;                    Df  Score Pr(&gt;Score)</span></span>
-<span><span class="co">#&gt; Model 2 vs Model 1  2 1.4358     0.5232</span></span></code></pre></div>
+<span><span class="co">#&gt;                    Df Score Pr(&gt;Score)</span></span>
+<span><span class="co">#&gt; Model 2 vs Model 1  2 1.445      0.514</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="negative-binomial">Negative Binomial<a class="anchor" aria-label="anchor" href="#negative-binomial"></a>
 </h3>
@@ -191,10 +191,10 @@
 <span><span class="co">#&gt; flipscores(formula = y ~ x + z, family = "negbinom", data = D)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt;             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)    </span></span>
-<span><span class="co">#&gt; (Intercept) -0.15365 -1.84162    3.42399 -0.53786    -0.087   0.5776    </span></span>
-<span><span class="co">#&gt; x            0.92089 14.93128    4.42610  3.37346     0.547   0.0008 ***</span></span>
-<span><span class="co">#&gt; z           -0.01282 -0.72457    7.24491 -0.10001    -0.016   0.9614    </span></span>
+<span><span class="co">#&gt;             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)   </span></span>
+<span><span class="co">#&gt; (Intercept) -0.15365 -1.84162    3.42399 -0.53786    -0.087   0.5864   </span></span>
+<span><span class="co">#&gt; x            0.92089 14.93128    4.42610  3.37346     0.547   0.0016 **</span></span>
+<span><span class="co">#&gt; z           -0.01282 -0.72457    7.24491 -0.10001    -0.016   0.9584   </span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">#&gt; </span></span>
