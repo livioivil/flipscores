@@ -121,10 +121,10 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)  
-#> (Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.890  
-#> ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.060 .
+#> (Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.893  
+#> ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.053 .
 #> ZC           20.8561   1.8043     0.8180   2.2057     0.615    0.039 *
-#> X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.730  
+#> X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.752  
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
@@ -141,11 +141,11 @@ summary(mod)
 #>    terms          r        r_n null_model   algorithm
 #> ZB   ~ZB -0.5295718 -0.5304792    ~1+ZC+X multi_start
 #> ZC   ~ZC  0.6146304  0.6148542    ~1+ZB+X multi_start
-#> X     ~X -0.1493213 -0.1849399   ~1+ZB+ZC multi_start
+#> X     ~X -0.1493213 -0.1891066   ~1+ZB+ZC multi_start
 # Compute for specific terms only
 gcor_normalized_binom(mod, terms = c("X", "ZC"))
 #>    terms          r        r_n null_model   algorithm
-#> X     ~X -0.1493213 -0.1891066   ~1+ZB+ZC multi_start
+#> X     ~X -0.1493213 -0.1849399   ~1+ZB+ZC multi_start
 #> ZC   ~ZC  0.6146304  0.6148542    ~1+ZB+X multi_start
 
 ```
