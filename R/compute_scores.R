@@ -87,12 +87,13 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
           B<-X*(sqrtW)-t(crossprod(crossprod(A,X*(sqrtW)),solve(crossprod(A),t(A))))
           scores=B*sqrtinvV_vect_times_residuals#/(sum(!is.na(model0$y))**0.5)
           scale_objects=list(nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect_times_residuals)^2)))
-          list(scores=scores, scale_objects=scale_objects)
+          list(scores=scores, scale_objects=scale_objects,Xr=B)
         }
 
         A<-(sqrtW)*Z
         temp=apply(X,2,.get_1score_effective)
         scores=sapply(temp,function(obj) obj$scores)
+        Xr=sapply(temp,function(obj) obj$Xr)
         # print(names(scores))
         scale_objects=lapply(temp,function(obj) obj$scale_objects)
         # print(names(scale_objects))
@@ -108,12 +109,13 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
             scores=b*sqrtinvV_vect_times_residuals#/(sum(!is.na(model0$y))**0.5)
             nrm=sqrt(sum(b^2)*sum((sqrtinvV_vect_times_residuals)^2))
             scale_objects=list(A=A,nrm=nrm)
-            list(scores=scores, scale_objects=scale_objects)
+            list(scores=scores, scale_objects=scale_objects,Xr=b)
           }
 
           U=svd((sqrtW*Z),nv=0)$u
           temp=apply(X,2,.get_1score_standardized,U)
           scores=sapply(temp,function(obj) obj$scores)
+          Xr=sapply(temp,function(obj) obj$Xr)
           # print(names(scores))
           scale_objects=lapply(temp,function(obj) obj$scale_objects)
           # print(names(scale_objects))
@@ -123,10 +125,11 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
           if(score_type=="orthogonalized"){
             .get_1score_orthogonalized <- function(X){
               B=(t(X*sqrtW)%*%OneMinusH*(sqrtinvV_vect))
-              scores=t(B%*%deco$u)*(t(deco$u)%*%(residuals))[,]#*(1/sum(!is.na(model0$y))**0.5)
+              Xr=t(B%*%deco$u)
+              scores=Xr*(t(deco$u)%*%(residuals))[,]#*(1/sum(!is.na(model0$y))**0.5)
               nrm=sqrt(sum(B^2)*sum(residuals^2))
               scale_objects=list(U=deco$u,B=B,nrm=nrm)
-              list(scores=scores, scale_objects=scale_objects)
+              list(scores=scores, scale_objects=scale_objects,Xr=Xr)
             }
 
             OneMinusH = diag(nrow(Z)) - ((sqrtW)* Z) %*% solve(t(Z) %*% ((sqrtW**2) * Z)) %*% t(Z * (sqrtW))
@@ -134,6 +137,7 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
             deco$d[deco$d<1E-12]=0
             temp=apply(X,2,.get_1score_orthogonalized)
             scores=sapply(temp,function(obj) obj$scores)
+            Xr=sapply(temp,function(obj) obj$Xr)
             # print(names(scores))
             scale_objects=lapply(temp,function(obj) obj$scale_objects)
             # print(names(scale_objects))
@@ -174,6 +178,7 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
   attr(scores,"scale_objects")=scale_objects
   attr(scores,"score_type")=score_type
   attr(scores,"resid_std")=sqrtinvV_vect_times_residuals
+  attr(scores,"Xresid_std")=Xr
 
   return(scores)
 }

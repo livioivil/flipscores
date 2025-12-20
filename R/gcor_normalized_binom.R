@@ -137,7 +137,8 @@ gcor_normalized_binom <- function(full_glm, terms = NULL,
     r=results$r,
     r_n=results$r_n,
     null_model = sapply(terms,function(i) paste0(setdiff(all_vars,i),collapse   ="+")),
-    algorithm=results$algorithm)
+    algorithm=results$algorithm,
+    is.exact=results$is.exact)
   return(results)
 }
 
@@ -174,8 +175,7 @@ compute_gcor_normalized_binom <- function(model0, X,
   # Determine maximum and minimum correlations
   if ((algorithm=="intercept_only")||intercept_only) {
     # Use exact method for empty/null model (r_minus = -r_plus always)
-    r_plus <- exact_threshold_search_intercept_only(as.numeric(X))$r
-    r_minus <- -r_plus
+    bound <- exact_threshold_search_intercept_only(as.numeric(X))
     algorithm="intercept_only"
   } else {
     # For non-empty null models
@@ -205,6 +205,7 @@ compute_gcor_normalized_binom <- function(model0, X,
     normalized_r <- 0
   }
 
-  out=data.frame(r=r,r_n=normalized_r,algorithm=algorithm)
+  out=data.frame(r=r,r_n=normalized_r,algorithm=algorithm,
+                 is.exact=ifelse(algorithm=="multi_start",FALSE,TRUE))
   return(out)
 }
