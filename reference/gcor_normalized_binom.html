@@ -140,10 +140,10 @@ quality for large problems where brute force is infeasible.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.893  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.053 .</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.891  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.052 .</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ZC           20.8561   1.8043     0.8180   2.2057     0.615    0.039 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.752  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.761  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -157,15 +157,15 @@ quality for large problems where brute force is infeasible.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">gcor_normalized_binom</span><span class="op">(</span><span class="va">mod</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    terms          r        r_n null_model   algorithm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZB   ~ZB -0.5295718 -0.5304792    ~1+ZC+X multi_start</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZC   ~ZC  0.6146304  0.6148542    ~1+ZB+X multi_start</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X     ~X -0.1493213 -0.1891066   ~1+ZB+ZC multi_start</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    terms          r        r_n null_model   algorithm is.exact</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZB   ~ZB -0.5295718 -0.5304792    ~1+ZC+X multi_start    FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC   ~ZC  0.6146304  0.6148542    ~1+ZB+X multi_start    FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X     ~X -0.1493213 -0.1891066   ~1+ZB+ZC multi_start    FALSE</span>
 <span class="r-in"><span><span class="co"># Compute for specific terms only</span></span></span>
 <span class="r-in"><span><span class="fu">gcor_normalized_binom</span><span class="op">(</span><span class="va">mod</span>, terms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="st">"ZC"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    terms          r        r_n null_model   algorithm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X     ~X -0.1493213 -0.1849399   ~1+ZB+ZC multi_start</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZC   ~ZC  0.6146304  0.6148542    ~1+ZB+X multi_start</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    terms          r        r_n null_model   algorithm is.exact</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X     ~X -0.1493213 -0.1891066   ~1+ZB+ZC multi_start    FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC   ~ZC  0.6146304  0.6148542    ~1+ZB+X multi_start    FALSE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
