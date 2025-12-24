@@ -65,85 +65,58 @@
 #'
 #'
 
-#' @export
-gcor_normalized_binom <- function(full_glm, terms = NULL,
-                                  intercept_too = FALSE,
-                                  algorithm = "auto",
-                                  algorithm.control=list(n_exact = 15, thresholds = c(-.1, 0, .1),
-                                  n_random = 10, max_iter = 1000, topK = 10,
-                                  tol = 1e-12, patience = 10)) {
-
-  verbose=FALSE
-  # Check if model is binomial
-  if (full_glm$family$family != "binomial") {
-    stop("Model must be from binomial family")
-  }
-  # Extract control parameters with defaults
-  control <- list(
-    n_exact = 15,
-    thresholds = c(-.1, 0, .1),
-    n_random = 10,
-    max_iter = 1000,
-    topK = 10,
-    tol = 1e-12,
-    patience = 10
-  )
-  control[names(algorithm.control)] <- algorithm.control
-
-
-
-  # Extract model components
-  Y <- full_glm$y
-  X_full <- model.matrix(full_glm)
-  family <- full_glm$family
-  #n <- length(Y)
-
-  # Check if intercept is present in full model
-  has_intercept <- attr(terms(full_glm$formula), "intercept") == 1
-
-  if (has_intercept) {
-    null_frml <- "~1"
-  } else {
-    null_frml <- "~0"
-  }
-
-
-  # Get all variable names (excluding intercept)
-  all_vars <- colnames(X_full)
-  if(!intercept_too) all_vars <- all_vars[all_vars != "(Intercept)"]
-
-  # If terms not specified, use all non-intercept terms
-  if (is.null(terms)) {
-    terms <- all_vars
-  } else {
-    # Validate specified terms
-    missing_vars <- setdiff(terms, all_vars)
-    if (length(missing_vars) > 0) {
-      stop("terms not found in model: ", paste(missing_vars, collapse = ", "))
-    }
-  }
-  #
-
-  results=lapply(terms,socket_compute_gcor_normalized_binom,
-                 full_glm,algorithm=algorithm,
-                 algorithm.control=algorithm.control)
-  results=do.call(rbind,results)
-
-
-  all_vars= c(null_frml,all_vars)
-
-  results <- data.frame(
-    terms = paste0("~",terms),
-    r=results$r,
-    r_n=results$r_n,
-    null_model = sapply(terms,function(i) paste0(setdiff(all_vars,i),collapse   ="+")),
-    algorithm=results$algorithm,
-    is.exact=results$is.exact)
-  return(results)
-}
-
-
-
+#@export
+# gcor_normalized_binom <- function(full_glm, terms = NULL,
+#                                   intercept_too = FALSE,
+#                                   algorithm = "auto",
+#                                   algorithm.control=list(n_exact = 15, thresholds = c(-.1, 0, .1),
+#                                   n_random = 10, max_iter = 1000, topK = 10,
+#                                   tol = 1e-12, patience = 10)) {
+#
+#   verbose=FALSE
+#   # Check if model is binomial
+#   if (full_glm$family$family != "binomial") {
+#     stop("Model must be from binomial family")
+#   }
+#   # Extract control parameters with defaults
+#   control <- list(
+#     n_exact = 15,
+#     thresholds = c(-.1, 0, .1),
+#     n_random = 10,
+#     max_iter = 1000,
+#     topK = 10,
+#     tol = 1e-12,
+#     patience = 10
+#   )
+#   control[names(algorithm.control)] <- algorithm.control
+#
+#
+#
+#   # Extract model components
+#   Y <- full_glm$y
+#   X_full <- model.matrix(full_glm)
+#   family <- full_glm$family
+#   #n <- length(Y)
+#
+#   # Check if intercept is present in full model
+#   has_intercept <- attr(terms(full_glm$formula), "intercept") == 1
+#
+#   if (has_intercept) {
+#     null_frml <- "~1"
+#   } else {
+#     null_frml <- "~0"
+#   }
+#
+#
+#   # Get all variable names (excluding intercept)
+#   all_vars <- colnames(X_full)
+#   if(!intercept_too) all_vars <- all_vars[all_vars != "(Intercept)"]
+#
+#
+# }
+#
+#
+#
 
 
 
@@ -158,11 +131,15 @@ compute_gcor_normalized_binom <- function(model0, X,
   verbose=FALSE
   X=get_X(model0,X)
   Z=model.matrix(model0)
+  r=compute_gcor(model0, X)
   # Check if model is binomial
   if (model0$family$family != "binomial") {
-    stop("Model must be from binomial family")
+    warning("when normalize==TRUE, model must be from binomial family")
+    out=data.frame(r=r,r_n=r,algorithm="from theory",
+                   is.exact=TRUE)
+    return(out)
   }
-  r=compute_gcor(model0, X)
+
   # # Check if link function is odd-symmetric
   link_fun <- model0$family$link
   # odd_symmetric_links <- c("logit", "probit", "cauchit", "identity")

@@ -4,7 +4,16 @@
 \alias{gR2}
 \title{Generalized R-squared for GLM Models}
 \usage{
-gR2(full_glm, null_glm = NULL, terms = NULL)
+gR2(
+  full_glm,
+  null_glm = NULL,
+  terms = NULL,
+  normalize = FALSE,
+  adjusted = FALSE,
+  algorithm = "auto",
+  algorithm.control = list(n_exact = 15, thresholds = c(-0.1, 0, 0.1), n_random = 10,
+    max_iter = 1000, topK = 10, tol = 1e-12, patience = 10)
+)
 }
 \arguments{
 \item{full_glm}{A fitted GLM object of class `glm` (the full model).}
@@ -15,9 +24,30 @@ uses an empty model (intercept-only if intercept is present, otherwise no predic
 \item{terms}{A character vector of variable names or a formula specifying
 the additional terms in the full model compared to the null. If provided,
 this overrides `null_glm` and the null model is refitted excluding these terms.}
+
+\item{normalize}{FALSE by default.}
+
+\item{algorithm}{`"auto"` by default. It chooses between `"brute_force"` and `"multi_start"`}
+
+\item{algorithm.control}{`list` of control parameters:
+\itemize{
+  \item `n_exact` Integer specifying the sample size threshold for using exact
+    methods (brute force). Default is 15.
+  \item `thresholds` Numeric vector of threshold values for multi-start initialization.
+  \item `n_random` Integer number of random starts for multi-start optimization.
+  \item `max_iter` Integer maximum number of iterations per start.
+  \item `topK` Integer number of top candidates to consider at each iteration.
+  \item `tol` Numeric tolerance for convergence.
+  \item `patience` Integer number of iterations without improvement before stopping.
+}}
 }
 \value{
-A numeric value representing the generalized R-squared measure.
+If normalize==FALSE: A numeric value representing the generalized R-squared measure.
+If normalize==TRUE: A list with components:
+  \item{R2}{The generalized R-squared coefficient for the set of terms}
+  \item{R2_n}{The normalized generalized R-squared coefficient}
+  \item{algorithm}{The algorithm used to compute the maximum R-squared}
+  \item{terms_tested}{The names of the terms included in the test}
 }
 \description{
 Computes the generalized R-squared measure for nested generalized linear models.
@@ -39,6 +69,19 @@ where:
 
 This measures the proportion of the standardized residual sum of squares explained
 by the additional predictors in the full model.
+
+The normalized generalized R-squared is computed as:
+\deqn{
+R^2_n = \frac{R^2}{R^2_{\max}}
+}
+where \eqn{R^2_{\max}} is the maximum possible R-squared value for the specified
+set of terms.
+
+Different algorithms are used based on sample size:
+\itemize{
+  \item For small samples (\eqn{n \leq n_{\text{exact}}}), brute force search finds the exact maximum
+  \item For larger samples, a greedy multi-start algorithm finds approximate maximum
+}
 }
 \examples{
 set.seed(1)
@@ -57,6 +100,21 @@ mod0=glm(Y~1,data=dt,family="poisson")
 # Compute for specific variables only
 (results <- gR2(mod,terms = c("X","Z")))
 
+
+set.seed(123)
+dt <- data.frame(X = rnorm(20),
+                 Z = factor(rep(LETTERS[1:3], length.out = 20)))
+dt$Y <- rbinom(n = 20, prob = plogis((dt$Z == "C") * 2), size = 1)
+mod <- glm(Y ~ Z + X, data = dt, family = binomial)
+
+# Compute generalized partial correlations for all variables
+(results <-  gR2(mod,normalize=TRUE))
+# equivalent to
+mod0=glm(Y~1,data=dt,family=binomial)
+(results <-  gR2(mod, mod0,normalize=TRUE))
+
+# Compute for specific variables only
+(results <-  gR2(mod,terms = c("X","Z"),normalize=TRUE))
 }
 \author{
 Livio Finos and Paolo Girardi

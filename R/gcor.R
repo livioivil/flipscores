@@ -10,10 +10,30 @@
 #'   model.matrix, that is pay attention for factors) for which to compute
 #'   generalized partial correlations. If `NULL` (default), computes for all
 #'   non-intercept terms in the model.
+#' @param normalize FALSE by default.
+#' @param intercept_too Logical indicating whether to include the intercept
+#'   as a variable. Default is FALSE.
+#' @param algorith Only used if \code{normalize} is \code{TRUE}. `"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`
+#' @param algorithm.control Only used if \code{normalize} is \code{TRUE}. `list` of control parameters:
+#' `n_exact` Integer specifying the sample size threshold for using exact
+#'   methods (brute force). Default is 15.
+#' `thresholds` Numeric vector of threshold values for multi-start initialization.
+#' `n_random` Integer number of random starts for multi-start optimization.
+#' `max_iter` Integer maximum number of iterations per start.
+#' `topK` Integer number of top candidates to consider at each iteration.
+#' `tol` Numeric tolerance for convergence.
+#' `patience` Integer number of iterations without improvement before stopping.
 #'
-#' @return A data frame with two columns:
+#' @return if \code{normalize} is \code{FALSE}, a data frame with five columns:
 #'   \item{variable}{The variable name}
 #'   \item{r}{The generalized partial correlation coefficient}
+#'   while if \code{normalize} is \code{TRUE}
+#'   \item{terms}{The variable name}
+#'   \item{r}{The generalized partial correlation coefficient}
+#'   \item{r_n}{The normalized generalized partial correlation coefficient}
+#'   \item{null_model}{The null model used to compute the generalized (partial) correlation}
+#'   \item{algorithm}{The algorithm used to compute the upper/lower bounds of the generalized partial correlation coefficient (to compute its normalized version)}
+#'   \item{exact}{logical}
 #'
 #' @details
 #' The generalized partial correlation \eqn{\r} measures the association between
@@ -35,6 +55,30 @@
 #' The function uses `flipscores:::get_par_expo_fam()` to compute \eqn{V} and \eqn{D}
 #' consistently with the flipscores package methodology.
 #'
+#' The normalized generalized partial correlation is computed as:
+#' \deqn{
+#' r_n = \begin{cases}
+#' +r / r_+ & \text{if } r > 0 \\
+#' -r / r_- & \text{if } r < 0
+#' \end{cases}
+#' }
+#' where \eqn{r_+} is the maximum possible correlation and \eqn{r_-} is the minimum.
+#'
+#' When the (full) model has only intercept and only one predictor X, the
+#' generalized (non partial) correlation is computed and the normalization factor
+#' for X is exact.
+#' In the more general case with more predictors, for sample sizes \eqn{n \leq n_{\text{exact}}}, brute force search is used to find
+#' the exact extrema. For larger sample sizes, a greedy multi-start algorithm is employed:
+#' \itemize{
+#'   \item Multiple starting points are generated using thresholding and random sampling
+#'   \item From each start, coordinates are greedily flipped to improve the correlation
+#'   \item Early stopping is used when no improvements are found for several iterations
+#'   \item The best solution across all starts is returned
+#' }
+#' This approach provides a good trade-off between computational efficiency and solution
+#' quality for large problems where brute force is infeasible.
+#'
+#'
 #' @author Livio Finos and Paolo Girardi
 #' @examples
 #' set.seed(1)
@@ -46,11 +90,23 @@
 #'
 #' # Compute generalized partial correlations for all terms
 #' (results <- gcor(mod))
-#' # equivalent to
-#' mod0=glm(Y~1,data=dt,family="poisson")
-#' (results <- gcor(mod, mod0))
+#'
 #' # Compute for specific terms only
 #' gcor(mod, terms = c("X", "ZC"))
+#'
+#' gcor(mod, terms = c("X", "ZC"),normalize=TRUE)
+#'
+#' set.seed(123)
+#' dt=data.frame(X=rnorm(20),
+#'    Z=factor(rep(LETTERS[1:3],length.out=20)))
+#' dt$Y=rbinom(n=20,prob=plogis((dt$Z=="C")*2),size=1)
+#' mod=flipscores(Y~Z+X,data=dt,family="binomial",n_flips=1000)
+#' summary(mod)
+#'
+#' (results <- gcor(mod,normalize=TRUE))
+#' # Compute for specific terms only
+#' gcor(mod, terms = c("X", "ZC"),normalize=TRUE)
+#'
 #'
 #' @export
 
@@ -58,13 +114,19 @@
 #sapply(dir("./to_flipscores/",pattern = ".R$",full.names = TRUE),source)
 
 
-gcor <- function(full_glm, terms = NULL,intercept_too=FALSE) {
-
+gcor <- function(full_glm, terms = NULL,
+                 normalize=FALSE,
+                 intercept_too=FALSE,
+                 algorithm = "auto",
+                 algorithm.control=list(n_exact = 15, thresholds = c(-.1, 0, .1),
+                                        n_random = 10, max_iter = 1000, topK = 10,
+                                        tol = 1e-12, patience = 10)
+                 ) {
   # Extract model components
   Y <- full_glm$y
   X_full <- model.matrix(full_glm)
   family <- full_glm$family
-  n <- length(Y)
+  #n <- length(Y)
 
   # Check if intercept is present in full model
   has_intercept <- attr(terms(full_glm$formula), "intercept") == 1
@@ -91,21 +153,51 @@ gcor <- function(full_glm, terms = NULL,intercept_too=FALSE) {
   }
   #
 
+  if(normalize){
+    # If terms not specified, use all non-intercept terms
+    if (is.null(terms)) {
+      terms <- all_vars
+    } else {
+      # Validate specified terms
+      missing_vars <- setdiff(terms, all_vars)
+      if (length(missing_vars) > 0) {
+        stop("terms not found in model: ", paste(missing_vars, collapse = ", "))
+      }
+    }
+    #
 
-  results=sapply(terms,socket_compute_gcor,
-                 full_glm)
+    results=lapply(terms,socket_compute_gcor_normalized_binom,
+                   full_glm,algorithm=algorithm,
+                   algorithm.control=algorithm.control)
+    results=do.call(rbind,results)
 
-  all_vars= c(null_frml,all_vars)
-  results <- data.frame(
-    terms = paste0("~",terms),
-    gcor = results,
-    null_model = sapply(terms,function(i) paste0(setdiff(all_vars,i),collapse   ="+")),
-    stringsAsFactors = FALSE
-  )
 
-  rownames(results)=NULL
-  return(results)
+    all_vars= c(null_frml,all_vars)
+
+    results <- data.frame(
+      terms = paste0("~",terms),
+      r=results$r,
+      r_n=results$r_n,
+      null_model = sapply(terms,function(i) paste0(setdiff(all_vars,i),collapse   ="+")),
+      algorithm=results$algorithm,
+      is.exact=results$is.exact)
+    return(results)
+  } else {
+    results=sapply(terms,socket_compute_gcor,
+                   full_glm)
+
+    all_vars= c(null_frml,all_vars)
+    results <- data.frame(
+      terms = paste0("~",terms),
+      gcor = results,
+      null_model = sapply(terms,function(i) paste0(setdiff(all_vars,i),collapse   ="+")),
+      stringsAsFactors = FALSE
+    )
+
+    rownames(results)=NULL
+    return(results)
   }
+}
 
 
 

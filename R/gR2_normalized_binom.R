@@ -60,43 +60,61 @@
 #' (results <-  gR2_normalized_binom(mod,terms = c("X","Z")))
 #'
 #'
+#'
 #' @export
-gR2_normalized_binom <- function(full_glm, null_glm = NULL, terms = NULL,
-                                 algorithm = "auto",
-                                 algorithm.control = list(n_exact = 15,
-                                                          thresholds = c(-.1, 0, .1),
-                                                          n_random = 10,
-                                                          max_iter = 1000,
-                                                          topK = 10,
-                                                          tol = 1e-12,
-                                                          patience = 10)) {
+# gR2_normalized_binom <- function(full_glm, null_glm = NULL, terms = NULL,
+#                                  algorithm = "auto",
+#                                  algorithm.control = list(n_exact = 15,
+#                                                           thresholds = c(-.1, 0, .1),
+#                                                           n_random = 10,
+#                                                           max_iter = 1000,
+#                                                           topK = 10,
+#                                                           tol = 1e-12,
+#                                                           patience = 10)) {
+#
+#
+#   # Extract control parameters with defaults
+#   control <- list(
+#     n_exact = 15,
+#     thresholds = c(-.1, 0, .1),
+#     n_random = 10,
+#     max_iter = 1000,
+#     topK = 10,
+#     tol = 1e-12,
+#     patience = 10
+#   )
+#   control[names(algorithm.control)] <- algorithm.control
+#
+#
+#   if(length(terms)>1){
+#     temp=lapply(terms,.socket_compute_gR2_n,full_glm, null_glm)
+#     return(do.call(rbind,temp))
+#   } else
+#     return(.socket_compute_gR2_n(terms,full_glm, null_glm))
+#
+# }
 
-  # Check if model is binomial
+.socket_compute_gR2_n <- function(terms,full_glm, null_glm = NULL,algorithm,control){
+  temp=.prepare_for_gR2(full_glm,null_glm,terms)
+  Z=model.matrix(temp$null_glm)
+  Y=temp$null_glm$y
+  X=temp$X
+  n=length(Y)
+  # Compute generalized R-squared
+  gR2=compute_gR2(temp$null_glm, X)
+
   if (full_glm$family$family != "binomial") {
-    stop("Model must be from binomial family")
-  }
-
-  # Extract control parameters with defaults
-  control <- list(
-    n_exact = 15,
-    thresholds = c(-.1, 0, .1),
-    n_random = 10,
-    max_iter = 1000,
-    topK = 10,
-    tol = 1e-12,
-    patience = 10
-  )
-  control[names(algorithm.control)] <- algorithm.control
-
-  .socket_compute_gR2_n <- function(terms,full_glm, null_glm = NULL){
-    temp=.prepare_for_gR2(full_glm,null_glm,terms)
-    Z=model.matrix(temp$null_glm)
-    Y=temp$null_glm$y
-    X=temp$X
-    n=length(Y)
-    # Compute generalized R-squared
-    gR2=compute_gR2(temp$null_glm, X)
-
+    warning("When normalize==TRUE, Model must be from binomial family")
+    data.frame(
+      terms = paste0("~ ",paste(colnames(temp$X),collapse = " + ")),
+      gR2 = gR2,
+      gR2_n = gR2,
+      algorithm = "from theory",
+      exact=TRUE,
+      null_model = deparse(temp$null_glm$formula),
+      stringsAsFactors = FALSE
+    )
+  } else {
 
     # Determine algorithm to use
     if (algorithm == "auto") {
@@ -117,6 +135,7 @@ gR2_normalized_binom <- function(full_glm, null_glm = NULL, terms = NULL,
       max_result <- bruteforce_R2(Z, X)
       gR2_max <- max_result$R2
     } else {
+      algorithm=="multi_start"
       max_result <- multi_start_R2(Z, X, Y_user = Y,
                                    thresholds = control$thresholds,
                                    n_random = control$n_random,
@@ -141,15 +160,9 @@ gR2_normalized_binom <- function(full_glm, null_glm = NULL, terms = NULL,
       gR2 = gR2,
       gR2_n = gR2_n,
       algorithm = algorithm_used,
+      exact=ifelse(algorithm=="multi_start",FALSE,TRUE),
       null_model = deparse(temp$null_glm$formula),
       stringsAsFactors = FALSE
     )
   }
-
-  if(length(terms)>1){
-    temp=lapply(terms,.socket_compute_gR2_n,full_glm, null_glm)
-    return(do.call(rbind,temp))
-  } else
-    return(.socket_compute_gR2_n(terms,full_glm, null_glm))
-
 }

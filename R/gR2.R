@@ -10,8 +10,27 @@
 #' @param terms A character vector of variable names or a formula specifying
 #'   the additional terms in the full model compared to the null. If provided,
 #'   this overrides `null_glm` and the null model is refitted excluding these terms.
+#' @param normalize FALSE by default.
+#' @param algorithm `"auto"` by default. It chooses between `"brute_force"` and `"multi_start"`
+#' @param algorithm.control `list` of control parameters:
+#'   \itemize{
+#'     \item `n_exact` Integer specifying the sample size threshold for using exact
+#'       methods (brute force). Default is 15.
+#'     \item `thresholds` Numeric vector of threshold values for multi-start initialization.
+#'     \item `n_random` Integer number of random starts for multi-start optimization.
+#'     \item `max_iter` Integer maximum number of iterations per start.
+#'     \item `topK` Integer number of top candidates to consider at each iteration.
+#'     \item `tol` Numeric tolerance for convergence.
+#'     \item `patience` Integer number of iterations without improvement before stopping.
+#'   }
 #'
-#' @return A numeric value representing the generalized R-squared measure.
+#' @return If normalize==FALSE: A numeric value representing the generalized R-squared measure.
+#' If normalize==TRUE: A list with components:
+#'   \item{R2}{The generalized R-squared coefficient for the set of terms}
+#'   \item{R2_n}{The normalized generalized R-squared coefficient}
+#'   \item{algorithm}{The algorithm used to compute the maximum R-squared}
+#'   \item{terms_tested}{The names of the terms included in the test}
+#'
 #'
 #' @details
 #' The generalized R-squared is computed as:
@@ -28,7 +47,20 @@
 #'
 #' This measures the proportion of the standardized residual sum of squares explained
 #' by the additional predictors in the full model.
-#' @author Livio Finos and Paolo Girardi
+#'
+#' The normalized generalized R-squared is computed as:
+#' \deqn{
+#' R^2_n = \frac{R^2}{R^2_{\max}}
+#' }
+#' where \eqn{R^2_{\max}} is the maximum possible R-squared value for the specified
+#' set of terms.
+#'
+#' Different algorithms are used based on sample size:
+#' \itemize{
+#'   \item For small samples (\eqn{n \leq n_{\text{exact}}}), brute force search finds the exact maximum
+#'   \item For larger samples, a greedy multi-start algorithm finds approximate maximum
+#' }
+#'
 #' @examples
 #' set.seed(1)
 #' dt=data.frame(X=rnorm(20),
@@ -46,29 +78,103 @@
 #' # Compute for specific variables only
 #' (results <- gR2(mod,terms = c("X","Z")))
 #'
+#'
+#' set.seed(123)
+#' dt <- data.frame(X = rnorm(20),
+#'                  Z = factor(rep(LETTERS[1:3], length.out = 20)))
+#' dt$Y <- rbinom(n = 20, prob = plogis((dt$Z == "C") * 2), size = 1)
+#' mod <- glm(Y ~ Z + X, data = dt, family = binomial)
+#'
+#' # Compute generalized partial correlations for all variables
+#' (results <-  gR2(mod,normalize=TRUE))
+#' # equivalent to
+#' mod0=glm(Y~1,data=dt,family=binomial)
+#' (results <-  gR2(mod, mod0,normalize=TRUE))
+#'
+#' # Compute for specific variables only
+#' (results <-  gR2(mod,terms = c("X","Z"),normalize=TRUE))
+#' @author Livio Finos and Paolo Girardi
 #' @export
 
-gR2 <- function(full_glm, null_glm = NULL, terms = NULL) {
-  .socket_compute_gR2 <- function(terms,full_glm, null_glm = NULL){
-    temp=.prepare_for_gR2(full_glm,null_glm,terms)
-    terms=colnames(temp$X)
-    terms=gsub("\\(Intercept\\)","1",terms)
+gR2 <- function(full_glm, null_glm = NULL,
+                terms = NULL,
+                normalize = FALSE,
+                adjusted=FALSE,
+                algorithm = "auto",
+                algorithm.control = list(n_exact = 15,
+                                         thresholds = c(-.1, 0, .1),
+                                         n_random = 10,
+                                         max_iter = 1000,
+                                         topK = 10,
+                                         tol = 1e-12,
+                                         patience = 10)
+                ) {
+  if(normalize){
+    # Check if model is binomial
+        temp=.prepare_for_gR2(full_glm,null_glm,terms)
+  Z=model.matrix(temp$null_glm)
+  Y=temp$null_glm$y
+  X=temp$X
+  n=length(Y)
+  # Compute generalized R-squared
+  gR2=compute_gR2(temp$null_glm, X)
 
-    # Compute generalized R-squared
-    gR2=compute_gR2(temp$null_glm, temp$X)
-    data.frame(
-      terms = paste0("~ ",paste(terms,collapse = " + ")),
-      gR2 = gR2,
-      null_model = deparse(temp$null_glm$formula),
-      stringsAsFactors = FALSE
+    # Extract control parameters with defaults
+    control <- list(
+      n_exact = 15,
+      thresholds = c(-.1, 0, .1),
+      n_random = 10,
+      max_iter = 1000,
+      topK = 10,
+      tol = 1e-12,
+      patience = 10
     )
-  }
+    control[names(algorithm.control)] <- algorithm.control
+
 
     if(length(terms)>1){
-   temp=lapply(terms,.socket_compute_gR2,full_glm, null_glm)
+      temp=lapply(terms,.socket_compute_gR2_n,full_glm, null_glm,algorithm=algorithm,control=control)
+      return(do.call(rbind,temp))
+    } else
+      return(.socket_compute_gR2_n(terms,full_glm, null_glm,algorithm=algorithm,control=control))
+
+
+    # call=as.list(    match.call())
+    # #call[[1]]
+    # call[[1]]=as.call("gR2_normalized_binom")
+    # call$normalize=NULL
+    # eval(call,parent.frame())
+    #     browser()
+    # match.call()
+    # return(do.call(gR2_normalized_binom,))
+  } else
+    if(length(terms)>1){
+   temp=lapply(terms,.socket_compute_gR2,full_glm, null_glm,adjusted=adjusted)
    return(do.call(rbind,temp))
   } else
-  return(.socket_compute_gR2(terms,full_glm, null_glm))
+  return(.socket_compute_gR2(terms,full_glm, null_glm,adjusted=adjusted))
+}
+
+.socket_compute_gR2 <- function(terms,full_glm, null_glm = NULL,adjusted){
+  temp=.prepare_for_gR2(full_glm,null_glm,terms)
+  terms=colnames(temp$X)
+  terms=gsub("\\(Intercept\\)","1",terms)
+
+  # Compute generalized R-squared
+  gR2=compute_gR2(temp$null_glm, temp$X)
+  p_plus_q=ncol(model.matrix(full_glm))
+  p=length(terms)
+  q=p_plus_q-p
+  if(adjusted)
+    adjusted=1-(1-gR2)*(n-q)/(n-p_plus_q)
+  else
+    adjusted=NULL
+  data.frame(
+    terms = paste0("~ ",paste(terms,collapse = " + ")),
+    gR2 = gR2,
+    null_model = deparse(temp$null_glm$formula),
+    stringsAsFactors = FALSE
+  )
 }
 
 
