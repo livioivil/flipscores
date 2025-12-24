@@ -8,7 +8,16 @@ null model.
 ## Usage
 
 ``` r
-gR2(full_glm, null_glm = NULL, terms = NULL)
+gR2(
+  full_glm,
+  null_glm = NULL,
+  terms = NULL,
+  normalize = FALSE,
+  adjusted = FALSE,
+  algorithm = "auto",
+  algorithm.control = list(n_exact = 15, thresholds = c(-0.1, 0, 0.1), n_random = 10,
+    max_iter = 1000, topK = 10, tol = 1e-12, patience = 10)
+)
 ```
 
 ## Arguments
@@ -30,9 +39,58 @@ gR2(full_glm, null_glm = NULL, terms = NULL)
   this overrides \`null_glm\` and the null model is refitted excluding
   these terms.
 
+- normalize:
+
+  FALSE by default.
+
+- algorithm:
+
+  \`"auto"\` by default. It chooses between \`"brute_force"\` and
+  \`"multi_start"\`
+
+- algorithm.control:
+
+  \`list\` of control parameters:
+
+  - \`n_exact\` Integer specifying the sample size threshold for using
+    exact methods (brute force). Default is 15.
+
+  - \`thresholds\` Numeric vector of threshold values for multi-start
+    initialization.
+
+  - \`n_random\` Integer number of random starts for multi-start
+    optimization.
+
+  - \`max_iter\` Integer maximum number of iterations per start.
+
+  - \`topK\` Integer number of top candidates to consider at each
+    iteration.
+
+  - \`tol\` Numeric tolerance for convergence.
+
+  - \`patience\` Integer number of iterations without improvement before
+    stopping.
+
 ## Value
 
-A numeric value representing the generalized R-squared measure.
+If normalize==FALSE: A numeric value representing the generalized
+R-squared measure. If normalize==TRUE: A list with components:
+
+- R2:
+
+  The generalized R-squared coefficient for the set of terms
+
+- R2_n:
+
+  The normalized generalized R-squared coefficient
+
+- algorithm:
+
+  The algorithm used to compute the maximum R-squared
+
+- terms_tested:
+
+  The names of the terms included in the test
 
 ## Details
 
@@ -55,6 +113,18 @@ where:
 
 This measures the proportion of the standardized residual sum of squares
 explained by the additional predictors in the full model.
+
+The normalized generalized R-squared is computed as: \$\$ R^2_n =
+\frac{R^2}{R^2\_{\max}} \$\$ where \\R^2\_{\max}\\ is the maximum
+possible R-squared value for the specified set of terms.
+
+Different algorithms are used based on sample size:
+
+- For small samples (\\n \leq n\_{\text{exact}}\\), brute force search
+  finds the exact maximum
+
+- For larger samples, a greedy multi-start algorithm finds approximate
+  maximum
 
 ## Author
 
@@ -104,4 +174,25 @@ mod0=glm(Y~1,data=dt,family="poisson")
 # Compute for specific variables only
 (results <- gR2(mod,terms = c("X","Z")))
 #> Error in model.frame.default(formula = Y ~ Z, data = dt, drop.unused.levels = TRUE): 'data' must be a data.frame, environment, or list
+
+
+set.seed(123)
+dt <- data.frame(X = rnorm(20),
+                 Z = factor(rep(LETTERS[1:3], length.out = 20)))
+dt$Y <- rbinom(n = 20, prob = plogis((dt$Z == "C") * 2), size = 1)
+mod <- glm(Y ~ Z + X, data = dt, family = binomial)
+
+# Compute generalized partial correlations for all variables
+(results <-  gR2(mod,normalize=TRUE))
+#>           terms       gR2     gR2_n   algorithm exact null_model
+#> 1 ~ ZB + ZC + X 0.6553299 0.6553299 multi_start  TRUE      Y ~ 1
+# equivalent to
+mod0=glm(Y~1,data=dt,family=binomial)
+(results <-  gR2(mod, mod0,normalize=TRUE))
+#>           terms       gR2     gR2_n   algorithm exact null_model
+#> 1 ~ ZB + ZC + X 0.6553299 0.6553299 multi_start  TRUE      Y ~ 1
+
+# Compute for specific variables only
+(results <-  gR2(mod,terms = c("X","Z"),normalize=TRUE))
+#> Error in model.frame.default(formula = Y ~ 1 - 1, data = dt, drop.unused.levels = TRUE): 'data' must be a data.frame, environment, or list
 ```

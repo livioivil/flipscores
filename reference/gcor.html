@@ -45,7 +45,15 @@ between the residualized predictor and standardized residuals.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">gcor</span><span class="op">(</span><span class="va">full_glm</span>, terms <span class="op">=</span> <span class="cn">NULL</span>, intercept_too <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">gcor</span><span class="op">(</span></span>
+<span>  <span class="va">full_glm</span>,</span>
+<span>  terms <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  normalize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  intercept_too <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  algorithm <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  algorithm.control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>n_exact <span class="op">=</span> <span class="fl">15</span>, thresholds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.1</span>, <span class="fl">0</span>, <span class="fl">0.1</span><span class="op">)</span>, n_random <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>    max_iter <span class="op">=</span> <span class="fl">1000</span>, topK <span class="op">=</span> <span class="fl">10</span>, tol <span class="op">=</span> <span class="fl">1e-12</span>, patience <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -62,15 +70,59 @@ model.matrix, that is pay attention for factors) for which to compute
 generalized partial correlations. If `NULL` (default), computes for all
 non-intercept terms in the model.</p></dd>
 
+
+<dt id="arg-normalize">normalize<a class="anchor" aria-label="anchor" href="#arg-normalize"></a></dt>
+<dd><p>FALSE by default.</p></dd>
+
+
+<dt id="arg-intercept-too">intercept_too<a class="anchor" aria-label="anchor" href="#arg-intercept-too"></a></dt>
+<dd><p>Logical indicating whether to include the intercept
+as a variable. Default is FALSE.</p></dd>
+
+
+<dt id="arg-algorithm-control">algorithm.control<a class="anchor" aria-label="anchor" href="#arg-algorithm-control"></a></dt>
+<dd><p>Only used if <code>normalize</code> is <code>TRUE</code>. `list` of control parameters:
+`n_exact` Integer specifying the sample size threshold for using exact
+  methods (brute force). Default is 15.
+`thresholds` Numeric vector of threshold values for multi-start initialization.
+`n_random` Integer number of random starts for multi-start optimization.
+`max_iter` Integer maximum number of iterations per start.
+`topK` Integer number of top candidates to consider at each iteration.
+`tol` Numeric tolerance for convergence.
+`patience` Integer number of iterations without improvement before stopping.</p></dd>
+
+
+<dt id="arg-algorith">algorith<a class="anchor" aria-label="anchor" href="#arg-algorith"></a></dt>
+<dd><p>Only used if <code>normalize</code> is <code>TRUE</code>. `"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data frame with two columns:</p>
+    <p>if <code>normalize</code> is <code>FALSE</code>, a data frame with five columns:</p>
 <dl><dt>variable</dt>
 <dd><p>The variable name</p></dd>
 
   <dt>r</dt>
 <dd><p>The generalized partial correlation coefficient</p></dd>
+
+</dl><p>while if <code>normalize</code> is <code>TRUE</code></p>
+<dl><dt>terms</dt>
+<dd><p>The variable name</p></dd>
+
+  <dt>r</dt>
+<dd><p>The generalized partial correlation coefficient</p></dd>
+
+  <dt>r_n</dt>
+<dd><p>The normalized generalized partial correlation coefficient</p></dd>
+
+  <dt>null_model</dt>
+<dd><p>The null model used to compute the generalized (partial) correlation</p></dd>
+
+  <dt>algorithm</dt>
+<dd><p>The algorithm used to compute the upper/lower bounds of the generalized partial correlation coefficient (to compute its normalized version)</p></dd>
+
+  <dt>exact</dt>
+<dd><p>logical</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -87,6 +139,24 @@ It is defined as the cosine similarity between the residualized predictor
 <li><p>\(V\) is the variance matrix and \(D\) is the derivative matrix</p></li>
 </ul><p>The function uses `flipscores:::get_par_expo_fam()` to compute \(V\) and \(D\)
 consistently with the flipscores package methodology.</p>
+<p>The normalized generalized partial correlation is computed as:
+$$
+r_n = \begin{cases}
++r / r_+ &amp; \text{if } r &gt; 0 \\
+-r / r_- &amp; \text{if } r &lt; 0
+\end{cases}
+$$
+where \(r_+\) is the maximum possible correlation and \(r_-\) is the minimum.</p>
+<p>When the (full) model has only intercept and only one predictor X, the
+generalized (non partial) correlation is computed and the normalization factor
+for X is exact.
+In the more general case with more predictors, for sample sizes \(n \leq n_{\text{exact}}\), brute force search is used to find
+the exact extrema. For larger sample sizes, a greedy multi-start algorithm is employed:</p><ul><li><p>Multiple starting points are generated using thresholding and random sampling</p></li>
+<li><p>From each start, coordinates are greedily flipped to improve the correlation</p></li>
+<li><p>Early stopping is used when no improvements are found for several iterations</p></li>
+<li><p>The best solution across all starts is returned</p></li>
+</ul><p>This approach provides a good trade-off between computational efficiency and solution
+quality for large problems where brute force is infeasible.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -108,10 +178,10 @@ consistently with the flipscores package methodology.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) -0.14256 -0.91360    2.62144 -0.34851    -0.127    0.741   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -0.18558 -0.50868    1.65785 -0.30683    -0.108    0.653   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZC           1.40981  8.55380    2.58950  3.30326     0.765    0.003 **</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X           -0.06964 -1.56935    4.70999 -0.33320    -0.117    0.675   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) -0.14256 -0.91360    2.62144 -0.34851    -0.127    0.720   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -0.18558 -0.50868    1.65785 -0.30683    -0.108    0.684   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC           1.40981  8.55380    2.58950  3.30326     0.765    0.005 **</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X           -0.06964 -1.56935    4.70999 -0.33320    -0.117    0.674   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -130,42 +200,60 @@ consistently with the flipscores package methodology.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1   ~ZB -0.1080979    ~1+ZC+X</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2   ~ZC  0.7651942    ~1+ZB+X</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3    ~X -0.1174534   ~1+ZB+ZC</span>
-<span class="r-in"><span><span class="co"># equivalent to</span></span></span>
-<span class="r-in"><span><span class="va">mod0</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">Y</span><span class="op">~</span><span class="fl">1</span>,data<span class="op">=</span><span class="va">dt</span>,family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">(</span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">gcor</span><span class="op">(</span><span class="va">mod</span>, <span class="va">mod0</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in gcor(mod, mod0):</span> terms not found in model: c(`(Intercept)` = 0.470003629247622), c(`1` = 0.249999999997642, `2` = -0.375000000001179, `3` = 1.49999999999528, `4` = -0.375000000001179, `5` = -0.375000000001179, `6` = 1.49999999999528, `7` = -1, `8` = -0.375000000001179, `9` = 1.49999999999528, `10` = -0.375000000001179, `11` = -0.375000000001179, `12` = 2.1249999999941, `13` = -0.375000000001179, `14` = -1, `15` = -0.375000000001179, `16` = -1, `17` = -1, `18` = 0.874999999996462, `19` = -0.375000000001179, `20` = -0.375000000001179), c(`1` = 1.60000000000302, `2` = 1.60000000000302, `3` = 1.60000000000302, `4` = 1.60000000000302, `5` = 1.60000000000302, `6` = 1.60000000000302, `7` = 1.60000000000302, `8` = 1.60000000000302, `9` = 1.60000000000302, `10` = 1.60000000000302, `11` = 1.60000000000302, `12` = 1.60000000000302, `13` = 1.60000000000302, `14` = 1.60000000000302, `15` = 1.60000000000302, `16` = 1.60000000000302, `17` = 1.60000000000302, `18` = 1.60000000000302, `19` = 1.60000000000302, `20` = 1.60000000000302), c(`(Intercept)` = -2.6587446098628, -0.53212985828345, 1.8395760831688, -0.53212985828345, -0.53212985828345, 1.8395760831688, -1.3226985054342, -0.53212985828345, 1.8395760831688, -0.53212985828345, -0.53212985828345, 2.63014473031955, -0.53212985828345, -1.3226985054342, -0.53212985828345, -1.3226985054342, -1.3226985054342, 1.04900743601805, -0.53212985828345, -0.53212985828345), -5.6568597440809, 1, list(qr = c(-5.6568597440809, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979, 0.223606797749979), rank = 1, qraux = 1.22360679774998, pivot = 1, tol = 1e-11), list(family = "poisson", link = "log", linkfun = function (mu) </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> log(mu), linkinv = function (eta) </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> pmax(exp(eta), .Machine$double.eps), variance = function (mu) </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> mu, dev.resids = function (y, mu, wt) </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> {</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>     r &lt;- mu * wt</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>     p &lt;- which(y &gt; 0)</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>     r[p] &lt;- (wt * (y * log(y/mu) - (y - mu)))[p]</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>     2 * r</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> }, aic = function (y, n, mu, wt, dev) </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> -2 * sum(dpois(y, mu, log = TRUE) * wt), mu.eta = function (eta) </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> pmax(exp(eta), .Machine$double.eps), initialize = expression({</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>     if (any(y &lt; 0)) </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>         stop("negative values not allowed for the 'Poisson' family")</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>     n &lt;- rep.int(1, nobs)</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>     mustart &lt;- y + 0.1</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> }), validmu = function (mu) </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> all(is.finite(mu)) &amp;&amp; all(mu &gt; 0), valideta = function (eta) </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> TRUE, simulate = function (object, nsim) </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> {</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>     wts &lt;- object$prior.weights</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>     if (any(wts != 1)) </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>         warning("ignoring prior weights")</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>     ftd &lt;- fitted(object)</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>     rpois(nsim * length(ftd), ftd)</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> }, dispersion = 1), c(`1` = 0.470003629247622, `2` = 0.470003629247622, `3` = 0.470003629247622, `4` = 0.470003629247622, `5` = 0.470003629247622, `6` = 0.470003629247622, `7` = 0.470003629247622, `8` = 0.470003629247622, `9` = 0.470003629247622, `10` = 0.470003629247622, `11` = 0.470003629247622, `12` = 0.470003629247622, `13` = 0.470003629247622, `14` = 0.470003629247622, `15` = 0.470003629247622, `16` = 0.470003629247622, `17` = 0.470003629247622, `18` = 0.470003629247622, `19` = 0.470003629247622, `20` = 0.470003629247622</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> ), 28.6494739737397, 69.5328874955007, 5, c(`1` = 1.60000310821015, `2` = 1.60000310821015, `3` = 1.60000310821015, `4` = 1.60000310821015, `5` = 1.60000310821015, `6` = 1.60000310821015, `7` = 1.60000310821015, `8` = 1.60000310821015, `9` = 1.60000310821015, `10` = 1.60000310821015, `11` = 1.60000310821015, `12` = 1.60000310821015, `13` = 1.60000310821015, `14` = 1.60000310821015, `15` = 1.60000310821015, `16` = 1.60000310821015, `17` = 1.60000310821015, `18` = 1.60000310821015, `19` = 1.60000310821015, `20` = 1.60000310821015), c(`1` = 1, `2` = 1, `3` = 1, `4` = 1, `5` = 1, `6` = 1, `7` = 1, `8` = 1, `9` = 1, `10` = 1, `11` = 1, `12` = 1, `13` = 1, `14` = 1, `15` = 1, `16` = 1, `17` = 1, `18` = 1, `19` = 1, `20` = 1), 19, c(`1` = 2, `2` = 1, `3` = 4, `4` = 1, `5` = 1, `6` = 4, `7` = 0, `8` = 1, `9` = 4, `10` = 1, `11` = 1, `12` = 5, `13` = 1, `14` = 0, `15` = 1, `16` = 0, `17` = 0, `18` = 3, `19` = 1, `20` = 1), TRUE, FALSE, list(Y = c(2, 1, 4, 1, 1, 4, 0, 1, 4, 1, 1, 5, 1, 0, 1, 0, 0, 3, 1, 1)), glm(formula = Y ~ 1, family = "poisson", data = dt), Y ~ 1, Y ~ 1, list(X = c(-0.626453810742332, 0.183643324222082, -0.835628612410047, 1.59528080213779, 0.329507771815361, -0.820468384118015, 0.487429052428485, 0.738324705129217, 0.575781351653492, -0.305388387156356, 1.51178116845085, 0.389843236411431, -0.621240580541804, -2.2146998871775, 1.12493091814311, -0.0449336090152309, -0.0161902630989461, 0.943836210685299, 0.821221195098089, 0.593901321217509), Z = c(1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2), Y = c(2, 1, 4, 1, 1, 4, 0, 1, 4, 1, 1, </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> 5, 1, 0, 1, 0, 0, 3, 1, 1)), NULL, list(epsilon = 1e-08, maxit = 25, trace = FALSE), glm.fit</span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Compute for specific terms only</span></span></span>
 <span class="r-in"><span><span class="fu">gcor</span><span class="op">(</span><span class="va">mod</span>, terms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="st">"ZC"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   terms       gcor null_model</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1    ~X -0.1174534   ~1+ZB+ZC</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2   ~ZC  0.7651942    ~1+ZB+X</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">gcor</span><span class="op">(</span><span class="va">mod</span>, terms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="st">"ZC"</span><span class="op">)</span>,normalize<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>when normalize==TRUE, model must be from binomial family</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>when normalize==TRUE, model must be from binomial family</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    terms          r        r_n null_model   algorithm is.exact</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X     ~X -0.1174534 -0.1174534   ~1+ZB+ZC from theory     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC   ~ZC  0.7651942  0.7651942    ~1+ZB+X from theory     TRUE</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dt</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>X<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   Z<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>,length.out<span class="op">=</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dt</span><span class="op">$</span><span class="va">Y</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">20</span>,prob<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="op">(</span><span class="va">dt</span><span class="op">$</span><span class="va">Z</span><span class="op">==</span><span class="st">"C"</span><span class="op">)</span><span class="op">*</span><span class="fl">2</span><span class="op">)</span>,size<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mod</span><span class="op">=</span><span class="fu"><a href="flipscores.html">flipscores</a></span><span class="op">(</span><span class="va">Y</span><span class="op">~</span><span class="va">Z</span><span class="op">+</span><span class="va">X</span>,data<span class="op">=</span><span class="va">dt</span>,family<span class="op">=</span><span class="st">"binomial"</span>,n_flips<span class="op">=</span><span class="fl">1000</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flipscores(formula = Y ~ Z + X, family = "binomial", data = dt, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     n_flips = 1000)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.902  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.069 .</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC           20.8561   1.8043     0.8180   2.2057     0.615    0.030 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.754  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Dispersion parameter for binomial family taken to be 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Null deviance: 27.5256  on 19  degrees of freedom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance:  9.4015  on 16  degrees of freedom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AIC: 17.401</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Number of Fisher Scoring iterations: 19</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">gcor</span><span class="op">(</span><span class="va">mod</span>,normalize<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    terms          r        r_n null_model   algorithm is.exact</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZB   ~ZB -0.5295718 -0.5304792    ~1+ZC+X multi_start    FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC   ~ZC  0.6146304  0.6148542    ~1+ZB+X multi_start    FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X     ~X -0.1493213 -0.1849399   ~1+ZB+ZC multi_start    FALSE</span>
+<span class="r-in"><span><span class="co"># Compute for specific terms only</span></span></span>
+<span class="r-in"><span><span class="fu">gcor</span><span class="op">(</span><span class="va">mod</span>, terms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="st">"ZC"</span><span class="op">)</span>,normalize<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    terms          r        r_n null_model   algorithm is.exact</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X     ~X -0.1493213 -0.1891066   ~1+ZB+ZC multi_start    FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC   ~ZC  0.6146304  0.6148542    ~1+ZB+X multi_start    FALSE</span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

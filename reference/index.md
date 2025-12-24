@@ -5,8 +5,14 @@
 - [`anova(`*`<flipscores>`*`)`](https://livioivil.github.io/flipscores/reference/anova.flipscores.md)
   : anova.flipscores
 
+- [`compute_gcor_normalized_binom()`](https://livioivil.github.io/flipscores/reference/compute_gcor_normalized_binom.md)
+  : Normalized Generalized Partial Correlation for Binomial GLMs
+
 - [`compute_scores()`](https://livioivil.github.io/flipscores/reference/compute_scores.md)
   : compute_scores
+
+- [`.socket_compute_gR2_n()`](https://livioivil.github.io/flipscores/reference/dot-socket_compute_gR2_n.md)
+  : Normalized Generalized R-squared for Binomial GLMs
 
 - [`print(`*`<flipscores>`*`)`](https://livioivil.github.io/flipscores/reference/flipscores-method.md)
   [`summary(`*`<flipscores>`*`)`](https://livioivil.github.io/flipscores/reference/flipscores-method.md)
@@ -18,14 +24,8 @@
 - [`gR2()`](https://livioivil.github.io/flipscores/reference/gR2.md) :
   Generalized R-squared for GLM Models
 
-- [`gR2_normalized_binom()`](https://livioivil.github.io/flipscores/reference/gR2_normalized_binom.md)
-  : Normalized Generalized R-squared for Binomial GLMs
-
 - [`gcor()`](https://livioivil.github.io/flipscores/reference/gcor.md) :
   Compute Generalized Partial Correlations for GLM terms
-
-- [`gcor_normalized_binom()`](https://livioivil.github.io/flipscores/reference/gcor_normalized_binom.md)
-  : Normalized Generalized Partial Correlation for Binomial GLMs
 
 - [`make_flips()`](https://livioivil.github.io/flipscores/reference/make_flips.md)
   :
