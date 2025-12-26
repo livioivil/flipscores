@@ -5,22 +5,22 @@
 
 compute_delta_r_vec <- function(Y, mu, V_d, X_r) {
   # This function computes the approximate change in r from flipping each coordinate of Y
-  
+
   # For each i = 1, ..., n:
   # 1. Let Y^{(i)} be Y with the i-th coordinate flipped
   # 2. Compute the change in standardized residual:
   #    ΔY_{r,i} = (1 - 2Y_i) / sqrt(V_{d,i})
   # 3. Approximate the change in r:
   #    δ_i = X_{r,i} · ΔY_{r,i}
-  
+
   n <- length(Y)
   delta <- numeric(n)
-  
+
   for (i in 1:n) {
     delta_Y <- (1 - 2 * Y[i]) / sqrt(V_d[i])
     delta[i] <- X_r[i] * delta_Y
   }
-  
+
   return(delta)
 }
 
@@ -62,10 +62,10 @@ greedy_optimize_r <- function(Y_start=NULL, Z, X,link="logit",sign_mult = 1,
   iter <- 0
   no_improve <- 0
   improved <- TRUE
-  
-  fit_curr <- compute_r_and_info(Y, Z, X,link=link) 
+
+  fit_curr <- compute_r_and_info(Y, Z, X,link=link)
   r_curr <- fit_curr$r
-  
+
   while (iter < max_iter && no_improve < patience) {
     iter <- iter + 1
 #    if (verbose)
@@ -88,7 +88,7 @@ greedy_optimize_r <- function(Y_start=NULL, Z, X,link="logit",sign_mult = 1,
       #  if (verbose)
       #    cat(sprintf("\nIter %d: flipped %d, r = %.8f;", iter, i, r_new))
         break
-        
+
       }
     }
     if (!improved) no_improve <- no_improve + 1
@@ -98,7 +98,7 @@ greedy_optimize_r <- function(Y_start=NULL, Z, X,link="logit",sign_mult = 1,
   list(Y = Y, r = final_r, iterations = iter)
 }
 
-multi_start_r <- function(Z, X, Y_user = NULL, 
+multi_start_r <- function(Z, X, Y_user = NULL,
                           link="logit",
                             thresholds = c(-.1,0,.1),
                             n_random = 10,
@@ -183,13 +183,13 @@ exact_threshold_search_intercept_only <- function(X) {
   Xr <- as.numeric(X - mean(X))
   normXr <- sqrt(sum(Xr^2))
   if (normXr == 0) stop("X is constant after centering: no information")
-  
+
   # sort Xr descending and remember original indices
   ord <- order(Xr, decreasing = TRUE)
   Xr_sorted <- Xr[ord]
   # cumulative sums of sorted Xr
   csum <- cumsum(Xr_sorted[-n])  # csum[k] = sum of top-k Xr
-  
+
   # Prepare formula for r_k for each k=1..n-1
   # We derived (after algebra): ||Y_r|| = sqrt(n) and
   # X_r^T Y_r = (1/sqrt(p(1-p))) * csum[k] where p=k/n
@@ -199,18 +199,18 @@ exact_threshold_search_intercept_only <- function(X) {
   pks <- ks / n
   denom_k <- sqrt(pks * (1 - pks)) * normXr * sqrt(n)  # >0
   r_k <- csum / denom_k
-  
+
   # For min, look at negative direction: we can either take bottom-k or simply look for min r_k
   # if (mode == "max_r") { always look for the max
     best_k_idx <- which.max(r_k)
     best_r <- r_k[best_k_idx]
-    best_k <- ks[best_k_idx]
+    #best_k <- ks[best_k_idx]
     # construct best Y: ones at top-k positions (in original order)
-    Y_sorted_best <- integer(n)
-    Y_sorted_best[1:best_k] <- 1
-    Y_best <- integer(n)
-    Y_best[ord] <- Y_sorted_best
-    best_R2 <- best_r^2
+    #Y_sorted_best <- integer(n)
+    #Y_sorted_best[1:best_k] <- 1
+    #Y_best <- integer(n)
+    #Y_best[ord] <- Y_sorted_best
+    #best_R2 <- best_r^2
   # } else if (mode == "min_r") {
   #   # min r could be achieved by taking bottom-k large negative Xr values.
   #   # Instead compute r for reversed order (same formula)
@@ -240,7 +240,7 @@ exact_threshold_search_intercept_only <- function(X) {
   #   Y_best[ord] <- Y_sorted_best
   #   best_R2 <- best_r^2
   # }
-  
+
   return(as.numeric(best_r))
   # list(Y = Y_best, r = as.numeric(best_r), R2 = as.numeric(best_R2), k = as.integer(best_k))
 }

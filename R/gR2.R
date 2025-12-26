@@ -11,7 +11,7 @@
 #'   the additional terms in the full model compared to the null. If provided,
 #'   this overrides `null_glm` and the null model is refitted excluding these terms.
 #' @param normalize FALSE by default.
-#' @param algorithm `"auto"` by default. It chooses between `"brute_force"` and `"multi_start"`
+#' @param algorith `"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`
 #' @param algorithm.control `list` of control parameters:
 #'   \itemize{
 #'     \item `n_exact` Integer specifying the sample size threshold for using exact
@@ -93,6 +93,13 @@
 #'
 #' # Compute for specific variables only
 #' (results <-  gR2(mod,terms = c("X","Z"),normalize=TRUE))
+#'
+#' mod <- glm(Y ~ X, data = dt, family = binomial)
+#'
+#' # Compute generalized partial correlations for all variables
+#' (results <-  gR2(mod,normalize=TRUE))
+#' (results <-  gR2(mod,normalize=TRUE,algorithm="intercept_only"))
+#' (results <-  gR2(mod,normalize=TRUE,algorithm="multi_start"))
 #' @author Livio Finos and Paolo Girardi
 #' @export
 
@@ -103,9 +110,9 @@ gR2 <- function(full_glm, null_glm = NULL,
                 algorithm = "auto",
                 algorithm.control = list(n_exact = 15,
                                          thresholds = c(-.1, 0, .1),
-                                         n_random = 10,
+                                         n_random = max(1,13+log(1/nrow(model.matrix(full_glm)))),
                                          max_iter = 1000,
-                                         topK = 10,
+                                         topK = max(10,min(100,length(nrow(model.matrix(full_glm)))/10)),
                                          tol = 1e-12,
                                          patience = 10)
                 ) {

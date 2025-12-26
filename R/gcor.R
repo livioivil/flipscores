@@ -118,9 +118,14 @@ gcor <- function(full_glm, terms = NULL,
                  normalize=FALSE,
                  intercept_too=FALSE,
                  algorithm = "auto",
-                 algorithm.control=list(n_exact = 15, thresholds = c(-.1, 0, .1),
-                                        n_random = 10, max_iter = 1000, topK = 10,
-                                        tol = 1e-12, patience = 10)
+                 algorithm.control=list(n_exact = 15,
+                                        thresholds = c(-.1, 0, .1),
+                                        n_random = max(1,13+log(1/nrow(model.matrix(full_glm)))),
+                                        max_iter = 1000,
+                                        topK = max(10,min(100,length(nrow(model.matrix(full_glm)))/10)),
+                                        tol = 1e-12,
+                                        patience = 10)
+
                  ) {
   # Extract model components
   Y <- full_glm$y

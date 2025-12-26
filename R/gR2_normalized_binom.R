@@ -104,7 +104,7 @@
   gR2=compute_gR2(temp$null_glm, X)
 
   if (full_glm$family$family != "binomial") {
-    warning("When normalize==TRUE, Model must be from binomial family")
+    #warning("When normalize==TRUE, Model must be from binomial family")
     data.frame(
       terms = paste0("~ ",paste(colnames(temp$X),collapse = " + ")),
       gR2 = gR2,
@@ -118,6 +118,9 @@
 
     # Determine algorithm to use
     if (algorithm == "auto") {
+      # Check if null model has intercept only
+      intercept_only <- (ncol(Z) == 1) && (length(unique(Z))==1)
+      algorithm_used="intercept_only"
       if (n <= control$n_exact) {
         algorithm_used <- "brute_force"
       } else {
@@ -133,6 +136,12 @@
         warning("Brute force with n > 20 may be computationally expensive")
       }
       max_result <- bruteforce_R2(Z, X)
+      gR2_max <- max_result$R2
+    } else if (algorithm_used == "brute_force") {
+      if (n > 20) {
+        warning("Brute force with n > 20 may be computationally expensive")
+      }
+      max_result <- exact_threshold_search_intercept_only(as.numeric(X))
       gR2_max <- max_result$R2
     } else {
       algorithm=="multi_start"
@@ -160,7 +169,7 @@
       gR2 = gR2,
       gR2_n = gR2_n,
       algorithm = algorithm_used,
-      exact=ifelse(algorithm=="multi_start",FALSE,TRUE),
+      exact=ifelse(algorithm_used=="multi_start",FALSE,TRUE),
       null_model = deparse(temp$null_glm$formula),
       stringsAsFactors = FALSE
     )

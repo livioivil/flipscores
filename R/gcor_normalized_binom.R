@@ -134,7 +134,7 @@ compute_gcor_normalized_binom <- function(model0, X,
   r=compute_gcor(model0, X)
   # Check if model is binomial
   if (model0$family$family != "binomial") {
-    warning("when normalize==TRUE, model must be from binomial family")
+    #warning("when normalize==TRUE, model must be from binomial family")
     out=data.frame(r=r,r_n=r,algorithm="from theory",
                    is.exact=TRUE)
     return(out)
@@ -183,6 +183,6 @@ compute_gcor_normalized_binom <- function(model0, X,
   }
 
   out=data.frame(r=r,r_n=normalized_r,algorithm=algorithm,
-                 is.exact=ifelse(algorithm=="multi_start",FALSE,TRUE))
+                 is.exact=algorithm!="multi_start")
   return(out)
 }
