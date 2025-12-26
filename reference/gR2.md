@@ -185,12 +185,12 @@ mod <- glm(Y ~ Z + X, data = dt, family = binomial)
 # Compute generalized partial correlations for all variables
 (results <-  gR2(mod,normalize=TRUE))
 #>           terms       gR2     gR2_n   algorithm exact null_model
-#> 1 ~ ZB + ZC + X 0.6553299 0.6553299 multi_start  TRUE      Y ~ 1
+#> 1 ~ ZB + ZC + X 0.6553299 0.6553299 multi_start FALSE      Y ~ 1
 # equivalent to
 mod0=glm(Y~1,data=dt,family=binomial)
 (results <-  gR2(mod, mod0,normalize=TRUE))
 #>           terms       gR2     gR2_n   algorithm exact null_model
-#> 1 ~ ZB + ZC + X 0.6553299 0.6553299 multi_start  TRUE      Y ~ 1
+#> 1 ~ ZB + ZC + X 0.6553299 0.6553299 multi_start FALSE      Y ~ 1
 
 # Compute for specific variables only
 (results <-  gR2(mod,terms = c("X","Z"),normalize=TRUE))

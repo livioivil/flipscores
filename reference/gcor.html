@@ -178,10 +178,10 @@ quality for large problems where brute force is infeasible.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) -0.14256 -0.91360    2.62144 -0.34851    -0.127    0.720   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -0.18558 -0.50868    1.65785 -0.30683    -0.108    0.684   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZC           1.40981  8.55380    2.58950  3.30326     0.765    0.005 **</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X           -0.06964 -1.56935    4.70999 -0.33320    -0.117    0.674   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) -0.14256 -0.91360    2.62144 -0.34851    -0.127    0.742   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -0.18558 -0.50868    1.65785 -0.30683    -0.108    0.670   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC           1.40981  8.55380    2.58950  3.30326     0.765    0.004 **</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X           -0.06964 -1.56935    4.70999 -0.33320    -0.117    0.673   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -208,8 +208,6 @@ quality for large problems where brute force is infeasible.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2   ~ZC  0.7651942    ~1+ZB+X</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">gcor</span><span class="op">(</span><span class="va">mod</span>, terms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="st">"ZC"</span><span class="op">)</span>,normalize<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>when normalize==TRUE, model must be from binomial family</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>when normalize==TRUE, model must be from binomial family</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    terms          r        r_n null_model   algorithm is.exact</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> X     ~X -0.1174534 -0.1174534   ~1+ZB+ZC from theory     TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ZC   ~ZC  0.7651942  0.7651942    ~1+ZB+X from theory     TRUE</span>
@@ -227,10 +225,10 @@ quality for large problems where brute force is infeasible.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.902  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.069 .</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZC           20.8561   1.8043     0.8180   2.2057     0.615    0.030 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.754  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.888  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.076 .</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC           20.8561   1.8043     0.8180   2.2057     0.615    0.023 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.732  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -247,7 +245,7 @@ quality for large problems where brute force is infeasible.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    terms          r        r_n null_model   algorithm is.exact</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ZB   ~ZB -0.5295718 -0.5304792    ~1+ZC+X multi_start    FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ZC   ~ZC  0.6146304  0.6148542    ~1+ZB+X multi_start    FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X     ~X -0.1493213 -0.1849399   ~1+ZB+ZC multi_start    FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X     ~X -0.1493213 -0.1891066   ~1+ZB+ZC multi_start    FALSE</span>
 <span class="r-in"><span><span class="co"># Compute for specific terms only</span></span></span>
 <span class="r-in"><span><span class="fu">gcor</span><span class="op">(</span><span class="va">mod</span>, terms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="st">"ZC"</span><span class="op">)</span>,normalize<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    terms          r        r_n null_model   algorithm is.exact</span>
