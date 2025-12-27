@@ -72,8 +72,9 @@
 #' # Compute generalized partial correlations for all variables
 #' (results <- gR2(mod))
 #' # equivalent to
-#' mod0=glm(Y~1,data=dt,family="poisson")
+#' mod0=glm(Y~0,data=dt,family="poisson")
 #' (results <- gR2(mod, mod0))
+#' (results <- gR2(mod, mod0,normalize=TRUE))
 #'
 #' # Compute for specific variables only
 #' (results <- gR2(mod,terms = c("X","Z")))

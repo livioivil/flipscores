@@ -1,9 +1,9 @@
 #' @title Methods for flipscores objects
 #'
-#' @description Methods for \code{flipscores} objects. 
+#' @description Methods for \code{flipscores} objects.
 #' The following are methods to extract and manipulate relevant information from
 #' a \code{flipscores} object.
-#' 
+#'
 #' @name flipscores-method
 #' @docType methods
 
@@ -54,7 +54,7 @@ summary.flipscores <- function (object, ...) {
   sum_model$coefficients[names(object$p.values),6]=object$p.values
   # sum_model$coefficients=sum_model$coefficients[,c(1,4)]
   colnames(sum_model$coefficients)[c(2,4,5,6)]=c("Score","z value","Part. Cor","Pr(>|z|)")
-  
+
   sum_model$aliased=rep(FALSE,length(sum_model$aliased))
   structure(sum_model, heading = get_head_flip_out(object), class = c("data.frame"))
   sum_model
@@ -63,16 +63,36 @@ summary.flipscores <- function (object, ...) {
 
 ###########
 get_head_flip_out <- function(x){
-  if(is.null(dim(x$n_flips))) 
+  if(is.null(dim(x$n_flips)))
     n_flips=x$n_flips else
       n_flips=nrow(x$n_flips)
   if(length(grep("Negative Binomial",x$family$family))==0)
-  {paste("Flip Score Test: 
+  {paste("Flip Score Test:
          score_type =",x$score_type,
          ", n_flips =",n_flips,"\n")}
-  else 
-    paste("Flip Score Test: 
+  else
+    paste("Flip Score Test:
           score_type =",x$score_type,
           ", n_flips =",n_flips,
           ", theta =",round(x$theta,digits=5),"\n")
+}
+
+.intercept_in_Z_and_count_family <- function(mod){
+  has_intercept=TRUE
+  # check if family is count data
+  if(mod$family$family%in% c("poisson", "quasipoisson", "Negative Binomial"))
+    {
+    Z=model.matrix(mod)
+    if(ncol(Z)==0) {
+      has_intercept=FALSE
+      } else {
+        P=Z%*%solve(t(Z)%*%Z)%*%t(Z)
+        ones=matrix(1,nrow(Z),1)
+        has_intercept=!(sum(abs(P%*%ones-ones))>1E-10)
+      }
+    if(!has_intercept) { #if intercept is the space spanned by Z
+    warning("The Normalized Generalized Partial Correlation (Determination) Coefficient for Count families without interncept in the null model has not implemented, yet. NA will be returned.")
+    }
+  }
+  has_intercept
 }

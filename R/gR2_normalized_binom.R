@@ -105,16 +105,18 @@
 
   if (full_glm$family$family != "binomial") {
     #warning("When normalize==TRUE, Model must be from binomial family")
+
+    has_NO_intercept=!.intercept_in_Z_and_count_family(temp$null_glm)
     data.frame(
       terms = paste0("~ ",paste(colnames(temp$X),collapse = " + ")),
       gR2 = gR2,
-      gR2_n = gR2,
-      algorithm = "from theory",
-      exact=TRUE,
+      gR2_n = ifelse(has_NO_intercept,NA,gR2),
+      algorithm = ifelse(has_NO_intercept,NA,"from theory"),
+      exact=ifelse(has_NO_intercept,NA,TRUE),
       null_model = deparse(temp$null_glm$formula),
       stringsAsFactors = FALSE
     )
-  } else {
+  } else { #is binomial family
 
     # Determine algorithm to use
     if (algorithm == "auto") {
