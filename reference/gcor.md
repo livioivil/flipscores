@@ -169,10 +169,10 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)   
-#> (Intercept) -0.14256 -0.91360    2.62144 -0.34851    -0.127    0.742   
-#> ZB          -0.18558 -0.50868    1.65785 -0.30683    -0.108    0.670   
+#> (Intercept) -0.14256 -0.91360    2.62144 -0.34851    -0.127    0.736   
+#> ZB          -0.18558 -0.50868    1.65785 -0.30683    -0.108    0.667   
 #> ZC           1.40981  8.55380    2.58950  3.30326     0.765    0.004 **
-#> X           -0.06964 -1.56935    4.70999 -0.33320    -0.117    0.673   
+#> X           -0.06964 -1.56935    4.70999 -0.33320    -0.117    0.652   
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
@@ -199,9 +199,7 @@ gcor(mod, terms = c("X", "ZC"))
 #> 2   ~ZC  0.7651942    ~1+ZB+X
 
 gcor(mod, terms = c("X", "ZC"),normalize=TRUE)
-#>    terms          r        r_n null_model   algorithm is.exact
-#> X     ~X -0.1174534 -0.1174534   ~1+ZB+ZC from theory     TRUE
-#> ZC   ~ZC  0.7651942  0.7651942    ~1+ZB+X from theory     TRUE
+#> Error in compute_gcor_normalized_binom(model0 = model_i, X = mm[, i_id,     drop = FALSE], algorithm = algorithm, algorithm.control = algorithm.control): object 'temp' not found
 
 set.seed(123)
 dt=data.frame(X=rnorm(20),
@@ -216,10 +214,10 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)  
-#> (Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.888  
-#> ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.076 .
-#> ZC           20.8561   1.8043     0.8180   2.2057     0.615    0.023 *
-#> X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.732  
+#> (Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.894  
+#> ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.071 .
+#> ZC           20.8561   1.8043     0.8180   2.2057     0.615    0.031 *
+#> X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.773  
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
