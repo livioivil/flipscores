@@ -11,8 +11,9 @@ gR2(
   normalize = FALSE,
   adjusted = FALSE,
   algorithm = "auto",
-  algorithm.control = list(n_exact = 15, thresholds = c(-0.1, 0, 0.1), n_random = 10,
-    max_iter = 1000, topK = 10, tol = 1e-12, patience = 10)
+  algorithm.control = list(n_exact = 15, thresholds = c(-0.1, 0, 0.1), n_random = max(1,
+    13 + log(1/nrow(model.matrix(full_glm)))), max_iter = 1000, topK = max(10, min(100,
+    length(nrow(model.matrix(full_glm)))/10)), tol = 1e-12, patience = 10)
 )
 }
 \arguments{
@@ -27,8 +28,6 @@ this overrides `null_glm` and the null model is refitted excluding these terms.}
 
 \item{normalize}{FALSE by default.}
 
-\item{algorithm}{`"auto"` by default. It chooses between `"brute_force"` and `"multi_start"`}
-
 \item{algorithm.control}{`list` of control parameters:
 \itemize{
   \item `n_exact` Integer specifying the sample size threshold for using exact
@@ -40,6 +39,8 @@ this overrides `null_glm` and the null model is refitted excluding these terms.}
   \item `tol` Numeric tolerance for convergence.
   \item `patience` Integer number of iterations without improvement before stopping.
 }}
+
+\item{algorith}{`"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`}
 }
 \value{
 If normalize==FALSE: A numeric value representing the generalized R-squared measure.
@@ -94,10 +95,12 @@ summary(mod)
 # Compute generalized partial correlations for all variables
 (results <- gR2(mod))
 # equivalent to
-mod0=glm(Y~1,data=dt,family="poisson")
+mod0=glm(Y~0,data=dt,family="poisson")
 (results <- gR2(mod, mod0))
+(results <- gR2(mod, mod0,normalize=TRUE))
 
 # Compute for specific variables only
+(results <- gR2(mod,terms = c("X","Z")))
 (results <- gR2(mod,terms = c("X","Z")))
 
 
@@ -115,6 +118,17 @@ mod0=glm(Y~1,data=dt,family=binomial)
 
 # Compute for specific variables only
 (results <-  gR2(mod,terms = c("X","Z"),normalize=TRUE))
+
+
+# Compute generalized (non partial!) correlations for all variables
+mod <- glm(Y ~ X, data = dt, family = binomial)
+(results <-  gR2(mod,normalize=TRUE))
+# note the difference:
+(results <-  gR2(mod,normalize=TRUE,algorithm="intercept_only"))
+# Despite the result is the same in this case,
+# the multi_start algorithm does not ensure exactness (while intercept_only and brute_force do)
+(results <-  gR2(mod,normalize=TRUE,algorithm="multi_start"))
+
 }
 \author{
 Livio Finos and Paolo Girardi

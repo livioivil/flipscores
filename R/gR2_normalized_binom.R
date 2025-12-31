@@ -148,6 +148,7 @@
     } else {
       algorithm=="multi_start"
       max_result <- multi_start_R2(Z, X, Y_user = Y,
+                                   link=full_glm$family$link,
                                    thresholds = control$thresholds,
                                    n_random = control$n_random,
                                    max_iter = control$max_iter,

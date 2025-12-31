@@ -78,6 +78,7 @@
 #'
 #' # Compute for specific variables only
 #' (results <- gR2(mod,terms = c("X","Z")))
+#' (results <- gR2(mod,terms = c("X","Z")))
 #'
 #'
 #' set.seed(123)
@@ -95,12 +96,16 @@
 #' # Compute for specific variables only
 #' (results <-  gR2(mod,terms = c("X","Z"),normalize=TRUE))
 #'
-#' mod <- glm(Y ~ X, data = dt, family = binomial)
 #'
-#' # Compute generalized partial correlations for all variables
+#' # Compute generalized (non partial!) correlations for all variables
+#' mod <- glm(Y ~ X, data = dt, family = binomial)
 #' (results <-  gR2(mod,normalize=TRUE))
+#' # note the difference:
 #' (results <-  gR2(mod,normalize=TRUE,algorithm="intercept_only"))
+#' # Despite the result is the same in this case,
+#' # the multi_start algorithm does not ensure exactness (while intercept_only and brute_force do)
 #' (results <-  gR2(mod,normalize=TRUE,algorithm="multi_start"))
+#'
 #' @author Livio Finos and Paolo Girardi
 #' @export
 
@@ -125,7 +130,7 @@ gR2 <- function(full_glm, null_glm = NULL,
   X=temp$X
   n=length(Y)
   # Compute generalized R-squared
-  gR2=compute_gR2(temp$null_glm, X)
+#  gR2=compute_gR2(temp$null_glm, X)
 
     # Extract control parameters with defaults
     control <- list(

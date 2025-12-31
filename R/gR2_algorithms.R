@@ -2,28 +2,28 @@
 # Greedy multi-start algorithm for max R^2 with early stopping
 # Brute force and umbrella function included
 # Requires: helpers.R and a user-provided fit_null_glm()
+#
+# compute_R2 <- function(Y, Z, X) {
+#   info <- fit_null_glm(Y, Z, X)
+#   mu <- info$mu; Vd <- info$V_diag; Xr <- as.matrix(info$X_r)
+#   Yr <- (Y - mu) / sqrt(Vd)
+#   # P <- .get_H(Xr)
+#   # num <- as.numeric(t(Yr) %*% P %*% Yr)
+#   if(is.null(ncol(Xr))||(length(Xr)==0)){
+#     rho2 <- as.numeric(sum(.nrmz(Yr)*.nrmz(Xr))^2)
+#     return(rho2)
+#   } else {
+#     den <- sum(Yr^2)
+#     if (den <= 0) return(0)
+#     semiP <- svd(Xr,nv=0)$u
+#     num <- as.numeric(sum((t(Yr) %*% semiP)^2))
+#     return(num / den)
+#   }
+# }
+#
 
-compute_R2 <- function(Y, Z, X) {
-  info <- fit_null_glm(Y, Z, X)
-  mu <- info$mu; Vd <- info$V_diag; Xr <- as.matrix(info$X_r)
-  Yr <- (Y - mu) / sqrt(Vd)
-  # P <- .get_H(Xr)
-  # num <- as.numeric(t(Yr) %*% P %*% Yr)
-  if(is.null(ncol(Xr))||(length(Xr)==0)){
-    rho2 <- as.numeric(sum(.nrmz(Yr)*.nrmz(Xr))^2)
-    return(rho2)
-  } else {
-    den <- sum(Yr^2)
-    if (den <= 0) return(0)
-    semiP <- svd(Xr,nv=0)$u
-    num <- as.numeric(sum((t(Yr) %*% semiP)^2))
-    return(num / den)
-  }
-}
-
-
-compute_R2_and_info <- function(Y, Z, X) {
-  info <- fit_null_glm(Y, Z, X)
+compute_R2_and_info <- function(Y, Z, X,link) {
+  info <- fit_null_glm(Y, Z, X,link=link)
   mu <- info$mu; Vd <- info$V_diag; Xr <- as.matrix(info$X_r)
   Yr <- (Y - mu) / sqrt(Vd)
   Yr <- .nrmz(Yr)
@@ -52,16 +52,16 @@ compute_R2_norefit <- function(Y,info) {
   }
 }
 
-greedy_optimize_R2 <- function(Y_start, Z, X, max_iter = 1000,
+greedy_optimize_R2 <- function(Y_start, Z, X, link, max_iter = 1000,
                                topK = 5, tol = 1e-12, patience = 10,
                                verbose = TRUE) {
   Y <- as.integer(Y_start)
   n <- length(Y)
   iter <- 0
   no_improve <- 0
-  fit_curr <- compute_R2_and_info(Y, Z, X) 
+  fit_curr <- compute_R2_and_info(Y, Z, X,link=link)
   R2_curr <- fit_curr$R2
-    
+
   while (iter < max_iter && no_improve < patience) {
     iter <- iter + 1
     if (verbose)
@@ -78,7 +78,7 @@ greedy_optimize_R2 <- function(Y_start, Z, X, max_iter = 1000,
     for (i in best_idx) {
       if (gains[i] <= tol) break
       Yt <- Y; Yt[i] <- 1 - Yt[i]
-      fit_last <- compute_R2_and_info(Yt, Z, X)
+      fit_last <- compute_R2_and_info(Yt, Z, X,link=link)
       R2_new <- fit_last$R2
       if (R2_new > R2_curr + tol) {
         Y <- Yt
@@ -97,6 +97,7 @@ greedy_optimize_R2 <- function(Y_start, Z, X, max_iter = 1000,
 }
 
 multi_start_R2 <- function(Z, X, Y_user = NULL,
+                           link="logit",
                            thresholds = c(-.1,0,.1),
                            n_random = 10,
                            max_iter = 100,
@@ -107,14 +108,22 @@ multi_start_R2 <- function(Z, X, Y_user = NULL,
   n <- nrow(Z)
   inits <- list()
   if (!is.null(Y_user)) inits[["user"]] <- as.integer(Y_user)
-  for (tau in thresholds) inits[[paste0("thr", tau)]] <- threshold_init_Y_Xmat(Z, X, tau)
+
+  Xr <- .get_IH(Z) %*% X
+  if(length(X)==1) v1=.nrmz(Xr) else{
+    eigP <- svd(Xr,nv = 0)
+    v1 <- eigP$u
+    coefs=.nrmz(rnorm(ncol(v1)))
+    v1 <- v1%*%coefs
+  }
+  for (tau in thresholds) inits[[paste0("thr", tau)]] <-   as.integer(v1 >= tau)
   for (r in 1:n_random) inits[[paste0("rand", r)]] <- rbinom(n, 1, 0.5)
 
   best <- list(R2 = -Inf, Y = NULL)
   for (nm in names(inits)) {
     if (verbose)
       cat("\n evaluating", nm, "\n")
-    res <- greedy_optimize_R2(inits[[nm]], Z, X,
+    res <- greedy_optimize_R2(inits[[nm]], Z, X,link=link,
                               max_iter = max_iter, topK = topK,
                               tol = tol, patience = patience,
                               verbose = verbose)

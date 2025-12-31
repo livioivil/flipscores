@@ -19,7 +19,7 @@
 \item{object}{a flipscores object}
 }
 \description{
-Methods for \code{flipscores} objects. 
+Methods for \code{flipscores} objects.
 The following are methods to extract and manipulate relevant information from
 a \code{flipscores} object.
 }

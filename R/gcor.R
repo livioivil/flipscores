@@ -96,6 +96,8 @@
 #'
 #' gcor(mod, terms = c("X", "ZC"),normalize=TRUE)
 #'
+#'
+#' gcor(mod, intercept_too=TRUE, normalize=TRUE)
 #' set.seed(123)
 #' dt=data.frame(X=rnorm(20),
 #'    Z=factor(rep(LETTERS[1:3],length.out=20)))
@@ -178,6 +180,9 @@ gcor <- function(full_glm, terms = NULL,
 
 
     all_vars= c(null_frml,all_vars)
+
+    if("(Intercept)"%in%all_vars)
+      all_vars=all_vars["(Intercept)"!=all_vars]
 
     results <- data.frame(
       terms = paste0("~",terms),

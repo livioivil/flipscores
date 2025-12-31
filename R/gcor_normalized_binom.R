@@ -134,14 +134,13 @@ compute_gcor_normalized_binom <- function(model0, X,
   r=compute_gcor(model0, X)
   # Check if model is binomial
   if (model0$family$family != "binomial") {
-    #warning("when normalize==TRUE, model must be from binomial family")
 
-    r_n_is_NA=.intercept_in_Z_and_count_family(temp$null_glm)
+    has_NO_intercept=!.intercept_in_Z_and_count_family(model0)
 
     out=data.frame(r=r,
-                   r_n=ifelse(r_n_is_NA,NA,r),
-                   algorithm=ifelse(r_n_is_NA,NA,"from theory"),
-                   is.exact=ifelse(r_n_is_NA,NA,TRUE),
+                   r_n=ifelse(has_NO_intercept,NA,r),
+                   algorithm=ifelse(has_NO_intercept,NA,"from theory"),
+                   is.exact=ifelse(has_NO_intercept,NA,TRUE),
                    stringsAsFactors = FALSE)
     return(out)
   }

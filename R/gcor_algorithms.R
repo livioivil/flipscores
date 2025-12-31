@@ -153,7 +153,7 @@ bruteforce_r <- function(Z, X, link="logit", mode = "max") {
   best_Y <- NULL
   for (num in 0:(2^n - 1)) {
     Y <- as.integer(intToBits(num)[1:n])
-    info <- fit_null_glm(Y, Z, X)
+    info <- fit_null_glm(Y, Z, X,link=link)
     val <- compute_r(Y, info$mu, info$V_diag, as.numeric(info$X_r))
     if ((mode == "max" && val > best_val) || (mode == "min" && val < best_val)) {
       best_val <- val
