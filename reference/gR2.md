@@ -15,8 +15,9 @@ gR2(
   normalize = FALSE,
   adjusted = FALSE,
   algorithm = "auto",
-  algorithm.control = list(n_exact = 15, thresholds = c(-0.1, 0, 0.1), n_random = 10,
-    max_iter = 1000, topK = 10, tol = 1e-12, patience = 10)
+  algorithm.control = list(n_exact = 15, thresholds = c(-0.1, 0, 0.1), n_random = max(1,
+    13 + log(1/nrow(model.matrix(full_glm)))), max_iter = 1000, topK = max(10, min(100,
+    length(nrow(model.matrix(full_glm)))/10)), tol = 1e-12, patience = 10)
 )
 ```
 
@@ -43,11 +44,6 @@ gR2(
 
   FALSE by default.
 
-- algorithm:
-
-  \`"auto"\` by default. It chooses between \`"brute_force"\` and
-  \`"multi_start"\`
-
 - algorithm.control:
 
   \`list\` of control parameters:
@@ -70,6 +66,11 @@ gR2(
 
   - \`patience\` Integer number of iterations without improvement before
     stopping.
+
+- algorith:
+
+  \`"auto"\` by default. It choose between \`"intercept_only"\`,
+  \`"brute_force"\` and \`"multi_start"\`
 
 ## Value
 
@@ -166,12 +167,18 @@ summary(mod)
 #>           terms       gR2 null_model
 #> 1 ~ ZB + ZC + X 0.6957557      Y ~ 1
 # equivalent to
-mod0=glm(Y~1,data=dt,family="poisson")
+mod0=glm(Y~0,data=dt,family="poisson")
 (results <- gR2(mod, mod0))
-#>           terms       gR2 null_model
-#> 1 ~ ZB + ZC + X 0.6957557      Y ~ 1
+#>               terms       gR2 null_model
+#> 1 ~ 1 + ZB + ZC + X 0.7378818      Y ~ 0
+(results <- gR2(mod, mod0,normalize=TRUE))
+#> Warning: The Normalized Generalized Partial Correlation (Determination) Coefficient for Count families without interncept in the null model has not implemented, yet. NA will be returned.
+#>                         terms       gR2 gR2_n algorithm exact null_model
+#> 1 ~ (Intercept) + ZB + ZC + X 0.7378818    NA        NA    NA      Y ~ 0
 
 # Compute for specific variables only
+(results <- gR2(mod,terms = c("X","Z")))
+#> Error in model.frame.default(formula = Y ~ Z, data = dt, drop.unused.levels = TRUE): 'data' must be a data.frame, environment, or list
 (results <- gR2(mod,terms = c("X","Z")))
 #> Error in model.frame.default(formula = Y ~ Z, data = dt, drop.unused.levels = TRUE): 'data' must be a data.frame, environment, or list
 
@@ -195,4 +202,20 @@ mod0=glm(Y~1,data=dt,family=binomial)
 # Compute for specific variables only
 (results <-  gR2(mod,terms = c("X","Z"),normalize=TRUE))
 #> Error in model.frame.default(formula = Y ~ 1 - 1, data = dt, drop.unused.levels = TRUE): 'data' must be a data.frame, environment, or list
+
+
+# Compute generalized (non partial!) correlations for all variables
+mod <- glm(Y ~ X, data = dt, family = binomial)
+(results <-  gR2(mod,normalize=TRUE))
+#>   terms          gR2        gR2_n   algorithm exact null_model
+#> 1   ~ X 0.0004224238 0.0006806998 multi_start FALSE      Y ~ 1
+# note the difference:
+(results <-  gR2(mod,normalize=TRUE,algorithm="intercept_only"))
+#>   terms          gR2        gR2_n      algorithm exact null_model
+#> 1   ~ X 0.0004224238 0.0006806998 intercept_only  TRUE      Y ~ 1
+# Despite the result is the same in this case,
+# the multi_start algorithm does not ensure exactness (while intercept_only and brute_force do)
+(results <-  gR2(mod,normalize=TRUE,algorithm="multi_start"))
+#>   terms          gR2        gR2_n   algorithm exact null_model
+#> 1   ~ X 0.0004224238 0.0006806998 multi_start FALSE      Y ~ 1
 ```
