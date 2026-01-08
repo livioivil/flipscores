@@ -170,11 +170,11 @@ summary(mod)
 mod0=glm(Y~0,data=dt,family="poisson")
 (results <- gR2(mod, mod0))
 #>               terms       gR2 null_model
-#> 1 ~ 1 + ZB + ZC + X 0.7378818      Y ~ 0
+#> 1 ~ 1 + ZB + ZC + X 0.5333333      Y ~ 0
 (results <- gR2(mod, mod0,normalize=TRUE))
 #> Warning: The Normalized Generalized Partial Correlation (Determination) Coefficient for Count families without interncept in the null model has not implemented, yet. NA will be returned.
 #>                         terms       gR2 gR2_n algorithm exact null_model
-#> 1 ~ (Intercept) + ZB + ZC + X 0.7378818    NA        NA    NA      Y ~ 0
+#> 1 ~ (Intercept) + ZB + ZC + X 0.5333333    NA        NA    NA      Y ~ 0
 
 # Compute for specific variables only
 (results <- gR2(mod,terms = c("X","Z")))

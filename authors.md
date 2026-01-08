@@ -13,14 +13,14 @@
 
 ## Citation
 
-Finos L (2025). *flipscores: Robust Score Testing in GLMs, by Sign-Flip
+Finos L (2026). *flipscores: Robust Score Testing in GLMs, by Sign-Flip
 Contributions*. R package version 1.3.2,
 <https://livioivil.github.io/flipscores/>.
 
     @Manual{,
       title = {flipscores: Robust Score Testing in GLMs, by Sign-Flip Contributions},
       author = {Livio Finos},
-      year = {2025},
+      year = {2026},
       note = {R package version 1.3.2},
       url = {https://livioivil.github.io/flipscores/},
     }
