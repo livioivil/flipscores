@@ -173,11 +173,11 @@ set of terms.</p>
 <span class="r-in"><span><span class="va">mod0</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">Y</span><span class="op">~</span><span class="fl">0</span>,data<span class="op">=</span><span class="va">dt</span>,family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">gR2</span><span class="op">(</span><span class="va">mod</span>, <span class="va">mod0</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               terms       gR2 null_model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 ~ 1 + ZB + ZC + X 0.5333333      Y ~ 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 ~ 1 + ZB + ZC + X 0.8580193      Y ~ 0</span>
 <span class="r-in"><span><span class="op">(</span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">gR2</span><span class="op">(</span><span class="va">mod</span>, <span class="va">mod0</span>,normalize<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>The Normalized Generalized Partial Correlation (Determination) Coefficient for Count families without interncept in the null model has not implemented, yet. NA will be returned.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                         terms       gR2 gR2_n algorithm exact null_model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 ~ (Intercept) + ZB + ZC + X 0.5333333    NA        NA    NA      Y ~ 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 ~ (Intercept) + ZB + ZC + X 0.8580193    NA        NA    NA      Y ~ 0</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Compute for specific variables only</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">gR2</span><span class="op">(</span><span class="va">mod</span>,terms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X"</span>,<span class="st">"Z"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
