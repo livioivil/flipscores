@@ -314,7 +314,7 @@ compute_gcor <- function(model0, X, compute_gR2=FALSE,...){
   if(ncol(Z)==0){
     IHY <- matrix(model0$y)
     IHY <- matrix(IHY)/sqrt(sum(IHY^2))
-    IHX = rep(1,nrow(IHY))
+    IHX = X
     IHY = .nrmz(IHY)
   } else { # at least one covariate
     ##  EFFECTIVE SCORE
