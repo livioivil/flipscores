@@ -349,66 +349,70 @@ check_model_compatibility <- function(full_glm, null_glm) {
 #' @param null_glm Null GLM model
 #' @return Generalized R-squared value
 #' @noRd
-compute_gR2 <- function(null_glm,X) {
-  # Extract components from both models
-  Y <- null_glm$y
-  Z <- model.matrix(null_glm)
-  family <- null_glm$family
+# compute_gR2 <- function(null_glm,X) {
+#   # Extract components from both models
+#   Y <- null_glm$y
+#   Z <- model.matrix(null_glm)
+#   family <- null_glm$family
+#
+#
+#   # Remove any NA/NaN values
+#   valid_idx <- complete.cases(Y, Z,X)
+#   Z <- Z[valid_idx, , drop = FALSE]
+#   X <- X[valid_idx, , drop = FALSE]
+#   Y <- Y[valid_idx]
+#
+#
+#   # Get null model fitted values and components
+#   mu_null <- fitted(null_glm)
+#
+#   # Use flipscores internal function to get V and D under null model
+#   par_list <- get_par_expo_fam(null_glm)
+#   V <- par_list$V
+#   D <- par_list$D
+#
+#   # Compute weights without creating diagonal matrices
+#   w_sqrt <- D / V^.5  # Vector of square roots
+#
+#   # Standardized residual vector from null model
+#   Y_r <- (Y - mu_null) / sqrt(V)
+#
+#   # Weighted design matrices using element-wise multiplication
+#   if (ncol(Z) == 0) {
+#     IH <- diag(length(Y))
+#   } else {
+#     Z_weighted <- Z * w_sqrt  # Equivalent to diag(w_sqrt) %*% Z
+#     IH <- .get_IH(Z_weighted)
+#   }
+#
+#   # Residualized additional predictors matrix
+#   X_weighted <- X * w_sqrt  # Equivalent to diag(w_sqrt) %*% X
+#   X_r <- IH %*% X_weighted
+#
+#
+#   # Compute generalized R-squared using the correct formula
+#   if (length(Y_r) == 0 || nrow(X_r) == 0) {
+#     return(NA)
+#   }
+#
+#   # gR^2 = Y_r^T X_r (X_r^T X_r)^{-1} X_r^T Y_r / (Y_r^T Y_r)
+#   # YtX <- t(Y_r_clean) %*% X_r_clean
+#   X_r <- IH%*%X
+#   XtX <- t(X_r)%*%X_r
+#   # XtY <- t(X_r_clean) %*% Y_r_clean
+#   YtY <- t(Y_r) %*% Y_r
+#
+#   # Handle case where XtX is singular
+#   if (rcond(XtX) < .Machine$double.eps) {
+#     warning("Design matrix of additional terms is singular. Generalized R-squared may be unreliable.")
+#   }
+#
+#   gR2 <- as.numeric(t(Y_r) %*% X_r  %*% solve(XtX) %*% t(X_r) %*% Y_r / (YtY))
+#
+#   return(gR2)
+#
+# }
 
-
-  # Remove any NA/NaN values
-  valid_idx <- complete.cases(Y, Z,X)
-  Z <- Z[valid_idx, , drop = FALSE]
-  X <- X[valid_idx, , drop = FALSE]
-  Y <- Y[valid_idx]
-
-
-  # Get null model fitted values and components
-  mu_null <- fitted(null_glm)
-
-  # Use flipscores internal function to get V and D under null model
-  par_list <- get_par_expo_fam(null_glm)
-  V <- par_list$V
-  D <- par_list$D
-
-  # Compute weights without creating diagonal matrices
-  w_sqrt <- D / V^.5  # Vector of square roots
-
-  # Standardized residual vector from null model
-  Y_r <- (Y - mu_null) / sqrt(V)
-
-  # Weighted design matrices using element-wise multiplication
-  if (ncol(Z) == 0) {
-    IH <- diag(length(Y))
-  } else {
-    Z_weighted <- Z * w_sqrt  # Equivalent to diag(w_sqrt) %*% Z
-    IH <- .get_IH(Z_weighted)
-  }
-
-  # Residualized additional predictors matrix
-  X_weighted <- X * w_sqrt  # Equivalent to diag(w_sqrt) %*% X
-  X_r <- IH %*% X_weighted
-
-
-  # Compute generalized R-squared using the correct formula
-  if (length(Y_r) == 0 || nrow(X_r) == 0) {
-    return(NA)
-  }
-
-  # gR^2 = Y_r^T X_r (X_r^T X_r)^{-1} X_r^T Y_r / (Y_r^T Y_r)
-  # YtX <- t(Y_r_clean) %*% X_r_clean
-  X_r <- IH%*%X
-  XtX <- t(X_r)%*%X_r
-  # XtY <- t(X_r_clean) %*% Y_r_clean
-  YtY <- t(Y_r) %*% Y_r
-
-  # Handle case where XtX is singular
-  if (rcond(XtX) < .Machine$double.eps) {
-    warning("Design matrix of additional terms is singular. Generalized R-squared may be unreliable.")
-  }
-
-  gR2 <- as.numeric(t(Y_r) %*% X_r  %*% solve(XtX) %*% t(X_r) %*% Y_r / (YtY))
-
-  return(gR2)
-
+compute_gR2 <- function(null_glm,X,...){
+  compute_gcor(null_glm,X,compute_gR2=TRUE,...)
 }

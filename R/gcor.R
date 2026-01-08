@@ -299,22 +299,26 @@ gcor <- function(full_glm, terms = NULL,
 
 
 
-compute_gcor <- function(model0, X, ...){
+compute_gcor <- function(model0, X, compute_gR2=FALSE,...){
   X=get_X(model0,X)
   Z=model.matrix(model0)
+  if(is.null(model0$y)) Y=model0$model[,1] else
+    Y=model0$y
 
+  valid_idx <- complete.cases(Y, Z,X)
+  Z <- Z[valid_idx, , drop = FALSE]
+  X <- X[valid_idx, , drop = FALSE]
+  Y <- Y[valid_idx]
 
   # no terms in the null model
   if(ncol(Z)==0){
     IHY <- matrix(model0$y)
     IHY <- matrix(IHY)/sqrt(sum(IHY^2))
     IHX = rep(1,nrow(IHY))
-    IHX <- IHX/sqrt(nrow(IHX))
+    IHY = .nrmz(IHY)
   } else { # at least one covariate
-    if(is.null(model0$y)) model0$y=model0$model[,1]
-    Z=Z
     ##  EFFECTIVE SCORE
-    residuals=(model0$y-model0$fitted.values)
+    residuals=(Y-model0$fitted.values)
     if(is.null(model0$weights))  sqrtW=rep(1,length(residuals)) else sqrtW=(as.numeric(model0$weights)**0.5)
     if(is.null(list(...)$parms_DV))
       parms_DV<-flipscores:::get_par_expo_fam(model0) else parms_DV=list(...)$parms_DV
@@ -322,29 +326,28 @@ compute_gcor <- function(model0, X, ...){
     V_vect<-rep(parms_DV$V,length.out=length(residuals))
     # W = DV^−1D
     sqrtinvV_vect<-V_vect**(-0.5)
-    sqrtW=diag(D_vect*sqrtinvV_vect)
+    sqrtW=(D_vect*sqrtinvV_vect)
     residuals=sqrtinvV_vect*residuals
     IHY <- matrix(residuals)
-    IH=diag(nrow(IHY))-sqrtW%*%Z%*%solve(t(Z)%*%sqrtW^2%*%Z)%*%t(Z)%*%sqrtW
-    IHX <- t(t(X)%*%sqrtW%*%IH)
-    H=sqrtW%*%Z%*%solve(t(Z)%*%(sqrtW^2)%*%Z)%*%t(Z)%*%sqrtW
-    HsqrtinvV <- t(diag(sqrtinvV_vect)%*%H)
-    IHsqrtinvV <- t(diag(sqrtinvV_vect)%*%(diag(nrow(IHY))-H))
-    # ##  Alternativa
-    # IHY <- residuals*(sqrtinvV_vect)
-    # IHY <- matrix(IHY / sqrt(sum(IHY^2)))
-    # IH=diag(nrow(IHY))-sqrtW%*%Z%*%solve(t(Z)%*%diag(D_vect*V_vect^-1*D_vect)%*%Z)%*%t(Z)%*%sqrtW
-    # IHX <- t(t(X)%*%sqrtW%*%IH)
+    IHY=.nrmz(IHY)
+    Z_weighted <- Z * sqrtW  # Equivalent to diag(w_sqrt) %*% Z
+    IH <- .get_IH(Z_weighted)
+    IHX <- t(t(X*sqrtW)%*%IH)
 
   }
 
-  part_cor=as.vector(t(IHX)%*%IHY/ sqrt(sum(residuals^2)))
-  if(ncol(IHX)>1)
-    part_cor <-part_cor*(colSums(IHX^2)^-.5)
-  else
-    part_cor <-part_cor/sqrt(sum(IHX^2))
-  names(part_cor)=colnames(X)
-  return(part_cor)
+  if(compute_gR2){
+    gR2 <- as.numeric(t(IHY) %*% IHX  %*% solve(t(IHX)%*%IHX) %*% t(IHX) %*% IHY)
+    return(gR2)
+  } else {
+    part_cor=as.vector(t(IHX)%*%IHY)
+    if(ncol(IHX)>1)
+      part_cor <-part_cor*(colSums(IHX^2)^-.5)
+    else
+      part_cor <-part_cor/sqrt(sum(IHX^2))
+    names(part_cor)=colnames(X)
+    return(part_cor)
+  }
   # return(list(IHX=IHX, IHY=IHY,part_cor=part_cor,
   #             HsqrtinvV=HsqrtinvV,
   #             IHsqrtinvV=IHsqrtinvV,
