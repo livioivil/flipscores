@@ -1,0 +1,49 @@
+ITATION file for yourpackage
+## Place this file in inst/CITATION inside your package
+
+citHeader("Please cite both the package and the related articles:")
+
+# First article: https://doi.org/10.1111/rssb.12369
+bibentry(
+  bibtype = "Article",
+    title   = "Robust testing in generalized linear models by sign-flipping score contributions",
+      author  = c(
+          person("J.", "Hemerik"),
+	      person("J. J.", "Goeman"),
+	          person("L.", "Finos")
+		    ),
+		      journal = "Journal of the Royal Statistical Society: Series B (Statistical Methodology)",
+		        year    = "2020",
+			  volume  = "82",
+			    number  = "3",
+			      pages   = "841-864",
+			        doi     = "10.1111/rssb.12369"
+				)
+
+				# Second article: https://doi.org/10.1080/01621459.2025.2491775
+				bibentry(
+				  bibtype = "Article",
+				    title   = "Inference in Generalized Linear Models with Robustness to Misspecified Variances",
+				      author  = c(
+				          person("R.", "De Santis"),
+					      person("J. J.", "Goeman"),
+					          person("J.", "Hemerik"),
+						      person("S.", "Davenport"),
+						          person("L.", "Finos")
+							    ),
+							      journal = "Journal of the American Statistical Association",
+							        year    = "2025",
+								  volume  = "in press",
+								    pages   = "1-10",
+								      doi     = "10.1080/01621459.2025.2491775"
+								      )
+
+								      # Footer reminding to cite R and the package
+								      citFooter(
+								        paste(
+									    "Please also cite the R software and this package itself.",
+									        "You can obtain the package citation by running:",
+										    "citation('flipscores') in R."
+										      )
+										      )
+
