@@ -28,6 +28,8 @@ non-intercept terms in the model.}
 \item{intercept_too}{Logical indicating whether to include the intercept
 as a variable. Default is FALSE.}
 
+\item{algorithm}{Only used if \code{normalize} is \code{TRUE}. `"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`}
+
 \item{algorithm.control}{Only used if \code{normalize} is \code{TRUE}. `list` of control parameters:
 `n_exact` Integer specifying the sample size threshold for using exact
   methods (brute force). Default is 15.
@@ -37,8 +39,6 @@ as a variable. Default is FALSE.}
 `topK` Integer number of top candidates to consider at each iteration.
 `tol` Numeric tolerance for convergence.
 `patience` Integer number of iterations without improvement before stopping.}
-
-\item{algorith}{Only used if \code{normalize} is \code{TRUE}. `"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`}
 }
 \value{
 if \code{normalize} is \code{FALSE}, a data frame with five columns:

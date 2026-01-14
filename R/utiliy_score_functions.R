@@ -117,13 +117,13 @@ socket_compute_scores <- function(i,model,score_type,nobservations=NULL,parms_DV
   # model$call$formula=as.formula(frml)
   # model$call$formula=update( model$call$formula,formula(paste("~.",paste("-",colnames(model[["x"]])[i],collapse=""))))
   # frml=as.formula(paste(yname,"~0+."))
-  # if(!is.null(mod$offset)){
-  #   OFFSET___=mod$offset
-  #   model$call$formula=as.formula(paste(yname,"~0+.+offset(OFFSET___)"))
-  #   model$offset=NULL
-  # } else {
-     model$call$formula=as.formula(paste(yname,"~0+."))
-  #   }
+  if(!is.null(model$offset)) {
+    OFFSET___ = model$offset
+    model$call$formula = as.formula(paste(yname, "~0+.+offset(OFFSET___)"))
+    model$offset = NULL
+  } else {
+    model$call$formula = as.formula(paste(yname, "~0+."))
+  }
   # if(!is.null(model$offset)){
   #   offs<-model$offset
   #   model$call$formula=update( model$call$formula,formula(paste("~+offset(offs)")))

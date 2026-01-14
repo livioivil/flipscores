@@ -13,7 +13,7 @@
 #' @param normalize FALSE by default.
 #' @param intercept_too Logical indicating whether to include the intercept
 #'   as a variable. Default is FALSE.
-#' @param algorith Only used if \code{normalize} is \code{TRUE}. `"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`
+#' @param algorithm Only used if \code{normalize} is \code{TRUE}. `"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`
 #' @param algorithm.control Only used if \code{normalize} is \code{TRUE}. `list` of control parameters:
 #' `n_exact` Integer specifying the sample size threshold for using exact
 #'   methods (brute force). Default is 15.

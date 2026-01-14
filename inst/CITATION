@@ -1,4 +1,4 @@
-ITATION file for yourpackage
+# CITATION file for yourpackage
 ## Place this file in inst/CITATION inside your package
 
 citHeader("Please cite both the package and the related articles:")

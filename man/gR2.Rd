@@ -28,6 +28,8 @@ this overrides `null_glm` and the null model is refitted excluding these terms.}
 
 \item{normalize}{FALSE by default.}
 
+\item{algorithm}{`"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`}
+
 \item{algorithm.control}{`list` of control parameters:
 \itemize{
   \item `n_exact` Integer specifying the sample size threshold for using exact
@@ -39,8 +41,6 @@ this overrides `null_glm` and the null model is refitted excluding these terms.}
   \item `tol` Numeric tolerance for convergence.
   \item `patience` Integer number of iterations without improvement before stopping.
 }}
-
-\item{algorith}{`"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`}
 }
 \value{
 If normalize==FALSE: A numeric value representing the generalized R-squared measure.
