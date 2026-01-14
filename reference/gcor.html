@@ -81,6 +81,10 @@ non-intercept terms in the model.</p></dd>
 as a variable. Default is FALSE.</p></dd>
 
 
+<dt id="arg-algorithm">algorithm<a class="anchor" aria-label="anchor" href="#arg-algorithm"></a></dt>
+<dd><p>Only used if <code>normalize</code> is <code>TRUE</code>. `"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`</p></dd>
+
+
 <dt id="arg-algorithm-control">algorithm.control<a class="anchor" aria-label="anchor" href="#arg-algorithm-control"></a></dt>
 <dd><p>Only used if <code>normalize</code> is <code>TRUE</code>. `list` of control parameters:
 `n_exact` Integer specifying the sample size threshold for using exact
@@ -91,10 +95,6 @@ as a variable. Default is FALSE.</p></dd>
 `topK` Integer number of top candidates to consider at each iteration.
 `tol` Numeric tolerance for convergence.
 `patience` Integer number of iterations without improvement before stopping.</p></dd>
-
-
-<dt id="arg-algorith">algorith<a class="anchor" aria-label="anchor" href="#arg-algorith"></a></dt>
-<dd><p>Only used if <code>normalize</code> is <code>TRUE</code>. `"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -179,10 +179,10 @@ quality for large problems where brute force is infeasible.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) -0.14256 -0.91360    2.62144 -0.34851    -0.127    0.722   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -0.18558 -0.50868    1.65785 -0.30683    -0.108    0.665   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZC           1.40981  8.55380    2.58950  3.30326     0.765    0.006 **</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X           -0.06964 -1.56935    4.70999 -0.33320    -0.117    0.682   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) -0.14256 -0.91360    2.62144 -0.34851    -0.127    0.723   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -0.18558 -0.50868    1.65785 -0.30683    -0.108    0.664   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC           1.40981  8.55380    2.58950  3.30326     0.765    0.005 **</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X           -0.06964 -1.56935    4.70999 -0.33320    -0.117    0.644   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -234,10 +234,10 @@ quality for large problems where brute force is infeasible.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.911  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.065 .</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZC           20.8561   1.8043     0.8180   2.2057     0.615    0.039 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.754  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.893  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.060 .</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC           20.8561   1.8043     0.8180   2.2057     0.615    0.031 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.762  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>

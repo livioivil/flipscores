@@ -44,6 +44,11 @@ gR2(
 
   FALSE by default.
 
+- algorithm:
+
+  \`"auto"\` by default. It choose between \`"intercept_only"\`,
+  \`"brute_force"\` and \`"multi_start"\`
+
 - algorithm.control:
 
   \`list\` of control parameters:
@@ -66,11 +71,6 @@ gR2(
 
   - \`patience\` Integer number of iterations without improvement before
     stopping.
-
-- algorith:
-
-  \`"auto"\` by default. It choose between \`"intercept_only"\`,
-  \`"brute_force"\` and \`"multi_start"\`
 
 ## Value
 

@@ -43,6 +43,11 @@ gcor(
   Logical indicating whether to include the intercept as a variable.
   Default is FALSE.
 
+- algorithm:
+
+  Only used if `normalize` is `TRUE`. \`"auto"\` by default. It choose
+  between \`"intercept_only"\`, \`"brute_force"\` and \`"multi_start"\`
+
 - algorithm.control:
 
   Only used if `normalize` is `TRUE`. \`list\` of control parameters:
@@ -54,11 +59,6 @@ gcor(
   start. \`topK\` Integer number of top candidates to consider at each
   iteration. \`tol\` Numeric tolerance for convergence. \`patience\`
   Integer number of iterations without improvement before stopping.
-
-- algorith:
-
-  Only used if `normalize` is `TRUE`. \`"auto"\` by default. It choose
-  between \`"intercept_only"\`, \`"brute_force"\` and \`"multi_start"\`
 
 ## Value
 
@@ -170,10 +170,10 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)   
-#> (Intercept) -0.14256 -0.91360    2.62144 -0.34851    -0.127    0.722   
-#> ZB          -0.18558 -0.50868    1.65785 -0.30683    -0.108    0.665   
-#> ZC           1.40981  8.55380    2.58950  3.30326     0.765    0.006 **
-#> X           -0.06964 -1.56935    4.70999 -0.33320    -0.117    0.682   
+#> (Intercept) -0.14256 -0.91360    2.62144 -0.34851    -0.127    0.723   
+#> ZB          -0.18558 -0.50868    1.65785 -0.30683    -0.108    0.664   
+#> ZC           1.40981  8.55380    2.58950  3.30326     0.765    0.005 **
+#> X           -0.06964 -1.56935    4.70999 -0.33320    -0.117    0.644   
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
@@ -225,10 +225,10 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)  
-#> (Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.911  
-#> ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.065 .
-#> ZC           20.8561   1.8043     0.8180   2.2057     0.615    0.039 *
-#> X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.754  
+#> (Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.893  
+#> ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.060 .
+#> ZC           20.8561   1.8043     0.8180   2.2057     0.615    0.031 *
+#> X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.762  
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 

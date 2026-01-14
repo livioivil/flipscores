@@ -126,7 +126,7 @@ Livio Finos, Riccardo De Santis, Jesse Hemerik and Jelle Goeman
 set.seed(1)
 dt=data.frame(X=rnorm(20),
    Z=factor(rep(LETTERS[1:3],length.out=20)))
-dt$Y=rpois(n=20,lambda=exp(dt$Z=="C"))
+dt$Y=rpois(n=20,lambda=exp((dt$Z=="C") + 2*dt$X))
 mod=flipscores(Y~Z+X,data=dt,family="poisson",n_flips=1000)
 summary(mod)
 #> 
@@ -135,19 +135,19 @@ summary(mod)
 #>     n_flips = 1000)
 #> 
 #> Coefficients:
-#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)   
-#> (Intercept) -0.14256 -0.91360    2.62144 -0.34851    -0.127    0.725   
-#> ZB          -0.18558 -0.50868    1.65785 -0.30683    -0.108    0.674   
-#> ZC           1.40981  8.55380    2.58950  3.30326     0.765    0.006 **
-#> X           -0.06964 -1.56935    4.70999 -0.33320    -0.117    0.672   
+#>              Estimate     Score Std. Error   z value Part. Cor Pr(>|z|)   
+#> (Intercept)   0.04964   0.55830    3.32802   0.16776     0.064    0.797   
+#> ZB            0.20371   3.71436    4.27357   0.86915     0.326    0.168   
+#> ZC            0.87538  17.18530    4.43500   3.87493     0.856    0.002 **
+#> X             1.95754 109.81199    9.92393  11.06538     0.749    0.003 **
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
 #> (Dispersion parameter for poisson family taken to be 1)
 #> 
-#>     Null deviance: 28.649  on 19  degrees of freedom
-#> Residual deviance: 11.218  on 16  degrees of freedom
-#> AIC: 58.102
+#>     Null deviance: 187.2834  on 19  degrees of freedom
+#> Residual deviance:   7.4756  on 16  degrees of freedom
+#> AIC: 69.284
 #> 
 #> Number of Fisher Scoring iterations: 5
 #> 

@@ -129,7 +129,7 @@ See also its methods (<code>summary.flipscores</code>, <code>anova.flipscores</c
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dt</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>X<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   Z<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>,length.out<span class="op">=</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">dt</span><span class="op">$</span><span class="va">Y</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">20</span>,lambda<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">dt</span><span class="op">$</span><span class="va">Z</span><span class="op">==</span><span class="st">"C"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dt</span><span class="op">$</span><span class="va">Y</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">20</span>,lambda<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">(</span><span class="va">dt</span><span class="op">$</span><span class="va">Z</span><span class="op">==</span><span class="st">"C"</span><span class="op">)</span> <span class="op">+</span> <span class="fl">2</span><span class="op">*</span><span class="va">dt</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">mod</span><span class="op">=</span><span class="fu">flipscores</span><span class="op">(</span><span class="va">Y</span><span class="op">~</span><span class="va">Z</span><span class="op">+</span><span class="va">X</span>,data<span class="op">=</span><span class="va">dt</span>,family<span class="op">=</span><span class="st">"poisson"</span>,n_flips<span class="op">=</span><span class="fl">1000</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -138,19 +138,19 @@ See also its methods (<code>summary.flipscores</code>, <code>anova.flipscores</c
 <span class="r-out co"><span class="r-pr">#&gt;</span>     n_flips = 1000)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) -0.14256 -0.91360    2.62144 -0.34851    -0.127    0.725   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -0.18558 -0.50868    1.65785 -0.30683    -0.108    0.674   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZC           1.40981  8.55380    2.58950  3.30326     0.765    0.006 **</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X           -0.06964 -1.56935    4.70999 -0.33320    -0.117    0.672   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              Estimate     Score Std. Error   z value Part. Cor Pr(&gt;|z|)   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)   0.04964   0.55830    3.32802   0.16776     0.064    0.797   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZB            0.20371   3.71436    4.27357   0.86915     0.326    0.168   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC            0.87538  17.18530    4.43500   3.87493     0.856    0.002 **</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X             1.95754 109.81199    9.92393  11.06538     0.749    0.003 **</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (Dispersion parameter for poisson family taken to be 1)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Null deviance: 28.649  on 19  degrees of freedom</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 11.218  on 16  degrees of freedom</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AIC: 58.102</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Null deviance: 187.2834  on 19  degrees of freedom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance:   7.4756  on 16  degrees of freedom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AIC: 69.284</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Number of Fisher Scoring iterations: 5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>

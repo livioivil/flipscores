@@ -53,7 +53,11 @@ The normalization scales the correlation by its maximum possible absolute value.
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-algorithm-control">algorithm.control<a class="anchor" aria-label="anchor" href="#arg-algorithm-control"></a></dt>
+<dl><dt id="arg-algorithm">algorithm<a class="anchor" aria-label="anchor" href="#arg-algorithm"></a></dt>
+<dd><p>`"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`</p></dd>
+
+
+<dt id="arg-algorithm-control">algorithm.control<a class="anchor" aria-label="anchor" href="#arg-algorithm-control"></a></dt>
 <dd><p>`list` of coltrol parameters:
 `n_exact` Integer specifying the sample size threshold for using exact
   methods (brute force). Default is 15.
@@ -78,10 +82,6 @@ terms in the model.</p></dd>
 <dt id="arg-intercept-too">intercept_too<a class="anchor" aria-label="anchor" href="#arg-intercept-too"></a></dt>
 <dd><p>Logical indicating whether to include the intercept
 as a variable. Default is FALSE.</p></dd>
-
-
-<dt id="arg-algorith">algorith<a class="anchor" aria-label="anchor" href="#arg-algorith"></a></dt>
-<dd><p>`"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -140,10 +140,10 @@ quality for large problems where brute force is infeasible.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.907  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.061 .</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZC           20.8561   1.8043     0.8180   2.2057     0.615    0.034 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.750  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.910  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.057 .</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC           20.8561   1.8043     0.8180   2.2057     0.615    0.037 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.735  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
