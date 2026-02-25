@@ -14,6 +14,8 @@ compute_gcor_normalized_binom(
 )
 }
 \arguments{
+\item{algorithm}{`"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`}
+
 \item{algorithm.control}{`list` of coltrol parameters:
 `n_exact` Integer specifying the sample size threshold for using exact
   methods (brute force). Default is 15.
@@ -32,8 +34,6 @@ terms in the model.}
 
 \item{intercept_too}{Logical indicating whether to include the intercept
 as a variable. Default is FALSE.}
-
-\item{algorith}{`"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`}
 }
 \value{
 A data frame with five columns:

@@ -9,7 +9,7 @@
 #'   terms in the model.
 #' @param intercept_too Logical indicating whether to include the intercept
 #'   as a variable. Default is FALSE.
-#' @param algorith `"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`
+#' @param algorithm `"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`
 #' @param algorithm.control `list` of coltrol parameters:
 #' `n_exact` Integer specifying the sample size threshold for using exact
 #'   methods (brute force). Default is 15.
