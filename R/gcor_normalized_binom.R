@@ -65,7 +65,6 @@
 #'
 #'
 
-#@export
 # gcor_normalized_binom <- function(full_glm, terms = NULL,
 #                                   intercept_too = FALSE,
 #                                   algorithm = "auto",

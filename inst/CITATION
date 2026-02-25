@@ -1,6 +1,3 @@
-ITATION file for yourpackage
-## Place this file in inst/CITATION inside your package
-
 citHeader("Please cite both the package and the related articles:")
 
 # First article: https://doi.org/10.1111/rssb.12369

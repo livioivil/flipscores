@@ -51,7 +51,8 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
     rownames(scores)=names(model0$fitted.values)
     scale_objects=list(list(nrm = crossprod(model0$y)^.5*length(model0$y)^.5))
     score_type="basic"
-    sqrtinvV_vect_times_residuals = rep(1,nrow(model0$x))
+    Xr <- sqrtinvV_vect_times_residuals <- rep(1,nrow(model0$x))
+
   } else { # at least one covariate
     if(is.null(model0$y)) model0$y=model0$model[,1]
     Z=model0$x
@@ -70,11 +71,12 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
         B=t(t(X * D_vect) %*% (diag(sqrtinvV_vect**2, nrow = length(sqrtW))))
         scores = B * (sqrtinvV_vect_times_residuals) #* (1/sum(!is.na(model0$y))^0.5)
         scale_objects=list(nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect_times_residuals)^2)))
-        list(scores=scores, scale_objects=scale_objects)
+        list(scores=scores, scale_objects=scale_objects,Xr=X)
       }
 
       temp=apply(X,2,.get_1score_basic)
       scores=sapply(temp,function(obj) obj$scores)
+      Xr=sapply(temp,function(obj) obj$Xr)
       # print(names(scores))
       scale_objects=lapply(temp,function(obj) obj$scale_objects)
       # print(names(scale_objects))

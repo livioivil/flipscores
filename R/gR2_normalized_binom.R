@@ -61,7 +61,6 @@
 #'
 #'
 #'
-#' @export
 # gR2_normalized_binom <- function(full_glm, null_glm = NULL, terms = NULL,
 #                                  algorithm = "auto",
 #                                  algorithm.control = list(n_exact = 15,

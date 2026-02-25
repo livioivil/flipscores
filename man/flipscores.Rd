@@ -56,7 +56,7 @@ Provides robust tests for testing in GLMs, by sign-flipping score contributions.
 set.seed(1)
 dt=data.frame(X=rnorm(20),
    Z=factor(rep(LETTERS[1:3],length.out=20)))
-dt$Y=rpois(n=20,lambda=exp(dt$Z=="C"))
+dt$Y=rpois(n=20,lambda=exp((dt$Z=="C") + 2*dt$X))
 mod=flipscores(Y~Z+X,data=dt,family="poisson",n_flips=1000)
 summary(mod)
 

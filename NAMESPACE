@@ -3,7 +3,6 @@
 S3method(anova,flipscores)
 S3method(print,flipscores)
 S3method(summary,flipscores)
-export(.socket_compute_gR2_n)
 export(compute_scores)
 export(flipscores)
 export(gR2)
