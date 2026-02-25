@@ -1,4 +1,4 @@
-# The flipscores package
+# The flipscores package [![flipscores website](reference/figures/logo.png)](https://livioivil.github.io/flipscores/)
 
 [On CRAN
 version](http://cran.r-project.org/web/packages/flipscores/index.md)
