@@ -53,6 +53,40 @@ get_std_dev_score <- function(fit,x2){
 # if(any(is.na(stat))) browser()
     stat
 }
+
+.score2t <-function(tspace,nrm,n){
+  tspace*sqrt(n/(nrm^2-tspace^2))
+}
+
+score2t <- function(Tspace,nrms=NULL,ns=NULL){
+  if(is(Tspace,"flipscores")){
+    if(is.null(nrms))
+      nrms=attr(Tspace$scores,"nrm")
+    if(is.null(ns))
+      ns=rep(nrow(Tspace$scores)-ncol(Tspace$scores),ncol(Tspace$scores))
+    Tspace=Tspace$Tspace[,,drop=FALSE]
+  }
+
+  if(is.null(nrms))
+    warning("nrms is missing and can't be retrived from Tspace since it is not a flipscores object")
+  if(is.null(ns))
+    warning("ns is missing and can't be retrived from Tspace since it is not a flipscores object")
+
+
+  #plot(scale(object$Tspace[,4]),.convert_score2t(4));points(scale(object$Tspace[,4])[1],.convert_score2t(4)[1],col="red")
+  #.score2t <-function(tspace,nrm,n){
+  #  tspace*sqrt(n/(nrm^2-tspace^2))
+  #}
+
+  temp=sapply(1:ncol(Tspace),
+              function(i)  #flipscores:::
+                .score2t(Tspace[,i],nrms[i],ns[i])
+  )
+  Tspace[,]=temp
+  Tspace
+}
+
+
 # .sum2t <- function(Tvector, sumY2, n){
 #   dev_resid=(sumY2-(Tvector^2/n))
 #   Tvector/sqrt(dev_resid/(n-1)*n)

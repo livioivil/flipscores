@@ -47,7 +47,7 @@ summary.flipscores <- function (object, ...) {
   # temp[rownames(sum_model$coefficients),]=sum_model$coefficients
   #sum_model$coefficients=temp
   sum_model$coefficients[names(object$p.values),-1]=NA
-  sum_model$coefficients[names(object$p.values),2]=unlist(object$Tspace[1,,drop=TRUE])
+  sum_model$coefficients[names(object$p.values),2]=unlist(colSums(object$scores))
   sum_model$coefficients[names(object$p.values),3]=attributes(object$scores)$sd#unlist(sapply(object$scores,sd)*sqrt(nrow(object$scores)))
   sum_model$coefficients[,4]=sum_model$coefficients[,2]/sum_model$coefficients[,3]
   sum_model$coefficients[names(object$p.values),5]=(sum_model$coefficients[names(object$p.values),2]/attributes(object$scores)$nrm)[]
