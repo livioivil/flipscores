@@ -64,13 +64,13 @@ dt$Y <- rbinom(n = 20, prob = plogis((dt$Z == "C") * 2), size = 1)
 mod <- glm(Y ~ Z + X, data = dt, family = binomial)
 
 # Compute generalized partial correlations for all variables
-(results <-  gR2_normalized_binom(mod))
+#(results <-  gR2_normalized_binom(mod))
 # equivalent to
 mod0=glm(Y~1,data=dt,family=binomial)
-(results <-  gR2_normalized_binom(mod, mod0))
+#(results <-  gR2_normalized_binom(mod, mod0))
 
 # Compute for specific variables only
-(results <-  gR2_normalized_binom(mod,terms = c("X","Z")))
+#(results <-  gR2_normalized_binom(mod,terms = c("X","Z")))
 
 
 

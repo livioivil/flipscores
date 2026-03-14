@@ -118,7 +118,8 @@
 #
 
 
-
+#' @keywords internal
+#' @noRd
 # Robust version that avoids formula issues
 compute_gcor_normalized_binom <- function(model0, X,
                                           algorithm="auto",
