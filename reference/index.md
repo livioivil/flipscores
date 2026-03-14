@@ -5,9 +5,6 @@
 - [`anova(`*`<flipscores>`*`)`](https://livioivil.github.io/flipscores/reference/anova.flipscores.md)
   : anova.flipscores
 
-- [`compute_gcor_normalized_binom()`](https://livioivil.github.io/flipscores/reference/compute_gcor_normalized_binom.md)
-  : Normalized Generalized Partial Correlation for Binomial GLMs
-
 - [`compute_scores()`](https://livioivil.github.io/flipscores/reference/compute_scores.md)
   : compute_scores
 
