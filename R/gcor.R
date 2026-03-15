@@ -321,7 +321,7 @@ compute_gcor <- function(model0, X, compute_gR2=FALSE,...){
     residuals=(Y-model0$fitted.values)
     if(is.null(model0$weights))  sqrtW=rep(1,length(residuals)) else sqrtW=(as.numeric(model0$weights)**0.5)
     if(is.null(list(...)$parms_DV))
-      parms_DV<-flipscores:::get_par_expo_fam(model0) else parms_DV=list(...)$parms_DV
+      parms_DV<-get_par_expo_fam(model0) else parms_DV=list(...)$parms_DV
     D_vect<-rep(parms_DV$D,length.out=length(residuals))
     V_vect<-rep(parms_DV$V,length.out=length(residuals))
     # W = DV^−1D

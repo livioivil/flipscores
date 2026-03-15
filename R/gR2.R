@@ -11,6 +11,7 @@
 #'   the additional terms in the full model compared to the null. If provided,
 #'   this overrides `null_glm` and the null model is refitted excluding these terms.
 #' @param normalize FALSE by default.
+#' @param adjusted description
 #' @param algorithm `"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`
 #' @param algorithm.control `list` of control parameters:
 #'   \itemize{

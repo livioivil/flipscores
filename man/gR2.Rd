@@ -28,6 +28,8 @@ this overrides `null_glm` and the null model is refitted excluding these terms.}
 
 \item{normalize}{FALSE by default.}
 
+\item{adjusted}{description}
+
 \item{algorithm}{`"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`}
 
 \item{algorithm.control}{`list` of control parameters:

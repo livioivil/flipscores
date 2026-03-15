@@ -92,7 +92,8 @@
 #     return(.socket_compute_gR2_n(terms,full_glm, null_glm))
 #
 # }
-
+#' @keywords internal
+#' @noRd
 .socket_compute_gR2_n <- function(terms,full_glm, null_glm = NULL,algorithm,control){
   temp=.prepare_for_gR2(full_glm,null_glm,terms)
   Z=model.matrix(temp$null_glm)

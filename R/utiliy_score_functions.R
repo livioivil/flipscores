@@ -79,7 +79,7 @@ score2t <- function(Tspace,nrms=NULL,ns=NULL){
   #}
 
   temp=sapply(1:ncol(Tspace),
-              function(i)  #flipscores:::
+              function(i)
                 .score2t(Tspace[,i],nrms[i],ns[i])
   )
   Tspace[,]=temp
