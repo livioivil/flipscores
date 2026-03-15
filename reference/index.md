@@ -8,9 +8,6 @@
 - [`compute_scores()`](https://livioivil.github.io/flipscores/reference/compute_scores.md)
   : compute_scores
 
-- [`.socket_compute_gR2_n()`](https://livioivil.github.io/flipscores/reference/dot-socket_compute_gR2_n.md)
-  : Normalized Generalized R-squared for Binomial GLMs
-
 - [`print(`*`<flipscores>`*`)`](https://livioivil.github.io/flipscores/reference/flipscores-method.md)
   [`summary(`*`<flipscores>`*`)`](https://livioivil.github.io/flipscores/reference/flipscores-method.md)
   : Methods for flipscores objects

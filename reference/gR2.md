@@ -44,6 +44,10 @@ gR2(
 
   FALSE by default.
 
+- adjusted:
+
+  description
+
 - algorithm:
 
   \`"auto"\` by default. It choose between \`"intercept_only"\`,
