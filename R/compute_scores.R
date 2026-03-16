@@ -22,7 +22,7 @@
 #' head(scr0)
 #' @export
 
-compute_scores <- function(model0, model1,score_type = "standardized",...){
+compute_scores <- function(model0, model1, score_type = "standardized", ...){
   score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic","my_lab"))
   if(missing(score_type))
     stop("test type is not specified or recognized")
@@ -34,6 +34,7 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
   } else id_model1=NULL
 
   rm(model1)
+
 
   ###############
   if(is.null(model0$x)||is.null(ncol(model0$x))) {
@@ -117,6 +118,8 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
           U=svd((sqrtW*Z),nv=0)$u
           temp=apply(X,2,.get_1score_standardized,U)
           scores=sapply(temp,function(obj) obj$scores)
+          dispersion=.get_dispersion(model0)
+          scores=scores/sqrt(dispersion)
           Xr=sapply(temp,function(obj) obj$Xr)
           # print(names(scores))
           scale_objects=lapply(temp,function(obj) obj$scale_objects)
@@ -130,7 +133,7 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
               Xr=t(B%*%deco$u)
               scores=Xr*(t(deco$u)%*%(residuals))[,]#*(1/sum(!is.na(model0$y))**0.5)
               nrm=sqrt(sum(B^2)*sum(residuals^2))
-              scale_objects=list(U=deco$u,B=B,nrm=nrm)
+              scale_objects=list(U=deco$u,B=B,nrm=nrm,dispersion=1)
               list(scores=scores, scale_objects=scale_objects,Xr=Xr)
             }
 
@@ -174,8 +177,8 @@ compute_scores <- function(model0, model1,score_type = "standardized",...){
 
     }
 
+
   std_dev=get_std_dev_score(model0,X)
-#  scale_objects$df.residual <- df.residual(model0)
   attr(scores,"sd")=std_dev
   attr(scores,"scale_objects")=scale_objects
   attr(scores,"score_type")=score_type

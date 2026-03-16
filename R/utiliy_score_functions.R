@@ -1,5 +1,5 @@
 # for standardized:
-.score_std=function(flp,scr_eff) {
+.score_std=function(flp,scr_eff, dispersion=1) {
   # scr_eff # un vettore
   numerator=crossprod(flp,scr_eff) #t(scr_eff)%*%flp
   # A<- attributes(scr_eff)$scale_objects$A
@@ -10,7 +10,7 @@
     denominator = 1 - sum((colSums(attributes(scr_eff)$scale_objects$A[flp==1,,drop=FALSE])
                            -colSums(attributes(scr_eff)$scale_objects$A[flp==-1,,drop=FALSE]))^2)
   }
-  numerator/(denominator**0.5)
+  numerator/((denominator*dispersion)**0.5)
 }
 
 #for effective and others:
@@ -310,5 +310,17 @@ get_par_expo_fam <- function(model0){
     warning("Class of the model not detected, homoscedasticity and canonical link are assumed.")
     Dhat<-Vhat<-rep(1,length(model0$fitted.values))
     return(list(D=Dhat, V=Vhat))}
+}
+
+## compute dispersion
+.get_dispersion <-function(object){
+  fam <- object$family
+  dispersion <- if (!is.null(fam$dispersion) && !is.na(fam$dispersion))
+    return(fam$dispersion)
+  else if (fam$family %in% c("poisson", "binomial"))
+    return(1)
+  else if (object$df.residual > 0) {
+    return(sum((object$weights * object$residuals^2)[object$weights > 0])/object$df.residual)
+  }
 }
 
