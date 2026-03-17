@@ -118,6 +118,8 @@ compute_scores <- function(model0, model1, score_type = "standardized", ...){
           U=svd((sqrtW*Z),nv=0)$u
           temp=apply(X,2,.get_1score_standardized,U)
           scores=sapply(temp,function(obj) obj$scores)
+          dispersion=.get_dispersion(model0)
+          scores=scores/sqrt(dispersion)
           Xr=sapply(temp,function(obj) obj$Xr)
           # print(names(scores))
           scale_objects=lapply(temp,function(obj) obj$scale_objects)
@@ -177,8 +179,6 @@ compute_scores <- function(model0, model1, score_type = "standardized", ...){
 
 
   std_dev=get_std_dev_score(model0,X)
-  dispersion=.get_dispersion(model0)
-  scores=scores/sqrt(dispersion)
   attr(scores,"sd")=std_dev
   attr(scores,"scale_objects")=scale_objects
   attr(scores,"score_type")=score_type
