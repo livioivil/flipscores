@@ -114,7 +114,8 @@ contributions" by J.Hemerik, J.Goeman and L.Finos.
 
 [`anova.flipscores`](https://livioivil.github.io/flipscores/reference/anova.flipscores.md),
 [`summary.flipscores`](https://livioivil.github.io/flipscores/reference/flipscores-method.md),
-`flip`
+`flip`,
+[`confint.flipscores`](https://livioivil.github.io/flipscores/reference/confint.flipscores.md)
 
 ## Author
 
@@ -135,11 +136,11 @@ summary(mod)
 #>     n_flips = 1000)
 #> 
 #> Coefficients:
-#>              Estimate     Score Std. Error   z value Part. Cor Pr(>|z|)    
-#> (Intercept)   0.04964   0.55830    3.32802   0.16776     0.064    0.769    
-#> ZB            0.20371   3.71436    4.27357   0.86915     0.326    0.180    
-#> ZC            0.87538  17.18530    4.43500   3.87493     0.856    0.001 ***
-#> X             1.95754 109.81199    9.92393  11.06538     0.749    0.003 ** 
+#>              Estimate     Score Std. Error   z value Part. Cor Pr(>|z|)   
+#> (Intercept)   0.04964   0.55830    3.32802   0.16776     0.064    0.790   
+#> ZB            0.20371   3.71436    4.27357   0.86915     0.326    0.175   
+#> ZC            0.87538  17.18530    4.43500   3.87493     0.856    0.003 **
+#> X             1.95754 109.81199    9.92393  11.06538     0.749    0.006 **
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 

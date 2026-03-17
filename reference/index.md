@@ -8,6 +8,9 @@
 - [`compute_scores()`](https://livioivil.github.io/flipscores/reference/compute_scores.md)
   : compute_scores
 
+- [`confint(`*`<flipscores>`*`)`](https://livioivil.github.io/flipscores/reference/confint.flipscores.md)
+  : Confidence intervals for flipscores
+
 - [`print(`*`<flipscores>`*`)`](https://livioivil.github.io/flipscores/reference/flipscores-method.md)
   [`summary(`*`<flipscores>`*`)`](https://livioivil.github.io/flipscores/reference/flipscores-method.md)
   : Methods for flipscores objects

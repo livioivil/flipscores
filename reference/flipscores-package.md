@@ -51,11 +51,11 @@ summary(mod)
 #>     x = TRUE)
 #> 
 #> Coefficients:
-#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)  
-#> (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7500  
-#> ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6352  
-#> ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6924  
-#> X             0.9439 16.2058     4.7272  3.4282     0.671   0.0108 *
+#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)   
+#> (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7602   
+#> ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6564   
+#> ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6980   
+#> X             0.9439 16.2058     4.7272  3.4282     0.671   0.0098 **
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
@@ -77,9 +77,9 @@ anova(mod)
 #> Inference is provided by FlipScores approach (5000 sign flips).
 #> 
 #> Model: Y ~ Z + X
-#>   Df   Score Pr(>Score)  
-#> Z  2 0.76136     0.6896  
-#> X  1 0.02938     0.0108 *
+#>   Df   Score Pr(>Score)   
+#> Z  2 0.76098     0.6970   
+#> X  1 0.02944     0.0098 **
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # or
@@ -93,8 +93,8 @@ anova(mod0,mod)
 #> 
 #> Model 1: Y ~ Z
 #> Model 2: Y ~ Z + X
-#>                    Df    Score Pr(>Score)  
-#> Model 2 vs Model 1  1 0.029646     0.0112 *
+#>                    Df   Score Pr(>Score)  
+#> Model 2 vs Model 1  1 0.02968     0.0102 *
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # and
