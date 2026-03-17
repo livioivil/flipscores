@@ -70,7 +70,7 @@ summary(mod2)
 "Robust testing in generalized linear models by sign-flipping score contributions" by J.Hemerik, J.Goeman and L.Finos.
 }
 \seealso{
-\code{\link{anova.flipscores}}, \code{\link{summary.flipscores}}, \code{\link[flip]{flip}}
+\code{\link{anova.flipscores}}, \code{\link{summary.flipscores}}, \code{\link[flip]{flip}}, \code{\link{confint.flipscores}}
 }
 \author{
 Livio Finos, Riccardo De Santis, Jesse Hemerik and Jelle Goeman

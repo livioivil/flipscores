@@ -36,7 +36,7 @@
 #'
 #' @author Livio Finos, Riccardo De Santis, Jesse Hemerik and Jelle Goeman
 #'
-#' @seealso \code{\link{anova.flipscores}}, \code{\link{summary.flipscores}}, \code{\link[flip]{flip}}
+#' @seealso \code{\link{anova.flipscores}}, \code{\link{summary.flipscores}}, \code{\link[flip]{flip}}, \code{\link{confint.flipscores}}
 #'
 #' @name flipscores
 #'
