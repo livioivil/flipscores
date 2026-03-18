@@ -11,6 +11,8 @@
 
 - **Riccardo De Santis**. Contributor.
 
+- **Andrea Panarotto**. Contributor.
+
 ## Citation
 
 Hemerik J, Goeman J, Finos L (2020). “Robust testing in generalized
