@@ -48,6 +48,7 @@ Other contributors:
   \item Jelle J. Goeman [contributor]
   \item Jesse Hemerik [contributor]
   \item Riccardo De Santis [contributor]
+  \item Andrea Panarotto [contributor]
 }
 
 
