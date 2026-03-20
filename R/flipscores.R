@@ -143,7 +143,7 @@ flipscores<-function(formula, family, data,
     # } else { #fit the glm or negbinom model
     #set the model to fit
     if(!is.null(mf$family)&&(mf$family=="negbinom")){
-      mf[[1L]]=quote(glm.nb)
+      mf[[1L]]=quote(MASS::glm.nb)
       mf$family=NULL
     } else{
       mf[[1L]]=quote(glm)
