@@ -128,29 +128,29 @@ set.seed(1)
 dt=data.frame(X=rnorm(20),
    Z=factor(rep(LETTERS[1:3],length.out=20)))
 dt$Y=rpois(n=20,lambda=exp((dt$Z=="C") + 2*dt$X))
-mod=flipscores(Y~Z+X,data=dt,family="poisson",n_flips=1000)
+mod=flipscores(Y~Z+X,data=dt,family="gaussian",n_flips=1000)
 summary(mod)
 #> 
 #> Call:
-#> flipscores(formula = Y ~ Z + X, family = "poisson", data = dt, 
+#> flipscores(formula = Y ~ Z + X, family = "gaussian", data = dt, 
 #>     n_flips = 1000)
 #> 
 #> Coefficients:
-#>              Estimate     Score Std. Error   z value Part. Cor Pr(>|z|)    
-#> (Intercept)   0.04964   0.55830    3.32802   0.16776     0.064    0.779    
-#> ZB            0.20371   3.71436    4.27357   0.86915     0.326    0.149    
-#> ZC            0.87538  17.18530    4.43500   3.87493     0.856    0.001 ***
-#> X             1.95754 109.81199    9.92393  11.06538     0.749    0.005 ** 
+#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
+#> (Intercept)  3.56308  4.01931   16.04623  0.25048     0.061    0.058 .  
+#> ZB           1.03516  0.63620   10.65168  0.05973     0.014    0.780    
+#> ZC           3.67684  2.01381   10.59661  0.19004     0.046    0.197    
+#> X            6.93645 12.51367   34.91574  0.35840     0.087    0.001 ***
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
-#> (Dispersion parameter for poisson family taken to be 1)
+#> (Dispersion parameter for gaussian family taken to be 34.21333)
 #> 
-#>     Null deviance: 187.2834  on 19  degrees of freedom
-#> Residual deviance:   7.4756  on 16  degrees of freedom
-#> AIC: 69.284
+#>     Null deviance: 1364.55  on 19  degrees of freedom
+#> Residual deviance:  547.41  on 16  degrees of freedom
+#> AIC: 132.95
 #> 
-#> Number of Fisher Scoring iterations: 5
+#> Number of Fisher Scoring iterations: 2
 #> 
 
 # Equivalent to:

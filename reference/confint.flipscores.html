@@ -118,10 +118,10 @@ Default is inherited by the input model.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate   Score Std. Error z value Part. Cor Pr(&gt;|z|)  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  -0.3513 -5.4234     4.2404 -1.2790    -0.169   0.1256  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZB            0.2276  1.8048     2.8140  0.6414     0.079   0.4442  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZC            0.9034 10.3392     3.4527  2.9945     0.348   0.0260 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X             0.6381 33.1168     8.0470  4.1154     0.478   0.0106 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  -0.3513 -5.4234     4.2404 -1.2790    -0.169   0.1156  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZB            0.2276  1.8048     2.8140  0.6414     0.079   0.4316  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC            0.9034 10.3392     3.4527  2.9945     0.348   0.0224 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X             0.6381 33.1168     8.0470  4.1154     0.478   0.0112 *</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -135,10 +135,10 @@ Default is inherited by the input model.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">mod0</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  2.5 %     97.5 %</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) -0.9972626 0.08924256</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -0.3813423 0.88127857</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZC           0.1298896 1.60111766</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X            0.1838746 1.14804850</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) -0.9807784 0.07000989</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZB          -0.3896343 0.90165305</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC           0.1422676 1.60617027</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X            0.1763124 1.14249278</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">xx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">zz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">0.2</span> <span class="op">*</span> <span class="va">xx</span><span class="op">)</span></span></span>
@@ -151,18 +151,18 @@ Default is inherited by the input model.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> flipscores(formula = yy ~ xx + zz)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate   Score Std. Error z value Part. Cor Pr(&gt;|z|)    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)    1.049  12.483      5.966   2.092     0.493   0.0016 ** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> xx             2.289  14.779      8.992   1.644     0.387   0.0002 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> zz            -1.338 -15.423      7.778  -1.983    -0.467   0.0016 ** </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate   Score Std. Error z value Part. Cor Pr(&gt;|z|)   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)   0.7060  8.9233     6.4200  1.3899     0.328   0.0386 * </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> xx            2.5725 14.0127    10.0068  1.4003     0.330   0.0028 **</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> zz           -0.9165 -7.8974     5.4616 -1.4460    -0.341   0.0266 * </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Dispersion parameter for gaussian family taken to be 1.088214)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Dispersion parameter for gaussian family taken to be 1.778906)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Null deviance: 104.5  on 19  degrees of freedom</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance:  18.5  on 17  degrees of freedom</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AIC: 63.198</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Null deviance: 125.386  on 19  degrees of freedom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance:  30.241  on 17  degrees of freedom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AIC: 73.027</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Number of Fisher Scoring iterations: 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
