@@ -1,0 +1,380 @@
+# flipscores
+
+## The “flipscores” package
+
+The package provides functions for hypothesis tests in GLMs based on
+sign-flipping score contributions. The tests are robust against
+overdispersion, heteroscedasticity and, in some cases, ignored nuisance
+variables.
+
+In this vignette, we provide some use cases and a simulation study to
+show possible usage of the package.
+
+The `flipscores` function is the main function of the package. It
+supports the standard usage of `R` modeling functions, such as `glm`,
+from which it inherits the majority of the arguments.
+
+``` r
+nn <- 30
+set.seed(123)
+dt <- data.frame(X = rnorm(nn), Z = factor(rep(LETTERS[1:3], length.out = nn)))
+dt$Y <- rpois(n = nn, lambda = exp(dt$X))
+mod <- flipscores(Y ~ Z + X,
+                  data = dt,
+                  family = "poisson",
+                  x = TRUE)
+summary(mod)
+#> 
+#> Call:
+#> flipscores(formula = Y ~ Z + X, family = "poisson", data = dt, 
+#>     x = TRUE)
+#> 
+#> Coefficients:
+#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
+#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016   0.9410    
+#> ZB           0.02318  0.13383    2.39994  0.05576     0.012   0.9568    
+#> ZC           0.15946  1.36568    2.93906  0.46467     0.097   0.6592    
+#> X            0.89732 35.59669    6.63014  5.36892     0.726   0.0004 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for poisson family taken to be 1)
+#> 
+#>     Null deviance: 60.819  on 29  degrees of freedom
+#> Residual deviance: 26.638  on 26  degrees of freedom
+#> AIC: 84.227
+#> 
+#> Number of Fisher Scoring iterations: 5
+```
+
+Functions like `summary` or `anova` can be applied to `flipscores`
+objects, obtaining an output in the usual format. The p-values are
+obtained by randomly sign-flipping score contributions and comparing the
+observed score with the flipped scores.
+
+``` r
+# Anova test
+anova(mod)
+#> Analysis of Deviance Table (Type III test)
+#> 
+#> Model: poisson, link: log
+#> 
+#> Inference is provided by FlipScores approach (5000 sign flips).
+#> 
+#> Model: Y ~ Z + X
+#>   Df   Score Pr(>Score)    
+#> Z  2 0.23948     0.9086    
+#> X  1 0.04207     0.0004 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+# or
+mod0 <- flipscores(Y~Z,data=dt,family="poisson",x=TRUE)
+anova(mod0,mod)
+#> Analysis of Deviance Table (Type III test)
+#> 
+#> Model: poisson, link: log
+#> 
+#> Inference is provided by FlipScores approach (5000 sign flips).
+#> 
+#> Model 1: Y ~ Z
+#> Model 2: Y ~ Z + X
+#>                    Df    Score Pr(>Score)    
+#> Model 2 vs Model 1  1 0.042397      2e-04 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+# and
+mod0 <- flipscores(Y~X,data=dt,family="poisson")
+anova(mod0,mod)
+#> Analysis of Deviance Table (Type III test)
+#> 
+#> Model: poisson, link: log
+#> 
+#> Inference is provided by FlipScores approach (5000 sign flips).
+#> 
+#> Model 1: Y ~ X
+#> Model 2: Y ~ Z + X
+#>                    Df   Score Pr(>Score)
+#> Model 2 vs Model 1  2 0.27193     0.8938
+```
+
+Equivalently, one might apply the `flipscores` function to a precomputed
+`glm` model.
+
+``` r
+model <- glm(Y~Z+X,data=dt,family="poisson")
+mod2 <- flipscores(model)
+summary(mod2)
+#> 
+#> Call:
+#> flipscores(formula = model)
+#> 
+#> Coefficients:
+#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
+#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016   0.9356    
+#> ZB           0.02318  0.13383    2.39994  0.05576     0.012   0.9604    
+#> ZC           0.15946  1.36568    2.93906  0.46467     0.097   0.6504    
+#> X            0.89732 35.59669    6.63014  5.36892     0.726   0.0004 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for poisson family taken to be 1)
+#> 
+#>     Null deviance: 60.819  on 29  degrees of freedom
+#> Residual deviance: 26.638  on 26  degrees of freedom
+#> AIC: 84.227
+#> 
+#> Number of Fisher Scoring iterations: 5
+```
+
+Notice that the p-values are not identical to the ones of the previous
+model. In fact, computing all possible combinations of flipped score
+contributions would be computationally unfeasible. Only a subset of this
+possibilities is computed, regulated by the parameter `n_flips`, with
+default at `5000`. Reproducibility can be achieved by setting the
+argument `seed` or precomputing flips with the function `make_flips`.
+
+``` r
+flps <- make_flips(n_obs = nn, n_flips = 1000)
+summary(flipscores(model, flips = flps))
+#> 
+#> Call:
+#> flipscores(formula = model, flips = flps)
+#> 
+#> Coefficients:
+#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
+#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.923    
+#> ZB           0.02318  0.13383    2.39994  0.05576     0.012    0.964    
+#> ZC           0.15946  1.36568    2.93906  0.46467     0.097    0.642    
+#> X            0.89732 35.59669    6.63014  5.36892     0.726    0.001 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for poisson family taken to be 1)
+#> 
+#>     Null deviance: 60.819  on 29  degrees of freedom
+#> Residual deviance: 26.638  on 26  degrees of freedom
+#> AIC: 84.227
+#> 
+#> Number of Fisher Scoring iterations: 5
+summary(flipscores(model, flips = flps))
+#> 
+#> Call:
+#> flipscores(formula = model, flips = flps)
+#> 
+#> Coefficients:
+#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
+#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.923    
+#> ZB           0.02318  0.13383    2.39994  0.05576     0.012    0.964    
+#> ZC           0.15946  1.36568    2.93906  0.46467     0.097    0.642    
+#> X            0.89732 35.59669    6.63014  5.36892     0.726    0.001 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for poisson family taken to be 1)
+#> 
+#>     Null deviance: 60.819  on 29  degrees of freedom
+#> Residual deviance: 26.638  on 26  degrees of freedom
+#> AIC: 84.227
+#> 
+#> Number of Fisher Scoring iterations: 5
+```
+
+One-sided testing alternatives are also covered
+
+``` r
+summary(flipscores(model, alternative = "less"))
+#> 
+#> Call:
+#> flipscores(formula = model, alternative = "less")
+#> 
+#> Coefficients:
+#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)
+#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.523
+#> ZB           0.02318  0.13383    2.39994  0.05576     0.012    0.529
+#> ZC           0.15946  1.36568    2.93906  0.46467     0.097    0.676
+#> X            0.89732 35.59669    6.63014  5.36892     0.726    1.000
+#> 
+#> (Dispersion parameter for poisson family taken to be 1)
+#> 
+#>     Null deviance: 60.819  on 29  degrees of freedom
+#> Residual deviance: 26.638  on 26  degrees of freedom
+#> AIC: 84.227
+#> 
+#> Number of Fisher Scoring iterations: 5
+summary(flipscores(model, alternative = "greater"))
+#> 
+#> Call:
+#> flipscores(formula = model, alternative = "greater")
+#> 
+#> Coefficients:
+#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
+#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016   0.4838    
+#> ZB           0.02318  0.13383    2.39994  0.05576     0.012   0.4648    
+#> ZC           0.15946  1.36568    2.93906  0.46467     0.097   0.3198    
+#> X            0.89732 35.59669    6.63014  5.36892     0.726   0.0002 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for poisson family taken to be 1)
+#> 
+#>     Null deviance: 60.819  on 29  degrees of freedom
+#> Residual deviance: 26.638  on 26  degrees of freedom
+#> AIC: 84.227
+#> 
+#> Number of Fisher Scoring iterations: 5
+```
+
+If only a subset of parameters is of interest, the `to_be_tested`
+parameter can be set to avoid computing the p-values for all the others
+
+``` r
+summary(flipscores(model, to_be_tested = "X", flips = flps))
+#> 
+#> Call:
+#> flipscores(formula = model, to_be_tested = "X", flips = flps)
+#> 
+#> Coefficients:
+#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
+#> (Intercept)  0.02207       NA         NA       NA        NA       NA    
+#> ZB           0.02318       NA         NA       NA        NA       NA    
+#> ZC           0.15946       NA         NA       NA        NA       NA    
+#> X            0.89732 35.59669    6.63014  5.36892     0.726    0.001 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for poisson family taken to be 1)
+#> 
+#>     Null deviance: 60.819  on 29  degrees of freedom
+#> Residual deviance: 26.638  on 26  degrees of freedom
+#> AIC: 84.227
+#> 
+#> Number of Fisher Scoring iterations: 5
+summary(flipscores(model, to_be_tested = c(1, 4), flips = flps))
+#> 
+#> Call:
+#> flipscores(formula = model, to_be_tested = c(1, 4), flips = flps)
+#> 
+#> Coefficients:
+#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
+#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.923    
+#> ZB           0.02318       NA         NA       NA        NA       NA    
+#> ZC           0.15946       NA         NA       NA        NA       NA    
+#> X            0.89732 35.59669    6.63014  5.36892     0.726    0.001 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for poisson family taken to be 1)
+#> 
+#>     Null deviance: 60.819  on 29  degrees of freedom
+#> Residual deviance: 26.638  on 26  degrees of freedom
+#> AIC: 84.227
+#> 
+#> Number of Fisher Scoring iterations: 5
+```
+
+`to_be_tested` accepts vectors with both the name of the variables and
+indexing numbers; these indicators refer to the name or the cardinality
+of the variable in the summary output, so the Intercept will always
+correspond to number 1, while particular attention should be paid if
+`factor/character` variables are involved.
+
+``` r
+summary(flipscores(model, to_be_tested = "ZB", flips = flps))
+#> 
+#> Call:
+#> flipscores(formula = model, to_be_tested = "ZB", flips = flps)
+#> 
+#> Coefficients:
+#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)
+#> (Intercept)  0.02207      NA         NA      NA        NA       NA
+#> ZB           0.02318 0.13383    2.39994 0.05576     0.012    0.964
+#> ZC           0.15946      NA         NA      NA        NA       NA
+#> X            0.89732      NA         NA      NA        NA       NA
+#> 
+#> (Dispersion parameter for poisson family taken to be 1)
+#> 
+#>     Null deviance: 60.819  on 29  degrees of freedom
+#> Residual deviance: 26.638  on 26  degrees of freedom
+#> AIC: 84.227
+#> 
+#> Number of Fisher Scoring iterations: 5
+summary(flipscores(model, to_be_tested = 2, flips = flps))
+#> 
+#> Call:
+#> flipscores(formula = model, to_be_tested = 2, flips = flps)
+#> 
+#> Coefficients:
+#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)
+#> (Intercept)  0.02207      NA         NA      NA        NA       NA
+#> ZB           0.02318 0.13383    2.39994 0.05576     0.012    0.964
+#> ZC           0.15946      NA         NA      NA        NA       NA
+#> X            0.89732      NA         NA      NA        NA       NA
+#> 
+#> (Dispersion parameter for poisson family taken to be 1)
+#> 
+#>     Null deviance: 60.819  on 29  degrees of freedom
+#> Residual deviance: 26.638  on 26  degrees of freedom
+#> AIC: 84.227
+#> 
+#> Number of Fisher Scoring iterations: 5
+```
+
+`flipscores` supports all the available families in `glm`, and also the
+Negative Binomial family. This, in particular, should be indicated as
+`"negbinom"` between quotes.
+
+``` r
+summary(flipscores(Y ~ Z + X, data = dt, family = "negbinom"))
+#> 
+#> Call:
+#> flipscores(formula = Y ~ Z + X, family = "negbinom", data = dt)
+#> 
+#> Coefficients:
+#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
+#> (Intercept)  0.02208  0.28520    3.18354  0.08959     0.017   0.9390    
+#> ZB           0.02316  0.14517    2.20995  0.06569     0.013   0.9536    
+#> ZC           0.15946  1.47358    2.72310  0.54114     0.104   0.6436    
+#> X            0.89733 16.89692    4.68164  3.60919     0.695   0.0002 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for Negative Binomial(20776.66) family taken to be 0.8801237)
+#> 
+#>     Null deviance: 60.815  on 29  degrees of freedom
+#> Residual deviance: 26.636  on 26  degrees of freedom
+#> AIC: 86.227
+#> 
+#> Number of Fisher Scoring iterations: 1
+```
+
+The `confint` method is also applicable to provide confidence intervals
+based on the inversion of the sign-flip score tests. These intervals
+inherit the properties of robustness to variance misspecification of the
+test.
+
+``` r
+confint(mod, n_flips = 1000)
+#>                  2.5 %    97.5 %
+#> (Intercept) -0.8270347 0.5717445
+#> ZB          -1.7909340 0.8410736
+#> ZC          -0.6984983 0.8645448
+#> X            0.6228603 1.2548427
+```
+
+As before, various options are allowed, including the possibility to
+generate symmetric confidence intervals.
+
+``` r
+confint(mod, parm = 4, flips = flps) # parm == to_be_tested!
+#>       2.5 %   97.5 %
+#> X 0.6421398 1.239412
+confint(mod, parm = 4, level = 0.99, flips = flps)
+#>       0.5 %   99.5 %
+#> X 0.5551433 1.719099
+confint(mod, parm = 4, alternative = "greater", flips = flps)
+#>        Est.     95 %
+#> X 0.8973217 1.166041
+confint(mod, parm = 4, type = "symmetric", flips = flps)
+#>       2.5 %   97.5 %
+#> X 0.6111385 1.183505
+```

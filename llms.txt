@@ -201,3 +201,8 @@ example) on [github](https://github.com/livioivil/flipscores/issues).
   It creates a `n_flips`x`n_obs` matrix of random +1 and -1. The first
   row is made by ones (i.e. the observed test statistic is computed)
 
+# Articles
+
+### All vignettes
+
+- [flipscores](https://livioivil.github.io/flipscores/articles/flipscores.md):

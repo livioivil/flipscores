@@ -1,8 +1,9 @@
 pandoc: 3.1.11
 pkgdown: 2.2.0
 pkgdown_sha: ~
-articles: {}
-last_built: 2026-03-21T11:31Z
+articles:
+  flipscores: flipscores.html
+last_built: 2026-03-23T10:33Z
 urls:
   reference: https://livioivil.github.io/flipscores/reference
   article: https://livioivil.github.io/flipscores/articles
