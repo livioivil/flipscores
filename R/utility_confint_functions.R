@@ -24,7 +24,8 @@ conf_bound_equitailed <- function(to_be_tested,
   #___
   # factor/char management
   # build dummy variables for all factors
-  dat <- merge(dat, model.matrix(mod, dat))
+  mm <- model.matrix(mod, dat)
+  dat <- cbind(dat, mm[, !colnames(mm) %in% colnames(dat), drop = FALSE])
   #___
   if(substr(mod$family$family, 0, 17) == "Negative Binomial")
   {
@@ -191,7 +192,8 @@ conf_bound_oneside <- function(mod,
   #___
   # factor/char management
   # build dummy variables for all factors
-  dat <- merge(dat, model.matrix(mod, dat))
+  mm <- model.matrix(mod, dat)
+  dat <- cbind(dat, mm[, !colnames(mm) %in% colnames(dat), drop = FALSE])
   #___
   if(substr(mod$family$family, 0, 17) == "Negative Binomial")
   {
@@ -272,7 +274,8 @@ conf_bound_symmetric <- function(to_be_tested,
   #___
   # factor/char management
   # build dummy variables for all factors
-  dat <- merge(dat, model.matrix(mod, dat))
+  mm <- model.matrix(mod, dat)
+  dat <- cbind(dat, mm[, !colnames(mm) %in% colnames(dat), drop = FALSE])
   #___
   if(substr(mod$family$family, 0, 17) == "Negative Binomial")
   {
@@ -379,7 +382,8 @@ conf_bound_twoside <- function(mod,
   #___
   # factor/char management
   # build dummy variables for all factors
-  dat <- merge(dat, model.matrix(mod, dat))
+  mm <- model.matrix(mod, dat)
+  dat <- cbind(dat, mm[, !colnames(mm) %in% colnames(dat), drop = FALSE])
   #___
   if(substr(mod$family$family, 0, 17) == "Negative Binomial")
   {
