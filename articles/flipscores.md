@@ -31,10 +31,10 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
-#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016   0.9410    
-#> ZB           0.02318  0.13383    2.39994  0.05576     0.012   0.9568    
-#> ZC           0.15946  1.36568    2.93906  0.46467     0.097   0.6592    
-#> X            0.89732 35.59669    6.63014  5.36892     0.726   0.0004 ***
+#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016   0.9350    
+#> ZB           0.02318  0.13383    2.39994  0.05576     0.012   0.9576    
+#> ZC           0.15946  1.36568    2.93906  0.46467     0.097   0.6598    
+#> X            0.89732 35.59669    6.63014  5.36892     0.726   0.0002 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -63,8 +63,8 @@ anova(mod)
 #> 
 #> Model: Y ~ Z + X
 #>   Df   Score Pr(>Score)    
-#> Z  2 0.23948     0.9086    
-#> X  1 0.04207     0.0004 ***
+#> Z  2 0.23306     0.9040    
+#> X  1 0.04284     0.0002 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 # or
@@ -79,7 +79,7 @@ anova(mod0,mod)
 #> Model 1: Y ~ Z
 #> Model 2: Y ~ Z + X
 #>                    Df    Score Pr(>Score)    
-#> Model 2 vs Model 1  1 0.042397      2e-04 ***
+#> Model 2 vs Model 1  1 0.042411      4e-04 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 # and
@@ -94,7 +94,7 @@ anova(mod0,mod)
 #> Model 1: Y ~ X
 #> Model 2: Y ~ Z + X
 #>                    Df   Score Pr(>Score)
-#> Model 2 vs Model 1  2 0.27193     0.8938
+#> Model 2 vs Model 1  2 0.26356     0.9016
 ```
 
 Equivalently, one might apply the `flipscores` function to a precomputed
@@ -110,10 +110,10 @@ summary(mod2)
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
-#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016   0.9356    
-#> ZB           0.02318  0.13383    2.39994  0.05576     0.012   0.9604    
-#> ZC           0.15946  1.36568    2.93906  0.46467     0.097   0.6504    
-#> X            0.89732 35.59669    6.63014  5.36892     0.726   0.0004 ***
+#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016   0.9430    
+#> ZB           0.02318  0.13383    2.39994  0.05576     0.012   0.9542    
+#> ZC           0.15946  1.36568    2.93906  0.46467     0.097   0.6452    
+#> X            0.89732 35.59669    6.63014  5.36892     0.726   0.0002 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -142,9 +142,9 @@ summary(flipscores(model, flips = flps))
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
-#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.923    
-#> ZB           0.02318  0.13383    2.39994  0.05576     0.012    0.964    
-#> ZC           0.15946  1.36568    2.93906  0.46467     0.097    0.642    
+#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.937    
+#> ZB           0.02318  0.13383    2.39994  0.05576     0.012    0.959    
+#> ZC           0.15946  1.36568    2.93906  0.46467     0.097    0.666    
 #> X            0.89732 35.59669    6.63014  5.36892     0.726    0.001 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
@@ -163,9 +163,9 @@ summary(flipscores(model, flips = flps))
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
-#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.923    
-#> ZB           0.02318  0.13383    2.39994  0.05576     0.012    0.964    
-#> ZC           0.15946  1.36568    2.93906  0.46467     0.097    0.642    
+#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.937    
+#> ZB           0.02318  0.13383    2.39994  0.05576     0.012    0.959    
+#> ZC           0.15946  1.36568    2.93906  0.46467     0.097    0.666    
 #> X            0.89732 35.59669    6.63014  5.36892     0.726    0.001 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
@@ -189,8 +189,8 @@ summary(flipscores(model, alternative = "less"))
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)
-#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.523
-#> ZB           0.02318  0.13383    2.39994  0.05576     0.012    0.529
+#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.535
+#> ZB           0.02318  0.13383    2.39994  0.05576     0.012    0.525
 #> ZC           0.15946  1.36568    2.93906  0.46467     0.097    0.676
 #> X            0.89732 35.59669    6.63014  5.36892     0.726    1.000
 #> 
@@ -208,9 +208,9 @@ summary(flipscores(model, alternative = "greater"))
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
-#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016   0.4838    
-#> ZB           0.02318  0.13383    2.39994  0.05576     0.012   0.4648    
-#> ZC           0.15946  1.36568    2.93906  0.46467     0.097   0.3198    
+#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016   0.4626    
+#> ZB           0.02318  0.13383    2.39994  0.05576     0.012   0.4816    
+#> ZC           0.15946  1.36568    2.93906  0.46467     0.097   0.3240    
 #> X            0.89732 35.59669    6.63014  5.36892     0.726   0.0002 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
@@ -256,7 +256,7 @@ summary(flipscores(model, to_be_tested = c(1, 4), flips = flps))
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
-#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.923    
+#> (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.937    
 #> ZB           0.02318       NA         NA       NA        NA       NA    
 #> ZC           0.15946       NA         NA       NA        NA       NA    
 #> X            0.89732 35.59669    6.63014  5.36892     0.726    0.001 ***
@@ -287,7 +287,7 @@ summary(flipscores(model, to_be_tested = "ZB", flips = flps))
 #> Coefficients:
 #>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)
 #> (Intercept)  0.02207      NA         NA      NA        NA       NA
-#> ZB           0.02318 0.13383    2.39994 0.05576     0.012    0.964
+#> ZB           0.02318 0.13383    2.39994 0.05576     0.012    0.959
 #> ZC           0.15946      NA         NA      NA        NA       NA
 #> X            0.89732      NA         NA      NA        NA       NA
 #> 
@@ -306,7 +306,7 @@ summary(flipscores(model, to_be_tested = 2, flips = flps))
 #> Coefficients:
 #>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)
 #> (Intercept)  0.02207      NA         NA      NA        NA       NA
-#> ZB           0.02318 0.13383    2.39994 0.05576     0.012    0.964
+#> ZB           0.02318 0.13383    2.39994 0.05576     0.012    0.959
 #> ZC           0.15946      NA         NA      NA        NA       NA
 #> X            0.89732      NA         NA      NA        NA       NA
 #> 
@@ -331,10 +331,10 @@ summary(flipscores(Y ~ Z + X, data = dt, family = "negbinom"))
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
-#> (Intercept)  0.02208  0.28520    3.18354  0.08959     0.017   0.9390    
-#> ZB           0.02316  0.14517    2.20995  0.06569     0.013   0.9536    
-#> ZC           0.15946  1.47358    2.72310  0.54114     0.104   0.6436    
-#> X            0.89733 16.89692    4.68164  3.60919     0.695   0.0002 ***
+#> (Intercept)  0.02208  0.26385    3.18354  0.08288     0.016   0.9344    
+#> ZB           0.02316  0.13368    2.20995  0.06049     0.012   0.9552    
+#> ZC           0.15946  1.36541    2.72310  0.50142     0.096   0.6530    
+#> X            0.89733 17.36132    4.68164  3.70839     0.714   0.0002 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -355,10 +355,10 @@ test.
 ``` r
 confint(mod, n_flips = 1000)
 #>                  2.5 %    97.5 %
-#> (Intercept) -0.8270347 0.5717445
-#> ZB          -1.7909340 0.8410736
-#> ZC          -0.6984983 0.8645448
-#> X            0.6228603 1.2548427
+#> (Intercept) -0.8202099 0.4961862
+#> ZB          -1.5969373 1.0009040
+#> ZC          -0.6435601 0.8681719
+#> X            0.6091594 1.2973873
 ```
 
 As before, various options are allowed, including the possibility to
@@ -367,14 +367,14 @@ generate symmetric confidence intervals.
 ``` r
 confint(mod, parm = 4, flips = flps) # parm == to_be_tested!
 #>       2.5 %   97.5 %
-#> X 0.6421398 1.239412
+#> X 0.6351909 1.304875
 confint(mod, parm = 4, level = 0.99, flips = flps)
 #>       0.5 %   99.5 %
-#> X 0.5551433 1.719099
+#> X 0.5263439 1.500074
 confint(mod, parm = 4, alternative = "greater", flips = flps)
 #>        Est.     95 %
-#> X 0.8973217 1.166041
+#> X 0.8973217 1.192337
 confint(mod, parm = 4, type = "symmetric", flips = flps)
 #>       2.5 %   97.5 %
-#> X 0.6111385 1.183505
+#> X 0.5783413 1.216302
 ```

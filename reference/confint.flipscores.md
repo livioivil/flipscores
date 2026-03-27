@@ -113,10 +113,10 @@ summary(mod0)
 #> 
 #> Coefficients:
 #>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)  
-#> (Intercept)  -0.3513 -5.4234     4.2404 -1.2790    -0.169   0.1170  
-#> ZB            0.2276  1.8048     2.8140  0.6414     0.079   0.4580  
-#> ZC            0.9034 10.3392     3.4527  2.9945     0.348   0.0220 *
-#> X             0.6381 33.1168     8.0470  4.1154     0.478   0.0102 *
+#> (Intercept)  -0.3513 -5.4234     4.2404 -1.2790    -0.169   0.1138  
+#> ZB            0.2276  1.8048     2.8140  0.6414     0.079   0.4368  
+#> ZC            0.9034 10.3392     3.4527  2.9945     0.348   0.0236 *
+#> X             0.6381 33.1168     8.0470  4.1154     0.478   0.0130 *
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
@@ -130,10 +130,10 @@ summary(mod0)
 #> 
 confint(mod0)
 #>                  2.5 %     97.5 %
-#> (Intercept) -1.0031401 0.07532379
-#> ZB          -0.4107332 0.89913236
-#> ZC           0.1399139 1.60459952
-#> X            0.1762101 1.16213084
+#> (Intercept) -1.0357806 0.08293611
+#> ZB          -0.3973320 0.90523738
+#> ZC           0.1709602 1.63795674
+#> X            0.1862412 1.17338267
 
 xx <- rnorm(20)
 zz <- rnorm(20, 0.2 * xx)
@@ -146,18 +146,18 @@ summary(mod1)
 #> flipscores(formula = yy ~ xx + zz)
 #> 
 #> Coefficients:
-#>             Estimate  Score Std. Error z value Part. Cor Pr(>|z|)    
-#> (Intercept)    1.115 11.747      5.668   2.072     0.488   0.0040 ** 
-#> xx             1.933 14.810      8.372   1.769     0.417   0.0002 ***
-#> zz            -1.075 -9.997      4.862  -2.056    -0.485   0.0088 ** 
+#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)    
+#> (Intercept)    1.063  19.712      5.673   3.475     0.819   0.0004 ***
+#> xx             1.894  21.083      5.573   3.783     0.892   0.0002 ***
+#> zz            -1.080 -12.236      3.846  -3.182    -0.750   0.0012 ** 
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
-#> (Dispersion parameter for gaussian family taken to be 1.109331)
+#> (Dispersion parameter for gaussian family taken to be 0.6050902)
 #> 
-#>     Null deviance: 87.053  on 19  degrees of freedom
-#> Residual deviance: 18.859  on 17  degrees of freedom
-#> AIC: 63.582
+#>     Null deviance: 50.249  on 19  degrees of freedom
+#> Residual deviance: 10.287  on 17  degrees of freedom
+#> AIC: 51.46
 #> 
 #> Number of Fisher Scoring iterations: 2
 #> 
