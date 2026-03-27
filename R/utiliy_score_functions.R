@@ -1,5 +1,5 @@
 # for standardized:
-.score_std=function(flp,scr_eff, dispersion=1) {
+.score_std=function(flp,scr_eff) {
   # scr_eff # un vettore
   numerator=crossprod(flp,scr_eff) #t(scr_eff)%*%flp
   # A<- attributes(scr_eff)$scale_objects$A
@@ -10,7 +10,7 @@
     denominator = 1 - sum((colSums(attributes(scr_eff)$scale_objects$A[flp==1,,drop=FALSE])
                            -colSums(attributes(scr_eff)$scale_objects$A[flp==-1,,drop=FALSE]))^2)
   }
-  numerator/((denominator*dispersion)**0.5)
+  numerator/((denominator)**0.5)
 }
 
 #for effective and others:
@@ -220,6 +220,12 @@ socket_compute_flip <- function(scores,flip_param_call){
   # seed=seed,
   # statTest="sum")
   # results$scores=scores
+  attributes(scores)$Xr
+  dispersion=attributes(scores)$dispersion
+  for(i in seq(length(results))){
+    nrm2=sum(attributes(scores)$Xr[,i]^2)
+    results[[i]]$Tspace=results[[1]]$Tspace/sqrt(dispersion*nrm2)
+  }
   results
 }
 
