@@ -13,7 +13,7 @@
 #' @param n_flips The number of random flips of the score contributions. Overwritten with the \code{nrow(flips)} when \code{flips} is not \code{NULL} (see parameter \code{flips} for more details).
 #' When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed.
 #' @param alternative It can be "greater", "less" or "two.sided" (default)
-#' @param id a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. If \code{id} is not \code{NULL}, only \code{score_type=="effective"} is allowed, yet.
+#' @param id a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. If \code{id} is not \code{NULL}, only \code{score_type \%in\% c("standardized","effective","basic")} is allowed, yet.
 #' @param seed \code{NULL} by default.
 #' @param to_be_tested vector of indices or names of coefficients of the glm model to be tested (it is faster than computing every scores and p-values of course).
 #' @param flips matrix fo +1 or -1, the matrix has \code{n_flips} rows and n (number of observations) columns

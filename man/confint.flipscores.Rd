@@ -58,7 +58,7 @@ dt <- data.frame(X=scale(rnorm(50)),
 dt$Y=rpois(n=nrow(dt),lambda=exp(dt$X*(dt$Z=="C")))
 mod0 <- flipscores(Y~Z+X,data=dt,family="poisson")
 summary(mod0)
-confint(mod0)
+confint(mod0, parm="X")
 
 xx <- rnorm(20)
 zz <- rnorm(20, 0.2 * xx)

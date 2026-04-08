@@ -28,7 +28,7 @@ When \code{n_flips} is equal or larger than the maximum number of possible flips
 
 \item{alternative}{It can be "greater", "less" or "two.sided" (default)}
 
-\item{id}{a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. If \code{id} is not \code{NULL}, only \code{score_type=="effective"} is allowed, yet.}
+\item{id}{a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. If \code{id} is not \code{NULL}, only \code{score_type \%in\% c("standardized","effective","basic")} is allowed, yet.}
 
 \item{seed}{\code{NULL} by default.}
 
@@ -57,7 +57,7 @@ set.seed(1)
 dt=data.frame(X=rnorm(20),
    Z=factor(rep(LETTERS[1:3],length.out=20)))
 dt$Y=rpois(n=20,lambda=exp((dt$Z=="C") + 2*dt$X))
-mod=flipscores(Y~Z+X,data=dt,family="gaussian",n_flips=1000)
+mod=flipscores(Y~Z+X,data=dt,family="poisson",n_flips=1000)
 summary(mod)
 
 # Equivalent to:
