@@ -58,7 +58,8 @@ precompute_flips=TRUE, ...)
 
   a `vector` identifying the clustered observations. If `NULL` (default)
   observations are assumed to be independent. If `id` is not `NULL`,
-  only `score_type=="effective"` is allowed, yet.
+  only `score_type %in% c("standardized","effective","basic")` is
+  allowed, yet.
 
 - seed:
 
@@ -128,29 +129,29 @@ set.seed(1)
 dt=data.frame(X=rnorm(20),
    Z=factor(rep(LETTERS[1:3],length.out=20)))
 dt$Y=rpois(n=20,lambda=exp((dt$Z=="C") + 2*dt$X))
-mod=flipscores(Y~Z+X,data=dt,family="gaussian",n_flips=1000)
+mod=flipscores(Y~Z+X,data=dt,family="poisson",n_flips=1000)
 summary(mod)
 #> 
 #> Call:
-#> flipscores(formula = Y ~ Z + X, family = "gaussian", data = dt, 
+#> flipscores(formula = Y ~ Z + X, family = "poisson", data = dt, 
 #>     n_flips = 1000)
 #> 
 #> Coefficients:
-#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)   
-#> (Intercept)   3.5631  24.5636    16.0462   1.5308     0.371    0.058 . 
-#> ZB            1.0352   3.6225    10.6517   0.3401     0.082    0.752   
-#> ZC            3.6768  11.8745    10.5966   1.1206     0.272    0.220   
-#> X             6.9365 109.8120    34.9157   3.1451     0.763    0.003 **
+#>              Estimate     Score Std. Error   z value Part. Cor Pr(>|z|)   
+#> (Intercept)   0.04964   0.55830    3.32802   0.16776     0.064    0.801   
+#> ZB            0.20371   3.71436    4.27357   0.86915     0.326    0.153   
+#> ZC            0.87538  17.18530    4.43500   3.87493     0.856    0.003 **
+#> X             1.95754 109.81199    9.92393  11.06538     0.749    0.002 **
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
-#> (Dispersion parameter for gaussian family taken to be 34.21333)
+#> (Dispersion parameter for poisson family taken to be 1)
 #> 
-#>     Null deviance: 1364.55  on 19  degrees of freedom
-#> Residual deviance:  547.41  on 16  degrees of freedom
-#> AIC: 132.95
+#>     Null deviance: 187.2834  on 19  degrees of freedom
+#> Residual deviance:   7.4756  on 16  degrees of freedom
+#> AIC: 69.284
 #> 
-#> Number of Fisher Scoring iterations: 2
+#> Number of Fisher Scoring iterations: 5
 #> 
 
 # Equivalent to:
