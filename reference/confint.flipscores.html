@@ -46,6 +46,7 @@
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"equitailed"</span>, <span class="st">"symmetric"</span><span class="op">)</span>,</span>
 <span>  score_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"standardized"</span>, <span class="st">"effective"</span><span class="op">)</span>,</span>
 <span>  alternative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"two.sided"</span>, <span class="st">"greater"</span>, <span class="st">"less"</span><span class="op">)</span>,</span>
+<span>  amp_const <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  flips <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n_flips <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -81,6 +82,10 @@ Default is inherited by the input model.</p></dd>
 <dd><p>The direction of the test to invert, and corresponding interval with respect to the estimate. It can be "two.sided" (default), "greater", or "less".</p></dd>
 
 
+<dt id="arg-amp-const">amp_const<a class="anchor" aria-label="anchor" href="#arg-amp-const"></a></dt>
+<dd><p>Argument related to the maximum initial span of the search interval. See details.</p></dd>
+
+
 <dt id="arg-flips">flips<a class="anchor" aria-label="anchor" href="#arg-flips"></a></dt>
 <dd><p>the fixed flips to use in the interval search. If <code>NULL</code> (default), it tries to inherit it from the input model.</p></dd>
 
@@ -102,6 +107,7 @@ Default is inherited by the input model.</p></dd>
     <p>All families allowed in <code>glm</code>, as well as Negative Binomial, are supported, and inherited here by the input model <code>object</code>. See the main function <code><a href="flipscores.html">flipscores</a></code> for further information.</p>
 <p><code>flipscores</code> is based on randomly sign-flipped score contributions. Performing the test (and generating the confidence interval) different times might give slightly different results. Providing a flip matrix generated with <code><a href="make_flips.html">make_flips</a></code> is suggested to uniform the results.</p>
 <p><code>to_be_tested</code> works differently for factors and character variables: the corresponding dummy variables are to be tested separately. So, to test a numeric variable <code>X</code>, one could write <code>to_be_tested = "X"</code>, but to test a factor <code>Z</code> with levels <code>A</code>, <code>B</code> and <code>C</code> one should write <code>to_be_tested = c("ZB", "ZC")</code> as they appear in the model summary.</p>
+<p>The bisection search is initialized in a predetermined interval. The maximum width of this interval is given by an amplitude (depending on the size of the estimated parameter and its standard error) multiplied by <code>amp_const</code>. The default for amp_const is 20. If the confidence bound is not found in the initial interval, <code>Inf</code> or <code>-Inf</code> is returned.</p>
 <p>#' @seealso <code><a href="flipscores.html">flipscores</a></code>, <code><a href="make_flips.html">make_flips</a></code></p>
     </div>
 
@@ -119,10 +125,10 @@ Default is inherited by the input model.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate   Score Std. Error z value Part. Cor Pr(&gt;|z|)  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  -0.3513 -5.4234     4.2404 -1.2790    -0.169   0.1174  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZB            0.2276  1.8048     2.8140  0.6414     0.079   0.4496  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ZC            0.9034 10.3392     3.4527  2.9945     0.348   0.0204 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X             0.6381 33.1168     8.0470  4.1154     0.478   0.0114 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  -0.3513 -5.4234     4.2404 -1.2790    -0.169   0.1136  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZB            0.2276  1.8048     2.8140  0.6414     0.079   0.4504  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ZC            0.9034 10.3392     3.4527  2.9945     0.348   0.0216 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X             0.6381 33.1168     8.0470  4.1154     0.478   0.0108 *</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -136,7 +142,7 @@ Default is inherited by the input model.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">mod0</span>, parm<span class="op">=</span><span class="st">"X"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       2.5 %   97.5 %</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X 0.1599183 1.134096</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X 0.1840837 1.152693</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">xx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">zz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">0.2</span> <span class="op">*</span> <span class="va">xx</span><span class="op">)</span></span></span>
@@ -150,17 +156,17 @@ Default is inherited by the input model.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate   Score Std. Error z value Part. Cor Pr(&gt;|z|)    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)   1.3887 23.4220     7.6982  3.0425     0.717   0.0002 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> xx            1.6018 19.6398     6.5080  3.0178     0.711   0.0030 ** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> zz           -0.5831 -9.5934     5.7612 -1.6652    -0.392   0.0706 .  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)    1.144  21.546      6.610   3.260     0.768   0.0010 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> xx             1.987  51.494     13.113   3.927     0.926   0.0016 ** </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> zz            -1.186 -20.132      6.217  -3.238    -0.763   0.0006 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Dispersion parameter for gaussian family taken to be 1.807022)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Dispersion parameter for gaussian family taken to be 1.006629)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Null deviance: 63.074  on 19  degrees of freedom</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 30.719  on 17  degrees of freedom</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AIC: 73.341</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Null deviance: 130.165  on 19  degrees of freedom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance:  17.113  on 17  degrees of freedom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AIC: 61.639</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Number of Fisher Scoring iterations: 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>

@@ -14,6 +14,7 @@ confint(
   type = c("equitailed", "symmetric"),
   score_type = c("standardized", "effective"),
   alternative = c("two.sided", "greater", "less"),
+  amp_const = 20,
   flips = NULL,
   n_flips = NULL,
   ...
@@ -51,6 +52,11 @@ confint(
   The direction of the test to invert, and corresponding interval with
   respect to the estimate. It can be "two.sided" (default), "greater",
   or "less".
+
+- amp_const:
+
+  Argument related to the maximum initial span of the search interval.
+  See details.
 
 - flips:
 
@@ -94,6 +100,12 @@ test a numeric variable `X`, one could write `to_be_tested = "X"`, but
 to test a factor `Z` with levels `A`, `B` and `C` one should write
 `to_be_tested = c("ZB", "ZC")` as they appear in the model summary.
 
+The bisection search is initialized in a predetermined interval. The
+maximum width of this interval is given by an amplitude (depending on
+the size of the estimated parameter and its standard error) multiplied
+by `amp_const`. The default for amp_const is 20. If the confidence bound
+is not found in the initial interval, `Inf` or `-Inf` is returned.
+
 \#' @seealso
 [`flipscores`](https://livioivil.github.io/flipscores/reference/flipscores.md),
 [`make_flips`](https://livioivil.github.io/flipscores/reference/make_flips.md)
@@ -113,10 +125,10 @@ summary(mod0)
 #> 
 #> Coefficients:
 #>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)  
-#> (Intercept)  -0.3513 -5.4234     4.2404 -1.2790    -0.169   0.1174  
-#> ZB            0.2276  1.8048     2.8140  0.6414     0.079   0.4496  
-#> ZC            0.9034 10.3392     3.4527  2.9945     0.348   0.0204 *
-#> X             0.6381 33.1168     8.0470  4.1154     0.478   0.0114 *
+#> (Intercept)  -0.3513 -5.4234     4.2404 -1.2790    -0.169   0.1136  
+#> ZB            0.2276  1.8048     2.8140  0.6414     0.079   0.4504  
+#> ZC            0.9034 10.3392     3.4527  2.9945     0.348   0.0216 *
+#> X             0.6381 33.1168     8.0470  4.1154     0.478   0.0108 *
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
@@ -130,7 +142,7 @@ summary(mod0)
 #> 
 confint(mod0, parm="X")
 #>       2.5 %   97.5 %
-#> X 0.1599183 1.134096
+#> X 0.1840837 1.152693
 
 xx <- rnorm(20)
 zz <- rnorm(20, 0.2 * xx)
@@ -144,17 +156,17 @@ summary(mod1)
 #> 
 #> Coefficients:
 #>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)    
-#> (Intercept)   1.3887 23.4220     7.6982  3.0425     0.717   0.0002 ***
-#> xx            1.6018 19.6398     6.5080  3.0178     0.711   0.0030 ** 
-#> zz           -0.5831 -9.5934     5.7612 -1.6652    -0.392   0.0706 .  
+#> (Intercept)    1.144  21.546      6.610   3.260     0.768   0.0010 ***
+#> xx             1.987  51.494     13.113   3.927     0.926   0.0016 ** 
+#> zz            -1.186 -20.132      6.217  -3.238    -0.763   0.0006 ***
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
-#> (Dispersion parameter for gaussian family taken to be 1.807022)
+#> (Dispersion parameter for gaussian family taken to be 1.006629)
 #> 
-#>     Null deviance: 63.074  on 19  degrees of freedom
-#> Residual deviance: 30.719  on 17  degrees of freedom
-#> AIC: 73.341
+#>     Null deviance: 130.165  on 19  degrees of freedom
+#> Residual deviance:  17.113  on 17  degrees of freedom
+#> AIC: 61.639
 #> 
 #> Number of Fisher Scoring iterations: 2
 #> 
