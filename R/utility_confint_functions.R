@@ -4,6 +4,7 @@ conf_bound_equitailed <- function(to_be_tested,
                                   mod,
                                   flips = NULL,
                                   alpha = 0.05,
+                                  amp_const = 20,
                                   score_type = score_type,
                                   alternative = alternative)
 {
@@ -50,7 +51,7 @@ conf_bound_equitailed <- function(to_be_tested,
     while (pp >= work_alpha)
     {
       bb <- bb - amp
-      if (abs(bb - bhat) > (15 * amp))
+      if (abs(bb - bhat) > (amp_const * amp))
       {
         warning("A confidence bound was not found in the search interval -- returning Inf")
         bb <- -Inf
@@ -105,7 +106,7 @@ conf_bound_equitailed <- function(to_be_tested,
     while (pp >= work_alpha)
     {
       bb <- bb + amp
-      if (abs(bb - bhat) > (15 * amp))
+      if (abs(bb - bhat) > (amp_const * amp))
       {
         warning("A confidence bound was not found in the search interval -- returning Inf")
         bb <- Inf
@@ -261,6 +262,7 @@ conf_bound_symmetric <- function(to_be_tested,
                                  mod,
                                  flips = NULL,
                                  alpha = 0.05,
+                                 amp_const = 20,
                                  score_type = score_type,
                                  ...)
 {
@@ -298,7 +300,7 @@ conf_bound_symmetric <- function(to_be_tested,
   while (pp >= alpha)
   {
     bdiff <- bdiff + amp
-    if (bdiff > (15 * amp))
+    if (bdiff > (amp_const * amp))
     {
       warning("A confidence bound was not found in the search interval -- returning Inf")
       bdiff <- Inf
