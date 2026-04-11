@@ -124,11 +124,11 @@ summary(mod0)
 #> flipscores(formula = Y ~ Z + X, family = "poisson", data = dt)
 #> 
 #> Coefficients:
-#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)  
-#> (Intercept)  -0.3513 -5.4234     4.2404 -1.2790    -0.169   0.1172  
-#> ZB            0.2276  1.8048     2.8140  0.6414     0.079   0.4368  
-#> ZC            0.9034 10.3392     3.4527  2.9945     0.348   0.0202 *
-#> X             0.6381 33.1168     8.0470  4.1154     0.478   0.0114 *
+#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)   
+#> (Intercept)  -0.3513 -5.4234     4.2404 -1.2790    -0.169   0.1152   
+#> ZB            0.2276  1.8048     2.8140  0.6414     0.079   0.4412   
+#> ZC            0.9034 10.3392     3.4527  2.9945     0.348   0.0214 * 
+#> X             0.6381 33.1168     8.0470  4.1154     0.478   0.0096 **
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
@@ -142,7 +142,7 @@ summary(mod0)
 #> 
 confint(mod0, parm="X")
 #>       2.5 %   97.5 %
-#> X 0.1828492 1.141177
+#> X 0.1795823 1.147919
 
 xx <- rnorm(20)
 zz <- rnorm(20, 0.2 * xx)
@@ -156,17 +156,17 @@ summary(mod1)
 #> 
 #> Coefficients:
 #>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
-#> (Intercept)   0.8013  15.9053     5.0564   3.1456     0.741    1e-03 ***
-#> xx            2.5305  33.6926     8.4136   4.0046     0.944    2e-04 ***
-#> zz           -0.8714 -22.6010     6.5895  -3.4299    -0.808    8e-04 ***
+#> (Intercept)   0.9816  17.7723     5.8115   3.0581     0.721   0.0024 ** 
+#> xx            2.0616  23.9152     6.4938   3.6828     0.868   0.0002 ***
+#> zz           -1.0089 -15.8961     5.3065  -2.9956    -0.706   0.0234 *  
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
-#> (Dispersion parameter for gaussian family taken to be 0.6140949)
+#> (Dispersion parameter for gaussian family taken to be 0.9488933)
 #> 
-#>     Null deviance: 99.29  on 19  degrees of freedom
-#> Residual deviance: 10.44  on 17  degrees of freedom
-#> AIC: 51.755
+#>     Null deviance: 66.978  on 19  degrees of freedom
+#> Residual deviance: 16.131  on 17  degrees of freedom
+#> AIC: 60.458
 #> 
 #> Number of Fisher Scoring iterations: 2
 #> 
