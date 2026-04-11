@@ -93,9 +93,9 @@ of the arguments.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)    </span></span>
-<span><span class="co">#&gt; (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016   0.9416    </span></span>
-<span><span class="co">#&gt; ZB           0.02318  0.13383    2.39994  0.05576     0.012   0.9582    </span></span>
-<span><span class="co">#&gt; ZC           0.15946  1.36568    2.93906  0.46467     0.097   0.6474    </span></span>
+<span><span class="co">#&gt; (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016   0.9358    </span></span>
+<span><span class="co">#&gt; ZB           0.02318  0.13383    2.39994  0.05576     0.012   0.9572    </span></span>
+<span><span class="co">#&gt; ZC           0.15946  1.36568    2.93906  0.46467     0.097   0.6602    </span></span>
 <span><span class="co">#&gt; X            0.89732 35.59669    6.63014  5.36892     0.726   0.0004 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
@@ -123,8 +123,8 @@ scores.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model: Y ~ Z + X</span></span>
 <span><span class="co">#&gt;   Df    Score Pr(&gt;Score)    </span></span>
-<span><span class="co">#&gt; Z  2 0.243224     0.9088    </span></span>
-<span><span class="co">#&gt; X  1 0.042297     0.0004 ***</span></span>
+<span><span class="co">#&gt; Z  2 0.240248     0.9082    </span></span>
+<span><span class="co">#&gt; X  1 0.042589     0.0004 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co"># or</span></span>
@@ -139,7 +139,7 @@ scores.</p>
 <span><span class="co">#&gt; Model 1: Y ~ Z</span></span>
 <span><span class="co">#&gt; Model 2: Y ~ Z + X</span></span>
 <span><span class="co">#&gt;                    Df    Score Pr(&gt;Score)    </span></span>
-<span><span class="co">#&gt; Model 2 vs Model 1  1 0.041756      4e-04 ***</span></span>
+<span><span class="co">#&gt; Model 2 vs Model 1  1 0.041773      2e-04 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co"># and</span></span>
@@ -154,7 +154,7 @@ scores.</p>
 <span><span class="co">#&gt; Model 1: Y ~ X</span></span>
 <span><span class="co">#&gt; Model 2: Y ~ Z + X</span></span>
 <span><span class="co">#&gt;                    Df   Score Pr(&gt;Score)</span></span>
-<span><span class="co">#&gt; Model 2 vs Model 1  2 0.27248     0.8886</span></span></code></pre></div>
+<span><span class="co">#&gt; Model 2 vs Model 1  2 0.27306      0.891</span></span></code></pre></div>
 <p>Equivalently, one might apply the <code>flipscores</code> function to
 a precomputed <code>glm</code> model.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -167,9 +167,9 @@ a precomputed <code>glm</code> model.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)    </span></span>
-<span><span class="co">#&gt; (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016   0.9364    </span></span>
-<span><span class="co">#&gt; ZB           0.02318  0.13383    2.39994  0.05576     0.012   0.9600    </span></span>
-<span><span class="co">#&gt; ZC           0.15946  1.36568    2.93906  0.46467     0.097   0.6506    </span></span>
+<span><span class="co">#&gt; (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016   0.9378    </span></span>
+<span><span class="co">#&gt; ZB           0.02318  0.13383    2.39994  0.05576     0.012   0.9618    </span></span>
+<span><span class="co">#&gt; ZC           0.15946  1.36568    2.93906  0.46467     0.097   0.6572    </span></span>
 <span><span class="co">#&gt; X            0.89732 35.59669    6.63014  5.36892     0.726   0.0004 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
@@ -197,9 +197,9 @@ precomputing flips with the function <code>make_flips</code>.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)    </span></span>
-<span><span class="co">#&gt; (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.945    </span></span>
-<span><span class="co">#&gt; ZB           0.02318  0.13383    2.39994  0.05576     0.012    0.956    </span></span>
-<span><span class="co">#&gt; ZC           0.15946  1.36568    2.93906  0.46467     0.097    0.653    </span></span>
+<span><span class="co">#&gt; (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.946    </span></span>
+<span><span class="co">#&gt; ZB           0.02318  0.13383    2.39994  0.05576     0.012    0.946    </span></span>
+<span><span class="co">#&gt; ZC           0.15946  1.36568    2.93906  0.46467     0.097    0.643    </span></span>
 <span><span class="co">#&gt; X            0.89732 35.59669    6.63014  5.36892     0.726    0.001 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
@@ -218,9 +218,9 @@ precomputing flips with the function <code>make_flips</code>.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)    </span></span>
-<span><span class="co">#&gt; (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.945    </span></span>
-<span><span class="co">#&gt; ZB           0.02318  0.13383    2.39994  0.05576     0.012    0.956    </span></span>
-<span><span class="co">#&gt; ZC           0.15946  1.36568    2.93906  0.46467     0.097    0.653    </span></span>
+<span><span class="co">#&gt; (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.946    </span></span>
+<span><span class="co">#&gt; ZB           0.02318  0.13383    2.39994  0.05576     0.012    0.946    </span></span>
+<span><span class="co">#&gt; ZC           0.15946  1.36568    2.93906  0.46467     0.097    0.643    </span></span>
 <span><span class="co">#&gt; X            0.89732 35.59669    6.63014  5.36892     0.726    0.001 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
@@ -241,9 +241,9 @@ precomputing flips with the function <code>make_flips</code>.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)</span></span>
-<span><span class="co">#&gt; (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.533</span></span>
-<span><span class="co">#&gt; ZB           0.02318  0.13383    2.39994  0.05576     0.012    0.516</span></span>
-<span><span class="co">#&gt; ZC           0.15946  1.36568    2.93906  0.46467     0.097    0.680</span></span>
+<span><span class="co">#&gt; (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.527</span></span>
+<span><span class="co">#&gt; ZB           0.02318  0.13383    2.39994  0.05576     0.012    0.521</span></span>
+<span><span class="co">#&gt; ZC           0.15946  1.36568    2.93906  0.46467     0.097    0.672</span></span>
 <span><span class="co">#&gt; X            0.89732 35.59669    6.63014  5.36892     0.726    1.000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; (Dispersion parameter for poisson family taken to be 1)</span></span>
@@ -260,9 +260,9 @@ precomputing flips with the function <code>make_flips</code>.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)    </span></span>
-<span><span class="co">#&gt; (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016   0.4654    </span></span>
-<span><span class="co">#&gt; ZB           0.02318  0.13383    2.39994  0.05576     0.012   0.4816    </span></span>
-<span><span class="co">#&gt; ZC           0.15946  1.36568    2.93906  0.46467     0.097   0.3228    </span></span>
+<span><span class="co">#&gt; (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016   0.4634    </span></span>
+<span><span class="co">#&gt; ZB           0.02318  0.13383    2.39994  0.05576     0.012   0.4786    </span></span>
+<span><span class="co">#&gt; ZC           0.15946  1.36568    2.93906  0.46467     0.097   0.3282    </span></span>
 <span><span class="co">#&gt; X            0.89732 35.59669    6.63014  5.36892     0.726   0.0002 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
@@ -306,7 +306,7 @@ p-values for all the others</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)    </span></span>
-<span><span class="co">#&gt; (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.945    </span></span>
+<span><span class="co">#&gt; (Intercept)  0.02207  0.26383    3.44133  0.07666     0.016    0.946    </span></span>
 <span><span class="co">#&gt; ZB           0.02318       NA         NA       NA        NA       NA    </span></span>
 <span><span class="co">#&gt; ZC           0.15946       NA         NA       NA        NA       NA    </span></span>
 <span><span class="co">#&gt; X            0.89732 35.59669    6.63014  5.36892     0.726    0.001 ***</span></span>
@@ -334,7 +334,7 @@ paid if <code>factor/character</code> variables are involved.</p>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate   Score Std. Error z value Part. Cor Pr(&gt;|z|)</span></span>
 <span><span class="co">#&gt; (Intercept)  0.02207      NA         NA      NA        NA       NA</span></span>
-<span><span class="co">#&gt; ZB           0.02318 0.13383    2.39994 0.05576     0.012    0.956</span></span>
+<span><span class="co">#&gt; ZB           0.02318 0.13383    2.39994 0.05576     0.012    0.946</span></span>
 <span><span class="co">#&gt; ZC           0.15946      NA         NA      NA        NA       NA</span></span>
 <span><span class="co">#&gt; X            0.89732      NA         NA      NA        NA       NA</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -353,7 +353,7 @@ paid if <code>factor/character</code> variables are involved.</p>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate   Score Std. Error z value Part. Cor Pr(&gt;|z|)</span></span>
 <span><span class="co">#&gt; (Intercept)  0.02207      NA         NA      NA        NA       NA</span></span>
-<span><span class="co">#&gt; ZB           0.02318 0.13383    2.39994 0.05576     0.012    0.956</span></span>
+<span><span class="co">#&gt; ZB           0.02318 0.13383    2.39994 0.05576     0.012    0.946</span></span>
 <span><span class="co">#&gt; ZC           0.15946      NA         NA      NA        NA       NA</span></span>
 <span><span class="co">#&gt; X            0.89732      NA         NA      NA        NA       NA</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -376,9 +376,9 @@ quotes.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate    Score Std. Error  z value Part. Cor Pr(&gt;|z|)    </span></span>
-<span><span class="co">#&gt; (Intercept)  0.02208  0.26385    3.18354  0.08288     0.016   0.9398    </span></span>
-<span><span class="co">#&gt; ZB           0.02316  0.13368    2.20995  0.06049     0.012   0.9552    </span></span>
-<span><span class="co">#&gt; ZC           0.15946  1.36541    2.72310  0.50142     0.096   0.6484    </span></span>
+<span><span class="co">#&gt; (Intercept)  0.02208  0.26385    3.18354  0.08288     0.016   0.9392    </span></span>
+<span><span class="co">#&gt; ZB           0.02316  0.13368    2.20995  0.06049     0.012   0.9586    </span></span>
+<span><span class="co">#&gt; ZC           0.15946  1.36541    2.72310  0.50142     0.096   0.6474    </span></span>
 <span><span class="co">#&gt; X            0.89733 17.36132    4.68164  3.70839     0.714   0.0004 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
@@ -397,25 +397,25 @@ misspecification of the test.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">mod</span>, n_flips <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                  2.5 %    97.5 %</span></span>
-<span><span class="co">#&gt; (Intercept) -0.8163922 0.4984970</span></span>
-<span><span class="co">#&gt; ZB          -1.5591010 0.8733270</span></span>
-<span><span class="co">#&gt; ZC          -0.6914538 0.8176993</span></span>
-<span><span class="co">#&gt; X            0.6327678 1.2986202</span></span></code></pre></div>
+<span><span class="co">#&gt; (Intercept) -0.8881130 0.4782445</span></span>
+<span><span class="co">#&gt; ZB          -1.5536832 0.8316145</span></span>
+<span><span class="co">#&gt; ZC          -0.7030348 0.9158036</span></span>
+<span><span class="co">#&gt; X            0.6542843 1.2892849</span></span></code></pre></div>
 <p>As before, various options are allowed, including the possibility to
 generate symmetric confidence intervals.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">mod</span>, parm <span class="op">=</span> <span class="fl">4</span>, flips <span class="op">=</span> <span class="va">flps</span><span class="op">)</span> <span class="co"># parm == to_be_tested!</span></span>
 <span><span class="co">#&gt;       2.5 %   97.5 %</span></span>
-<span><span class="co">#&gt; X 0.6467617 1.279425</span></span>
+<span><span class="co">#&gt; X 0.6385174 1.308078</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">mod</span>, parm <span class="op">=</span> <span class="fl">4</span>, level <span class="op">=</span> <span class="fl">0.99</span>, flips <span class="op">=</span> <span class="va">flps</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       0.5 %   99.5 %</span></span>
-<span><span class="co">#&gt; X 0.5443523 1.824792</span></span>
+<span><span class="co">#&gt; X 0.5535961 1.594587</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">mod</span>, parm <span class="op">=</span> <span class="fl">4</span>, alternative <span class="op">=</span> <span class="st">"greater"</span>, flips <span class="op">=</span> <span class="va">flps</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        Est.     95 %</span></span>
-<span><span class="co">#&gt; X 0.8973217 1.183059</span></span>
+<span><span class="co">#&gt; X 0.8973217 1.191005</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">mod</span>, parm <span class="op">=</span> <span class="fl">4</span>, type <span class="op">=</span> <span class="st">"symmetric"</span>, flips <span class="op">=</span> <span class="va">flps</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       2.5 %   97.5 %</span></span>
-<span><span class="co">#&gt; X 0.5751064 1.219537</span></span></code></pre></div>
+<span><span class="co">#&gt; X 0.5892757 1.205368</span></span></code></pre></div>
 </div>
   </main>
 </div>

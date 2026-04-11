@@ -108,8 +108,9 @@ test statistics (i.e. no flips) is in the first row of `Tspace`.
 
 ## References
 
-"Robust testing in generalized linear models by sign-flipping score
-contributions" by J.Hemerik, J.Goeman and L.Finos.
+De Santis, Goeman, Hemerik, Davenport, Finos (2025) Inference in
+generalized linear models with robustness to misspecified variances.
+JASA \<doi:10.1080/01621459.2025.2491775\>
 
 ## See also
 
@@ -137,11 +138,11 @@ summary(mod)
 #>     n_flips = 1000)
 #> 
 #> Coefficients:
-#>              Estimate     Score Std. Error   z value Part. Cor Pr(>|z|)   
-#> (Intercept)   0.04964   0.55830    3.32802   0.16776     0.064    0.810   
-#> ZB            0.20371   3.71436    4.27357   0.86915     0.326    0.171   
-#> ZC            0.87538  17.18530    4.43500   3.87493     0.856    0.004 **
-#> X             1.95754 109.81199    9.92393  11.06538     0.749    0.004 **
+#>              Estimate     Score Std. Error   z value Part. Cor Pr(>|z|)    
+#> (Intercept)   0.04964   0.55830    3.32802   0.16776     0.064    0.796    
+#> ZB            0.20371   3.71436    4.27357   0.86915     0.326    0.161    
+#> ZC            0.87538  17.18530    4.43500   3.87493     0.856    0.002 ** 
+#> X             1.95754 109.81199    9.92393  11.06538     0.749    0.001 ***
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 

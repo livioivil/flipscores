@@ -189,9 +189,6 @@ example) on [github](https://github.com/livioivil/flipscores/issues).
 - [`flipscores()`](https://livioivil.github.io/flipscores/reference/flipscores.md)
   : Robust testing in GLMs, by sign-flipping score contributions
 
-- [`gR2()`](https://livioivil.github.io/flipscores/reference/gR2.md) :
-  Generalized R-squared for GLM Models
-
 - [`gcor()`](https://livioivil.github.io/flipscores/reference/gcor.md) :
   Compute Generalized Partial Correlations for GLM terms
 
