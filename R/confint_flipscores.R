@@ -7,6 +7,7 @@
 #' @param score_type The type of score that is computed. It can be "standardized" or "effective".
 #' Default is inherited by the input model.
 #' @param alternative The direction of the test to invert, and corresponding interval with respect to the estimate. It can be "two.sided" (default), "greater", or "less".
+#' @param amp_const Argument related to the maximum initial span of the search interval. See details.
 #' @param flips the fixed flips to use in the interval search. If \code{NULL} (default), it tries to inherit it from the input model.
 #' @param n_flips If \code{flips} are not given or retrieved by the model, the number of random flips of the score contributions. Default inherits them from the input model.
 #' @param ... additional arguments for methods.
@@ -18,6 +19,8 @@
 #' \code{flipscores} is based on randomly sign-flipped score contributions. Performing the test (and generating the confidence interval) different times might give slightly different results. Providing a flip matrix generated with \code{\link{make_flips}} is suggested to uniform the results.
 #'
 #' \code{to_be_tested} works differently for factors and character variables: the corresponding dummy variables are to be tested separately. So, to test a numeric variable \code{X}, one could write \code{to_be_tested = "X"}, but to test a factor \code{Z} with levels \code{A}, \code{B} and \code{C} one should write \code{to_be_tested = c("ZB", "ZC")} as they appear in the model summary.
+#'
+#' The bisection search is initialized in a predetermined interval. The maximum width of this interval is given by an amplitude (depending on the size of the estimated parameter and its standard error) multiplied by \code{amp_const}. The default for amp_const is 20. If the confidence bound is not found in the initial interval, \code{Inf} or \code{-Inf} is returned.
 #'
 #'#' @seealso \code{\link{flipscores}}, \code{\link{make_flips}}
 #'
@@ -45,6 +48,7 @@ confint.flipscores <- function(object,
                                type = c("equitailed", "symmetric"),
                                score_type = c("standardized", "effective"),
                                alternative = c("two.sided", "greater", "less"),
+                               amp_const = 20,
                                # -1, 0, 1
                                flips = NULL,
                                n_flips = NULL,
@@ -178,6 +182,7 @@ confint.flipscores <- function(object,
         mod = object,
         flips = flips,
         alpha = alpha,
+        amp_const = amp_const,
         score_type = score_type,
         alternative = alternative
     )
