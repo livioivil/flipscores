@@ -108,7 +108,8 @@
 #' (results <-  gR2(mod,normalize=TRUE,algorithm="multi_start"))
 #'
 #' @author Livio Finos and Paolo Girardi
-#' @export
+#' @noRd
+# @export
 
 gR2 <- function(full_glm, null_glm = NULL,
                 terms = NULL,

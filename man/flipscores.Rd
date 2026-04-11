@@ -67,7 +67,7 @@ summary(mod2)
 
 }
 \references{
-"Robust testing in generalized linear models by sign-flipping score contributions" by J.Hemerik, J.Goeman and L.Finos.
+De Santis, Goeman, Hemerik, Davenport, Finos (2025) Inference in generalized linear models with robustness to misspecified variances. JASA <doi:10.1080/01621459.2025.2491775>
 }
 \seealso{
 \code{\link{anova.flipscores}}, \code{\link{summary.flipscores}}, \code{\link[flip]{flip}}, \code{\link{confint.flipscores}}

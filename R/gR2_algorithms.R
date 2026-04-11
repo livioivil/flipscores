@@ -138,19 +138,5 @@ multi_start_R2 <- function(Z, X, Y_user = NULL,
 
 # ----------- Brute force for small n -----------
 
-bruteforce_R2 <- function(Z, X) {
-  n <- nrow(Z)
-  best_val <- -Inf
-  best_Y <- NULL
-  for (num in 0:(2^n - 1)) {
-    Y <- as.integer(intToBits(num)[1:n])
-    val <- compute_R2(Y, Z, X)
-    if (val > best_val) {
-      best_val <- val
-      best_Y <- Y
-    }
-  }
-  list(Y = best_Y, R2 = best_val)
-}
 
 

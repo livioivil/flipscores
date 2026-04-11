@@ -5,7 +5,7 @@
 \alias{flipscores-package}
 \title{flipscores: Robust Score Testing in GLMs, by Sign-Flip Contributions}
 \description{
-Provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables. See Hemerik, Goeman and Finos (2020) \doi{10.1111/rssb.12369}.
+Provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables. See Hemerik, Goeman and Finos (2020) \doi{10.1111/rssb.12369} and De Santis, Goeman, Hemerik, Davenport, Finos (2025) \doi{10.1080/01621459.2025.2491775}.
 
 It provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables.
 }
@@ -51,7 +51,5 @@ Other contributors:
   \item Andrea Panarotto [contributor]
 }
 
-
-Livio Finos, Jelle Goeman and Jesse Hemerik, with contribution of Riccardo De Santis.
 }
 \keyword{internal}

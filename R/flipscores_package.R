@@ -1,4 +1,4 @@
-#' Robust Score Testing in GLMs, by Sign-Flip Contributions 
+#' Robust Score Testing in GLMs, by Sign-Flip Contributions
 #'
 #' @description It provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables.
 #' @importFrom MASS glm.nb
@@ -11,7 +11,7 @@
 #' dt$Y=rpois(n=20,lambda=exp(dt$X))
 #' mod=flipscores(Y~Z+X,data=dt,family="poisson",x=TRUE)
 #' summary(mod)
-#' 
+#'
 #' # Anova test
 #' anova(mod)
 #' # or
@@ -21,7 +21,6 @@
 #' mod0=flipscores(Y~X,data=dt,family="poisson")
 #' anova(mod0,mod)
 #'
-#' @author Livio Finos, Jelle Goeman and Jesse Hemerik, with contribution of Riccardo De Santis.
 #' @name flipscores-package
-#' @keywords internal 
+#' @keywords internal
 "_PACKAGE"

@@ -40,7 +40,7 @@
 #'
 #' @name flipscores
 #'
-#' @references "Robust testing in generalized linear models by sign-flipping score contributions" by J.Hemerik, J.Goeman and L.Finos.
+#' @references  De Santis, Goeman, Hemerik, Davenport, Finos (2025) Inference in generalized linear models with robustness to misspecified variances. JASA <doi:10.1080/01621459.2025.2491775>
 #'
 #' @examples
 #' set.seed(1)
@@ -56,6 +56,14 @@
 #' summary(mod2)
 #'
 #' @export
+#' @importFrom stats binomial
+#' @importFrom stats coef
+#' @importFrom stats complete.cases
+#' @importFrom stats fitted
+#' @importFrom stats glm
+#' @importFrom stats plogis
+#' @importFrom stats rbinom
+#' @importFrom stats rnorm
 
 
 

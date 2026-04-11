@@ -13,16 +13,6 @@
 #' @param normalize FALSE by default.
 #' @param intercept_too Logical indicating whether to include the intercept
 #'   as a variable. Default is FALSE.
-#' @param algorithm Only used if \code{normalize} is \code{TRUE}. `"auto"` by default. It choose between `"intercept_only"`, `"brute_force"` and `"multi_start"`
-#' @param algorithm.control Only used if \code{normalize} is \code{TRUE}. `list` of control parameters:
-#' `n_exact` Integer specifying the sample size threshold for using exact
-#'   methods (brute force). Default is 15.
-#' `thresholds` Numeric vector of threshold values for multi-start initialization.
-#' `n_random` Integer number of random starts for multi-start optimization.
-#' `max_iter` Integer maximum number of iterations per start.
-#' `topK` Integer number of top candidates to consider at each iteration.
-#' `tol` Numeric tolerance for convergence.
-#' `patience` Integer number of iterations without improvement before stopping.
 #'
 #' @return if \code{normalize} is \code{FALSE}, a data frame with five columns:
 #'   \item{variable}{The variable name}
@@ -110,25 +100,50 @@
 #' gcor(mod, terms = c("X", "ZC"),normalize=TRUE)
 #'
 #'
+#'############################
+#' set.seed(1)
+#' Z=rnorm(20)
+#' X=Z+rnorm(20)-10
+#' Y=rpois(n=20,lambda=exp(Z+.25*X))
+#' model1=glm(Y~Z+X,family="poisson")
+#' gcor(model1)
+#' gcor(model1, normalize=TRUE)
+#' normalized_gcor_poisson(model1, "X", verbose = TRUE)[1:3]
+#' model0=glm(Y~Z,family="poisson")
+#' sapply(c('v','kl','sse','lr','n'),function(type) rsq.partial(model1,model0,type=type)$partial.rsq)
+#'
+#' set.seed(1)
+#' Z=rnorm(2000)
+#' X=5+Z+rnorm(2000)
+#' Y=rbinom(n=2000,1,prob=plogis((-.5*Z+1*X)))
+#' model1=glm(Y~Z+X,family="binomial")
+#' gcor(model1)
+#' gcor(model1, normalize=TRUE)
+#' normalized_gcor_binomial(model1, "X", verbose = TRUE)[1:3]
+#' model0=glm(Y~Z,family="binomial")
+#' sapply(c('v','kl','sse','lr','n'),function(type) rsq.partial(model1,model0,type=type)$partial.rsq)
+#'
+#' set.seed(1)
+#' Z=rnorm(20)
+#' X=Z+rnorm(20)
+#' Y=rnorm(n=20,mean=(Z+2*X))
+#' model1=glm(Y~Z+X)
+#' gcor(model1)
+#' gcor(model1, normalize=TRUE)
+#'
+#' library(rsq)
+#' model0x=glm(X~Z)
+#' model0y=glm(Y~Z)
+#' t(.nrmz(resid(model0x)))%*% .nrmz(resid(model0y))
+#' library(ppcor)
+#' pcor(cbind(X,Z,Y))
+#' sapply(c('v','kl','sse','lr','n'),function(type) rsq.partial(model1,model0y,type=type)$partial.rsq)
+#'
 #' @export
-
-#library(flipscores)
-#sapply(dir("./to_flipscores/",pattern = ".R$",full.names = TRUE),source)
-
 
 gcor <- function(full_glm, terms = NULL,
                  normalize=FALSE,
-                 intercept_too=FALSE,
-                 algorithm = "auto",
-                 algorithm.control=list(n_exact = 15,
-                                        thresholds = c(-.1, 0, .1),
-                                        n_random = max(1,13+log(1/nrow(model.matrix(full_glm)))),
-                                        max_iter = 1000,
-                                        topK = max(10,min(100,length(nrow(model.matrix(full_glm)))/10)),
-                                        tol = 1e-12,
-                                        patience = 10)
-
-                 ) {
+                 intercept_too=FALSE) {
   # Extract model components
   Y <- full_glm$y
   X_full <- model.matrix(full_glm)
@@ -173,9 +188,8 @@ gcor <- function(full_glm, terms = NULL,
     }
     #
 
-    results=lapply(terms,socket_compute_gcor_normalized_binom,
-                   full_glm,algorithm=algorithm,
-                   algorithm.control=algorithm.control)
+    results=lapply(terms,socket_compute_gcor_normalized_conditional,
+                   full_glm)
     results=do.call(rbind,results)
 
 
@@ -188,9 +202,7 @@ gcor <- function(full_glm, terms = NULL,
       terms = paste0("~",terms),
       r=results$r,
       r_n=results$r_n,
-      null_model = sapply(terms,function(i) paste0(setdiff(all_vars,i),collapse   ="+")),
-      algorithm=results$algorithm,
-      is.exact=results$is.exact)
+      null_model = sapply(terms,function(i) paste0(setdiff(all_vars,i),collapse   ="+")))
     return(results)
   } else {
     results=sapply(terms,socket_compute_gcor,
@@ -235,11 +247,14 @@ gcor <- function(full_glm, terms = NULL,
 #' model0=glm(Y~Z+1,family="poisson",x=TRUE)
 #' model1=glm(Y~Z+X,family="poisson")
 #' X=data.frame(X=X)
+#' gcor(model1)
+#' gcor(model1, normalize=TRUE)
 #' scr0=compute_gcor(model0 = model0,  X)
 #' scr0$part_cor^2
 #' sc=part_cor_new(model0 = model0,  model1)
 #' sapply(c('v','kl','sse','lr','n'),function(type) rsq.partial(model1,model0,type=type)$partial.rsq)
 #' plot(scr0$IHX,scr0$IHY)
+#' normalized_gcor_poisson(model1, "X", verbose = TRUE)
 #'
 #' set.seed(1)
 #' Z=rnorm(20)
@@ -247,6 +262,9 @@ gcor <- function(full_glm, terms = NULL,
 #' Y=rbinom(n=20,1,prob=plogis((-.5*Z+2*X)))
 #' model0=glm(Y~Z+1,family="binomial")
 #' model1=glm(Y~Z+X,family="binomial")
+#' gcor(model1)
+#' gcor(model1, normalize=TRUE)
+
 #' X=data.frame(X=X)
 #' scr0=compute_gcor(model0 = model0,  X)
 #' scr0$part_cor^2
@@ -315,7 +333,6 @@ compute_gcor <- function(model0, X, compute_gR2=FALSE,...){
     IHY <- matrix(model0$y)
     IHY <- matrix(IHY)/sqrt(sum(IHY^2))
     IHX = X
-    IHY = .nrmz(IHY)
   } else { # at least one covariate
     ##  EFFECTIVE SCORE
     residuals=(Y-model0$fitted.values)
@@ -329,16 +346,16 @@ compute_gcor <- function(model0, X, compute_gR2=FALSE,...){
     sqrtW=(D_vect*sqrtinvV_vect)
     residuals=sqrtinvV_vect*residuals
     IHY <- matrix(residuals)
-    IHY=.nrmz(IHY)
     Z_weighted <- Z * sqrtW  # Equivalent to diag(w_sqrt) %*% Z
     IH <- .get_IH(Z_weighted)
     IHX <- t(t(X*sqrtW)%*%IH)
 
   }
 
+  IHY=.nrmz(IHY)
   if(compute_gR2){
     gR2 <- as.numeric(t(IHY) %*% IHX  %*% solve(t(IHX)%*%IHX) %*% t(IHX) %*% IHY)
-    return(gR2)
+    return(list(gR2=gR2,IHX=IHX,IH=IH,sqrtinvV_vect=sqrtinvV_vect,W=D_vect^2/V_vect))
   } else {
     part_cor=as.vector(t(IHX)%*%IHY)
     if(ncol(IHX)>1)
@@ -346,8 +363,9 @@ compute_gcor <- function(model0, X, compute_gR2=FALSE,...){
     else
       part_cor <-part_cor/sqrt(sum(IHX^2))
     names(part_cor)=colnames(X)
-    return(part_cor)
+    return(list(part_cor=part_cor,IHX=IHX,IH=IH,sqrtinvV_vect=sqrtinvV_vect,W=D_vect^2/V_vect))
   }
+
   # return(list(IHX=IHX, IHY=IHY,part_cor=part_cor,
   #             HsqrtinvV=HsqrtinvV,
   #             IHsqrtinvV=IHsqrtinvV,

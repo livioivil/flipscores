@@ -118,21 +118,13 @@ socket_compute_gcor <- function(i,model){
     model$call[[1]]=quote(glm.nb) else
       model$call[[1]]=quote(glm)
   model_i <-update(model)
-    gcor=compute_gcor(model0 = model_i,X = mm[,i,drop=FALSE])
+    gcor=compute_gcor(model0 = model_i,X = mm[,i,drop=FALSE])$part_cor
 }
 
 
 
 # i and exclude are indices of the columns of model.frame x
-socket_compute_gcor_normalized_binom <- function(i,model,algorithm="auto",
-                                                 algorithm.control=list(
-                                                   n_exact = 15,
-                                                   thresholds = c(-.1, 0, .1),
-                                                   n_random = 10,
-                                                   max_iter = 1000,
-                                                   topK = 10,
-                                                   tol = 1e-12,
-                                                   patience = 10), ...){
+socket_compute_gcor_normalized_conditional <- function(i,model, ...){
   mm=model.matrix(model)
   all_vars_names=colnames(mm)
   if(is.numeric(i)) {
@@ -162,62 +154,11 @@ socket_compute_gcor_normalized_binom <- function(i,model,algorithm="auto",
   if(length(grep("Negative Binomial",model$family$family))==1)
     model$call[[1]]=quote(glm.nb) else
       model$call[[1]]=quote(glm)
+
   model_i <-update(model)
-  gcor=compute_gcor_normalized_binom(model0 = model_i,X = mm[,i_id,drop=FALSE],
-                                     algorithm=algorithm,
-                                     algorithm.control=algorithm.control)
+  gcor=compute_gcor_normalized_conditional(model0 = model_i,X = mm[,i_id,drop=FALSE])
 }
 
-
-
-# fit_null_glm.R
-# Implements fit_null_glm(Y, Z, X) expected by the helper and algorithm scripts.
-# - Y: binary vector (0/1), length n
-# - Z: n x q matrix of confounders (without intercept)
-# - X: n x p matrix of predictors of interest (can be vector or matrix)
-# Returns a list with:
-#   mu      : fitted probabilities (length n)
-#   V_diag  : vector of variances mu*(1-mu)
-#   X_r     : residualized (weighted) design for X: X_r = (I - H) W^{1/2} X
-#   H       : the weighted hat matrix for the null model (n x n)
-#   fit     : the glm fit object (invisible use)
-# fit_null_glm <- function(Y, Z, X) {
-#   n <- length(Y)
-#   if (is.null(Z)) {
-#     Z <- matrix(nrow = n, ncol = 0)
-#   }
-#   # Ensure X is matrix
-#   X <- as.matrix(X)
-#   # Fit null logistic regression; use glm with binomial
-#   fit <- glm(Y ~ Z-1, family = binomial())
-#   mu <- fitted(fit)
-#   # ensure mu in (epsilon, 1-epsilon)
-#   eps <- 1e-12
-#   mu <- pmin(pmax(mu, eps), 1 - eps)
-#   Vd <- mu * (1 - mu)
-#   # Weighted matrices
-#   W <- Vd
-#   Ws_half <- sqrt(W)
-#   Wmat_sqrt <- diag(Ws_half, n, n)
-#   # Compute H = W^{1/2} X (X^T W X)^{-1} X^T W^{1/2}
-#   XtWX <- t(X) %*% (W * X)   # same as t(X) %*% diag(W) %*% X but faster
-#   # regularize if near-singular
-#   if (rcond(XtWX) < 1e-12) {
-#     XtWX <- XtWX + diag(1e-8, ncol(XtWX))
-#   }
-#   XtWXinv <- solve(XtWX)
-#   H <- Wmat_sqrt %*% X %*% XtWXinv %*% t(X) %*% Wmat_sqrt
-#   # Compute X_r = (I - H) W^{1/2} X
-#   WX <- Wmat_sqrt %*% X
-#   IminusH <- diag(n) - H
-#   X_r <- IminusH %*% WX
-#   # Return list
-#   list(mu = as.numeric(mu),
-#        V_diag = as.numeric(Vd),
-#        X_r = X_r,
-#        H = H,
-#        fit = fit)
-# }
 
 fit_null_glm <- function(Y, Z, X,link="logit") {
   # Y: 0/1 vector length n

@@ -264,7 +264,7 @@ get_X <- function (model0, model1)
   else if (is.character(model1)) {
     vars0 = colnames(model.matrix(model0))
     extra_terms=setdiff(model1, vars0)
-    X = mm[,   extra_terms, drop = FALSE]
+    X = model.matrix(model0)[,   extra_terms, drop = FALSE]
   } else X=model1
 
   if (!is.matrix(X))
