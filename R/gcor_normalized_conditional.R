@@ -113,7 +113,7 @@ compute_gcor_normalized_conditional <- function(model0, X, ...){
         Z %*% (solveZ %*% WZ(A))
       }
 
-      Xr = X - project(X)
+      Xr = r$IHX#X - project(X)
 
       mx = if(r$part_cor < 0) min(Xr) else max(Xr)
       S = which(abs(Xr - mx) < 1e-8)
@@ -121,7 +121,7 @@ compute_gcor_normalized_conditional <- function(model0, X, ...){
       v = rep(0, length(X))
       v[S] = 1
 
-      vr = v - project(v)
+      vr = r$IH%*%v
 
       bound = sum(Xr * vr) / sqrt(sum(Xr^2) * sum(vr^2))
   } else if(model0$family$link == "log"){
