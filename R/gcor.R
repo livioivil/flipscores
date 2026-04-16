@@ -113,9 +113,9 @@
 #' sapply(c('v','kl','sse','lr','n'),function(type) rsq.partial(model1,model0,type=type)$partial.rsq)
 #'
 #' set.seed(1)
-#' Z=rnorm(2000)
-#' X=5+Z+rnorm(2000)
-#' Y=rbinom(n=2000,1,prob=plogis((-.5*Z+1*X)))
+#' Z=rnorm(20)
+#' X=Z+rnorm(20)
+#' Y=rbinom(n=20,1,prob=plogis((-.5*Z+1*X)))
 #' model1=glm(Y~Z+X,family="binomial")
 #' gcor(model1)
 #' gcor(model1, normalize=TRUE)
@@ -125,7 +125,7 @@
 #'
 #' set.seed(1)
 #' Z=rnorm(20)
-#' X=Z+rnorm(20)
+#' X=10+Z+rnorm(20)
 #' Y=rnorm(n=20,mean=(Z+2*X))
 #' model1=glm(Y~Z+X)
 #' gcor(model1)
@@ -363,7 +363,7 @@ compute_gcor <- function(model0, X, compute_gR2=FALSE,...){
     else
       part_cor <-part_cor/sqrt(sum(IHX^2))
     names(part_cor)=colnames(X)
-    return(list(part_cor=part_cor,IHX=IHX,IH=IH,sqrtinvV_vect=sqrtinvV_vect,W=D_vect^2/V_vect))
+    return(list(part_cor=part_cor,IHX=IHX,IHY=IHY,IH=IH,sqrtinvV_vect=sqrtinvV_vect,W=D_vect^2/V_vect))
   }
 
   # return(list(IHX=IHX, IHY=IHY,part_cor=part_cor,

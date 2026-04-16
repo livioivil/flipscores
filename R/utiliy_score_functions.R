@@ -220,7 +220,7 @@ socket_compute_flip <- function(scores,flip_param_call){
   # seed=seed,
   # statTest="sum")
   # results$scores=scores
-  attributes(scores)$Xr
+  #attributes(scores)$Xr
   dispersion=attributes(scores)$dispersion
   for(i in seq(length(results))){
     nrm2=sum(attributes(scores)$Xr[,i]^2)

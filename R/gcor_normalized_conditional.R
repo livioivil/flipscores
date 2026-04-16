@@ -101,29 +101,38 @@ compute_gcor_normalized_conditional <- function(model0, X, ...){
     #   bound = t(.nrmz(r$IHX))%*%.nrmz(Y_opt)
 
       ######################################
-      #X = X
-      Z = model.matrix(model0)
-      w <- p0 <- predict(model0, type="response")
+    # Z = model.matrix(model0)
+    # p0 = predict(model0, type="response")
+    # w = p0*(1-p0)
+    #
+    # WZ = function(A) crossprod(Z, w * A)
+    # solveZ = solve(crossprod(Z, w * Z))
+    #
+    # project = function(A){
+    #   Z %*% (solveZ %*% WZ(A))
+    # }
 
-      # weighted mean projection helper
-      WZ = function(A) crossprod(Z, w * A)
-      solveZ = solve(crossprod(Z, w * Z))
+    # residualized X
+    Xr = r$IHX #X - project(X)
 
-      project = function(A){
-        Z %*% (solveZ %*% WZ(A))
-      }
+    # CORRECT set: positive X
+    #S = which(X > 0)
 
-      Xr = r$IHX#X - project(X)
+    # limiting vector
+    #v = rep(0, length(X))
+    #v[S] = 1
+    #v=X>0
 
-      mx = if(r$part_cor < 0) min(Xr) else max(Xr)
-      S = which(abs(Xr - mx) < 1e-8)
 
-      v = rep(0, length(X))
-      v[S] = 1
+    # cosine +
+    vr = r$IH%*%(X>0) #v - project(v)
+    bound_p = sum(Xr * vr) / sqrt(sum(Xr^2) * sum(vr^2))
 
-      vr = r$IH%*%v
+    # cosine -
+    vr = r$IH%*%(X<0) #v - project(v)
+    bound_m = sum(Xr * vr) / sqrt(sum(Xr^2) * sum(vr^2))
 
-      bound = sum(Xr * vr) / sqrt(sum(Xr^2) * sum(vr^2))
+    bound=max(abs(bound_m),abs(bound_p))
   } else if(model0$family$link == "log"){
     # ATTENZIONE: pensato per poisson e gamma, ma cosa succedere per altre family?
 
@@ -150,23 +159,42 @@ compute_gcor_normalized_conditional <- function(model0, X, ...){
     # Fitted means under H0
     w <- mu0 <- predict(model0, type = "response")
 
+#     #DECOMMENTA DA QUI
+#     # Select extremal set
+#     tol = 1e-8
+#     mx = if(r$part_cor < 0) min(Xr) else max(Xr)
+#     S = which(abs(Xr - mx) < tol)
+#
+#     # Build v*
+#     v = rep(0, length(Xr))
+#     v[S] = r$sqrtinvV_vect[S] #mu0[S]
+#     bound = sum(Xr[S] * v[S]) / sqrt(sum(Xr^2) * sum(v[S]^2))
+# # A QUI
+    # Weighted centering (intercept-only projection)
+   # v_bar_w = sum(w[S] * v[S]) / sum(w)
+   # v_r = v - v_bar_w
+   #
+   #  # Compute bound
+   # bound = sum(Xr * v_r) / sqrt(sum(Xr^2) * sum(v_r^2))
+
+
     # Select extremal set
     tol = 1e-8
-    mx = if(r$part_cor < 0) min(Xr) else max(Xr)
-    S = which(abs(Xr - mx) < tol)
+    mx =  min(X)
+    Sm = which(abs(X - mx) < tol)
+    mx = max(X)
+    Sp = which(abs(X - mx) < tol)
 
-    # Build v*
-    v = rep(0, length(Xr))
-    v[S] = mu0[S]
+    # Build v-
+    v = rep(0, length(X))
+    v[Sm] = r$sqrtinvV_vect[Sm] #mu0[S]
+    bound_m = sum(Xr[Sm] * v[Sm]) / sqrt(sum(Xr^2) * sum(v[Sm]^2))
+    # Build v+
+    v = rep(0, length(X))
+    v[Sp] = r$sqrtinvV_vect[Sp] #mu0[S]
+    bound_p = sum(Xr[Sp] * v[Sp]) / sqrt(sum(Xr^2) * sum(v[Sp]^2))
 
-    # Weighted centering (intercept-only projection)
-
-    v_bar_w = sum(w * v) / sum(w)
-    v_r = v - v_bar_w
-
-    # Compute bound
-    bound = sum(Xr * v_r) / sqrt(sum(Xr^2) * sum(v_r^2))
-
+    bound=max(abs(bound_m),abs(bound_p))
   } else if(model0$family$link == "inverse"){
     # ATTENZIONE: pensato per  gamma, ma cosa succedere per altre family?
     X=round(X,5)
@@ -185,7 +213,7 @@ compute_gcor_normalized_conditional <- function(model0, X, ...){
   if (r$part_cor > 0) {
     normalized_r <- r$part_cor / bound
   } else if (r$part_cor < 0) {
-    normalized_r <- -r$part_cor / bound
+    normalized_r <- r$part_cor / bound
   } else {
     normalized_r <- 0
   }

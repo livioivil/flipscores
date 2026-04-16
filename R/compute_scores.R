@@ -52,7 +52,7 @@ compute_scores <- function(model0, model1, score_type = "standardized", ...){
     rownames(scores)=names(model0$fitted.values)
     scale_objects=list(list(nrm = crossprod(model0$y)^.5*length(model0$y)^.5))
     score_type="basic"
-    Xr <- sqrtinvV_vect_times_residuals <- rep(1,nrow(model0$x))
+    Xr <- sqrtinvV_vect_times_residuals <- matrix(1,nrow(model0$x),1)
 
   } else { # at least one covariate
     if(is.null(model0$y)) model0$y=model0$model[,1]
