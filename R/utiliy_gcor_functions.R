@@ -79,7 +79,15 @@ threshold_init_Y <- function(nrmzXr, tau = 0) {
 }
 
 .get_H <- function(Z){
-  Z %*% solve(t(Z) %*% Z) %*% t(Z)
+  if (!is.matrix(Z))
+    stop("Z must be a matrix.")
+  if (nrow(Z) < ncol(Z))
+    stop("Z must have at least as many rows as columns.")
+
+  # Use QR decomposition instead of explicit matrix inversion:
+  # If Z = QR, then H = QQ'  — more stable and efficient
+  Q <- qr.Q(qr(Z))
+  return(Q %*% t(Q))
 }
 
 .get_IH <- function(Z){
