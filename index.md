@@ -32,6 +32,7 @@ Misspecified Variances. Journal of the American Statistical Association,
 ## Some examples
 
 ``` r
+
 library(flipscores)
 set.seed(1)
 dt=data.frame(X=rnorm(20),
@@ -108,6 +109,7 @@ anova(mod0,mod)
 ### Negative Binomial
 
 ``` r
+
 set.seed(1)
 D=data.frame(x=(1:40)/20, z=rnorm(40))
 D$y=rnbinom(40,mu=exp(D$x),size=3)
