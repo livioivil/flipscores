@@ -18,6 +18,9 @@
 - [`flipscores()`](https://livioivil.github.io/flipscores/reference/flipscores.md)
   : Robust testing in GLMs, by sign-flipping score contributions
 
+- [`flipscores_contrasts()`](https://livioivil.github.io/flipscores/reference/flipscores_contrasts.md)
+  : Flip-score tests for custom contrasts
+
 - [`gcor()`](https://livioivil.github.io/flipscores/reference/gcor.md) :
   Compute Generalized Partial Correlations for GLM terms
 
