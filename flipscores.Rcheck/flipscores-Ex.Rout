@@ -1,0 +1,698 @@
+
+R version 4.5.1 (2025-06-13 ucrt) -- "Great Square Root"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: x86_64-w64-mingw32/x64
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "flipscores"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> options(pager = "console")
+> library('flipscores')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("anova.flipscores")
+> ### * anova.flipscores
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: anova.flipscores
+> ### Title: anova.flipscores
+> ### Aliases: anova.flipscores
+> 
+> ### ** Examples
+> 
+> set.seed(1)
+> dt=data.frame(X=scale(rnorm(50)),
++    Z=factor(rep(LETTERS[1:3],length.out=50)))
+> dt$Y=rpois(n=nrow(dt),lambda=exp(dt$X*(dt$Z=="C")))
+> mod0=flipscores(Y~Z+X,data=dt,family="poisson")
+> summary(mod0)
+
+Call:
+flipscores(formula = Y ~ Z + X, family = "poisson", data = dt)
+
+Coefficients:
+            Estimate   Score Std. Error z value Part. Cor Pr(>|z|)   
+(Intercept)  -0.3513 -5.4234     4.2404 -1.2790    -0.169   0.1218   
+ZB            0.2276  1.8048     2.8140  0.6414     0.079   0.4332   
+ZC            0.9034 10.3392     3.4527  2.9945     0.348   0.0264 * 
+X             0.6381 33.1168     8.0470  4.1154     0.478   0.0076 **
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 82.225  on 49  degrees of freedom
+Residual deviance: 52.798  on 46  degrees of freedom
+AIC: 143.12
+
+Number of Fisher Scoring iterations: 5
+
+> anova(mod0)
+Analysis of Deviance Table (Type III test)
+
+Model: poisson, link: log
+
+Inference is provided by FlipScores approach (5000 sign flips).
+
+Model: Y ~ Z + X
+  Df  Score Pr(>Score)   
+Z  2 4.4162     0.1058   
+X  1 0.0343     0.0076 **
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+> 
+> mod1=flipscores(Y~Z*X,data=dt,family="poisson")
+> summary(mod1)
+
+Call:
+flipscores(formula = Y ~ Z * X, family = "poisson", data = dt)
+
+Coefficients:
+            Estimate   Score Std. Error z value Part. Cor Pr(>|z|)  
+(Intercept)  -0.3549 -4.3865     3.8867 -1.1286    -0.189   0.0906 .
+ZB            0.3570  2.3488     2.6093  0.9002     0.145   0.2876  
+ZC            0.6023  3.3952     2.3099  1.4698     0.235   0.0738 .
+X             0.6439  8.1773     3.6816  2.2211     0.331   0.1276  
+ZB:X         -0.5979 -3.8933     2.5112 -1.5504    -0.238   0.3360  
+ZC:X          0.4856  2.8440     2.4290  1.1709     0.184   0.2296  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 82.225  on 49  degrees of freedom
+Residual deviance: 44.750  on 44  degrees of freedom
+AIC: 139.07
+
+Number of Fisher Scoring iterations: 5
+
+> anova(mod0,model1 = mod1)
+Analysis of Deviance Table (Type III test)
+
+Model: poisson, link: log
+
+Inference is provided by FlipScores approach (5000 sign flips).
+
+Model 1: Y ~ Z + X
+Model 2: Y ~ Z * X
+                   Df  Score Pr(>Score)  
+Model 2 vs Model 1  2 4.5372      0.067 .
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("compute_scores")
+> ### * compute_scores
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: compute_scores
+> ### Title: compute_scores
+> ### Aliases: compute_scores
+> 
+> ### ** Examples
+> 
+> set.seed(1)
+> Z=rnorm(20)
+> X=Z+rnorm(20)
+> Y=rpois(n=20,lambda=exp(Z+X))
+> mod0=glm(Y~Z,family="poisson")
+> X=data.frame(X=X)
+> scr0=compute_scores(model0 = mod0, model1 = X)
+> head(scr0)
+            X
+1 -0.09157255
+2  1.29487548
+3  0.14949028
+4 46.19093971
+5  1.30167541
+6  0.18155826
+> 
+> 
+> 
+> cleanEx()
+> nameEx("confint.flipscores")
+> ### * confint.flipscores
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: confint.flipscores
+> ### Title: Confidence intervals for flipscores
+> ### Aliases: confint.flipscores
+> 
+> ### ** Examples
+> 
+> set.seed(1)
+> dt <- data.frame(X=scale(rnorm(50)),
++    Z=factor(rep(LETTERS[1:3],length.out=50)))
+> dt$Y=rpois(n=nrow(dt),lambda=exp(dt$X*(dt$Z=="C")))
+> mod0 <- flipscores(Y~Z+X,data=dt,family="poisson")
+> summary(mod0)
+
+Call:
+flipscores(formula = Y ~ Z + X, family = "poisson", data = dt)
+
+Coefficients:
+            Estimate   Score Std. Error z value Part. Cor Pr(>|z|)   
+(Intercept)  -0.3513 -5.4234     4.2404 -1.2790    -0.169   0.1180   
+ZB            0.2276  1.8048     2.8140  0.6414     0.079   0.4308   
+ZC            0.9034 10.3392     3.4527  2.9945     0.348   0.0234 * 
+X             0.6381 33.1168     8.0470  4.1154     0.478   0.0100 **
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 82.225  on 49  degrees of freedom
+Residual deviance: 52.798  on 46  degrees of freedom
+AIC: 143.12
+
+Number of Fisher Scoring iterations: 5
+
+> confint(mod0, parm="X")
+      2.5 %   97.5 %
+X 0.1942903 1.138385
+> 
+> xx <- rnorm(20)
+> zz <- rnorm(20, 0.2 * xx)
+> yy <- rnorm(20, 1 + 2 * xx - zz)
+> flps <- make_flips(20, 1000)
+> mod1 <- flipscores(yy ~ xx + zz)
+> summary(mod1)
+
+Call:
+flipscores(formula = yy ~ xx + zz)
+
+Coefficients:
+            Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)    
+(Intercept)   0.9097  17.3160     6.0013   2.8854     0.680   0.0034 ** 
+xx            1.5894  21.5766     6.2983   3.4258     0.807   0.0002 ***
+zz           -1.1253 -36.7793    10.4109  -3.5328    -0.833   0.0002 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for gaussian family taken to be 1.076729)
+
+    Null deviance: 85.766  on 19  degrees of freedom
+Residual deviance: 18.304  on 17  degrees of freedom
+AIC: 62.986
+
+Number of Fisher Scoring iterations: 2
+
+> confint(mod1, flips = flps)
+                 2.5 %     97.5 %
+(Intercept)  0.4153332  1.4444317
+xx           1.1682344  2.1400581
+zz          -1.6905798 -0.6747961
+> 
+> 
+> 
+> cleanEx()
+> nameEx("custom_contrasts")
+> ### * custom_contrasts
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: custom_contrasts
+> ### Title: Build custom contrasts for flip-score tests
+> ### Aliases: custom_contrasts apply_custom_contrasts
+> 
+> ### ** Examples
+> 
+> set.seed(1)
+> dat <- data.frame(
++   treatment = factor(rep(c("Control", "Drug"), each = 30)),
++   sex = factor(rep(c("F", "M"), times = 30)),
++   age_group = factor(rep(c("Young", "Old", "Middle"), length.out = 60)),
++   severity = runif(60, 0, 1)
++ )
+> eta <- with(dat,
++   -1 + 0.8 * (treatment == "Drug") + 0.4 * (sex == "M") +
++     0.6 * (age_group == "Old") - 0.3 * severity
++ )
+> dat$y <- rbinom(nrow(dat), 1, plogis(eta))
+> 
+> fit <- glm(y ~ treatment * sex + age_group + severity,
++            data = dat, family = binomial)
+> 
+> # Simple treatment contrast for one factor
+> custom_contrasts(fit, ~ treatment)
+Custom contrasts
+Formula: ~treatment
+Type: simple
+Variables: treatment
+Level combinations: 2
+Contrasts: 1
+
+               Control Drug
+Drug - Control      -1    1
+> 
+> # Pairwise treatment contrasts inside each sex
+> custom_contrasts(fit, pairwise ~ treatment | sex)
+Custom contrasts
+Formula: pairwise ~ treatment | sex
+Type: pairwise
+Variables: treatment, sex
+Level combinations: 4
+Contrasts: 2
+
+                   Control:F Drug:F Control:M Drug:M
+Control - Drug | F         1     -1         0      0
+Control - Drug | M         0      0         1     -1
+> 
+> # Interaction-cell contrasts, similar to emmeans pairwise comparisons
+> cc <- custom_contrasts(fit, pairwise ~ treatment:age_group | sex)
+> apply_custom_contrasts(cc)
+Custom contrast matrix
+Dimensions: 30 contrasts x 12 cells
+
+                                   Control:Middle:F Drug:Middle:F Control:Old:F
+Control:Middle - Drug:Middle | F                  1            -1             0
+Control:Middle - Control:Old | F                  1             0            -1
+Control:Middle - Drug:Old | F                     1             0             0
+Control:Middle - Control:Young | F                1             0             0
+Control:Middle - Drug:Young | F                   1             0             0
+                                   Drug:Old:F Control:Young:F Drug:Young:F
+Control:Middle - Drug:Middle | F            0               0            0
+Control:Middle - Control:Old | F            0               0            0
+Control:Middle - Drug:Old | F              -1               0            0
+Control:Middle - Control:Young | F          0              -1            0
+Control:Middle - Drug:Young | F             0               0           -1
+                                   Control:Middle:M Drug:Middle:M Control:Old:M
+Control:Middle - Drug:Middle | F                  0             0             0
+Control:Middle - Control:Old | F                  0             0             0
+Control:Middle - Drug:Old | F                     0             0             0
+Control:Middle - Control:Young | F                0             0             0
+Control:Middle - Drug:Young | F                   0             0             0
+                                   Drug:Old:M Control:Young:M Drug:Young:M
+Control:Middle - Drug:Middle | F            0               0            0
+Control:Middle - Control:Old | F            0               0            0
+Control:Middle - Drug:Old | F               0               0            0
+Control:Middle - Control:Young | F          0               0            0
+Control:Middle - Drug:Young | F             0               0            0
+> 
+> 
+> 
+> cleanEx()
+> nameEx("flipscores-package")
+> ### * flipscores-package
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: flipscores-package
+> ### Title: flipscores: Robust Score Testing in GLMs, by Sign-Flip
+> ###   Contributions
+> ### Aliases: flipscores-package
+> ### Keywords: internal
+> 
+> ### ** Examples
+> 
+> set.seed(1)
+> dt=data.frame(X=rnorm(20),
++    Z=factor(rep(LETTERS[1:3],length.out=20)))
+> dt$Y=rpois(n=20,lambda=exp(dt$X))
+> mod=flipscores(Y~Z+X,data=dt,family="poisson",x=TRUE)
+> summary(mod)
+
+Call:
+flipscores(formula = Y ~ Z + X, family = "poisson", data = dt, 
+    x = TRUE)
+
+Coefficients:
+            Estimate   Score Std. Error z value Part. Cor Pr(>|z|)  
+(Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7560  
+ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6542  
+ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6978  
+X             0.9439 16.2058     4.7272  3.4282     0.671   0.0128 *
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 27.135  on 19  degrees of freedom
+Residual deviance: 12.888  on 16  degrees of freedom
+AIC: 57.459
+
+Number of Fisher Scoring iterations: 5
+
+> 
+> # Anova test
+> anova(mod)
+Analysis of Deviance Table (Type III test)
+
+Model: poisson, link: log
+
+Inference is provided by FlipScores approach (5000 sign flips).
+
+Model: Y ~ Z + X
+  Df   Score Pr(>Score)  
+Z  2 0.77339     0.6996  
+X  1 0.02908     0.0128 *
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+> # or
+> mod0=flipscores(Y~Z,data=dt,family="poisson",x=TRUE)
+> anova(mod0,mod)
+Analysis of Deviance Table (Type III test)
+
+Model: poisson, link: log
+
+Inference is provided by FlipScores approach (5000 sign flips).
+
+Model 1: Y ~ Z
+Model 2: Y ~ Z + X
+                   Df    Score Pr(>Score)  
+Model 2 vs Model 1  1 0.029301     0.0102 *
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+> # and
+> mod0=flipscores(Y~X,data=dt,family="poisson")
+> anova(mod0,mod)
+Analysis of Deviance Table (Type III test)
+
+Model: poisson, link: log
+
+Inference is provided by FlipScores approach (5000 sign flips).
+
+Model 1: Y ~ X
+Model 2: Y ~ Z + X
+                   Df  Score Pr(>Score)
+Model 2 vs Model 1  2 1.4234     0.5286
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("flipscores")
+> ### * flipscores
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: flipscores
+> ### Title: Robust testing in GLMs, by sign-flipping score contributions
+> ### Aliases: flipscores
+> 
+> ### ** Examples
+> 
+> set.seed(1)
+> dt=data.frame(X=rnorm(20),
++    Z=factor(rep(LETTERS[1:3],length.out=20)))
+> dt$Y=rpois(n=20,lambda=exp((dt$Z=="C") + 2*dt$X))
+> mod=flipscores(Y~Z+X,data=dt,family="poisson",n_flips=1000)
+> summary(mod)
+
+Call:
+flipscores(formula = Y ~ Z + X, family = "poisson", data = dt, 
+    n_flips = 1000)
+
+Coefficients:
+             Estimate     Score Std. Error   z value Part. Cor Pr(>|z|)   
+(Intercept)   0.04964   0.55830    3.32802   0.16776     0.064    0.782   
+ZB            0.20371   3.71436    4.27357   0.86915     0.326    0.151   
+ZC            0.87538  17.18530    4.43500   3.87493     0.856    0.004 **
+X             1.95754 109.81199    9.92393  11.06538     0.749    0.003 **
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 187.2834  on 19  degrees of freedom
+Residual deviance:   7.4756  on 16  degrees of freedom
+AIC: 69.284
+
+Number of Fisher Scoring iterations: 5
+
+> 
+> # Equivalent to:
+> model=glm(Y~Z+X,data=dt,family="poisson")
+> mod2=flipscores(model)
+> summary(mod2)
+
+Call:
+flipscores(formula = model)
+
+Coefficients:
+             Estimate     Score Std. Error   z value Part. Cor Pr(>|z|)   
+(Intercept)   0.04964   0.55830    3.32802   0.16776     0.064   0.7854   
+ZB            0.20371   3.71436    4.27357   0.86915     0.326   0.1594   
+ZC            0.87538  17.18530    4.43500   3.87493     0.856   0.0024 **
+X             1.95754 109.81199    9.92393  11.06538     0.749   0.0028 **
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 187.2834  on 19  degrees of freedom
+Residual deviance:   7.4756  on 16  degrees of freedom
+AIC: 69.284
+
+Number of Fisher Scoring iterations: 5
+
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("flipscores_contrasts")
+> ### * flipscores_contrasts
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: flipscores_contrasts
+> ### Title: Flip-score tests for custom contrasts
+> ### Aliases: flipscores_contrasts
+> 
+> ### ** Examples
+> 
+> set.seed(1)
+> dat <- data.frame(
++   treatment = factor(rep(c("Control", "Drug"), each = 30)),
++   sex = factor(rep(c("F", "M"), times = 30)),
++   age_group = factor(rep(c("Young", "Old", "Middle"), length.out = 60)),
++   severity = runif(60, 0, 1)
++ )
+> eta <- with(dat,
++   -1 + 0.8 * (treatment == "Drug") + 0.4 * (sex == "M") +
++     0.6 * (age_group == "Old") - 0.3 * severity
++ )
+> dat$y <- rbinom(nrow(dat), 1, plogis(eta))
+> 
+> fit <- glm(y ~ treatment * sex + age_group + severity,
++            data = dat, family = binomial, x = TRUE)
+> 
+> # Test the treatment effect separately for F and M.
+> flipscores_contrasts(fit, pairwise ~ treatment | sex,
++                      n_flips = 100, seed = 1)
+Flip-score custom contrasts
+score_type = standardized, n_flips = 100, alternative = two.sided
+
+           contrast  estimate     Score p.value
+ Control - Drug | F -1.191570 -1.528571    0.13
+ Control - Drug | M -1.196268 -1.535975    0.17
+> 
+> # Test selected interaction-cell contrasts. Increase n_flips in real analyses.
+> flipscores_contrasts(fit, ~ treatment:age_group | sex,
++                      n_flips = 100, seed = 1)
+Flip-score custom contrasts
+score_type = standardized, n_flips = 100, alternative = two.sided
+
+                           contrast   estimate      Score p.value
+   Drug:Middle - Control:Middle | F  1.1915705  1.5285708    0.13
+   Control:Old - Control:Middle | F  0.2302185  0.3368640    0.74
+      Drug:Old - Control:Middle | F  1.4217889  1.3573139    0.20
+ Control:Young - Control:Middle | F -0.2226355 -0.3287063    0.72
+    Drug:Young - Control:Middle | F  0.9689350  0.9355907    0.41
+   Drug:Middle - Control:Middle | M  1.1962685  1.5359745    0.17
+   Control:Old - Control:Middle | M  0.2302185  0.3368640    0.74
+      Drug:Old - Control:Middle | M  1.4264869  1.3547755    0.20
+ Control:Young - Control:Middle | M -0.2226355 -0.3287063    0.72
+    Drug:Young - Control:Middle | M  0.9736330  0.9428786    0.37
+> 
+> 
+> 
+> cleanEx()
+> nameEx("gcor")
+> ### * gcor
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: gcor
+> ### Title: Compute Generalized Partial Correlations for GLM terms
+> ### Aliases: gcor
+> 
+> ### ** Examples
+> 
+> set.seed(1)
+> dt=data.frame(X=rnorm(20),
++    Z=factor(rep(LETTERS[1:3],length.out=20)))
+> dt$Y=rpois(n=20,lambda=exp(dt$Z=="C"))
+> mod=flipscores(Y~Z+X,data=dt,family="poisson",n_flips=1000)
+> summary(mod)
+
+Call:
+flipscores(formula = Y ~ Z + X, family = "poisson", data = dt, 
+    n_flips = 1000)
+
+Coefficients:
+            Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)   
+(Intercept) -0.14256 -0.91360    2.62144 -0.34851    -0.127    0.733   
+ZB          -0.18558 -0.50868    1.65785 -0.30683    -0.108    0.668   
+ZC           1.40981  8.55380    2.58950  3.30326     0.765    0.005 **
+X           -0.06964 -1.56935    4.70999 -0.33320    -0.117    0.677   
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 28.649  on 19  degrees of freedom
+Residual deviance: 11.218  on 16  degrees of freedom
+AIC: 58.102
+
+Number of Fisher Scoring iterations: 5
+
+> 
+> # Compute generalized partial correlations for all terms
+> (results <- gcor(mod))
+  terms       gcor null_model
+1   ~ZB -0.1080979    ~1+ZC+X
+2   ~ZC  0.7651942    ~1+ZB+X
+3    ~X -0.1174534   ~1+ZB+ZC
+> 
+> # Compute for specific terms only
+> gcor(mod, terms = c("X", "ZC"))
+  terms       gcor null_model
+1    ~X -0.1174534   ~1+ZB+ZC
+2   ~ZC  0.7651942    ~1+ZB+X
+> 
+> gcor(mod, terms = c("X", "ZC"),normalize=TRUE)
+   terms          r        r_n null_model
+X     ~X -0.1174534 -0.2755351   ~1+ZB+ZC
+ZC   ~ZC  0.7651942  1.0442471    ~1+ZB+X
+> 
+> 
+> gcor(mod, intercept_too=TRUE, normalize=TRUE)
+                   terms          r        r_n null_model
+(Intercept) ~(Intercept) -0.1265802 -0.2077374 ~1+ZB+ZC+X
+ZB                   ~ZB -0.1080979 -0.1532418    ~1+ZC+X
+ZC                   ~ZC  0.7651942  1.0442471    ~1+ZB+X
+X                     ~X -0.1174534 -0.2755351   ~1+ZB+ZC
+> set.seed(123)
+> dt=data.frame(X=rnorm(20),
++    Z=factor(rep(LETTERS[1:3],length.out=20)))
+> dt$Y=rbinom(n=20,prob=plogis((dt$Z=="C")*2),size=1)
+> mod=flipscores(Y~Z+X,data=dt,family="binomial",n_flips=1000)
+> summary(mod)
+
+Call:
+flipscores(formula = Y ~ Z + X, family = "binomial", data = dt, 
+    n_flips = 1000)
+
+Coefficients:
+            Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)  
+(Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.898  
+ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.056 .
+ZC           20.8561   1.8043     0.8180   2.2057     0.615    0.032 *
+X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.753  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 27.5256  on 19  degrees of freedom
+Residual deviance:  9.4015  on 16  degrees of freedom
+AIC: 17.401
+
+Number of Fisher Scoring iterations: 19
+
+> 
+> (results <- gcor(mod,normalize=TRUE))
+   terms          r        r_n null_model
+ZB   ~ZB -0.5295718        NaN    ~1+ZC+X
+ZC   ~ZC  0.6146304        NaN    ~1+ZB+X
+X     ~X -0.1493213 -0.3669599   ~1+ZB+ZC
+> # Compute for specific terms only
+> gcor(mod, terms = c("X", "ZC"),normalize=TRUE)
+   terms          r        r_n null_model
+X     ~X -0.1493213 -0.3669599   ~1+ZB+ZC
+ZC   ~ZC  0.6146304        NaN    ~1+ZB+X
+> 
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("make_flips")
+> ### * make_flips
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: make_flips
+> ### Title: It creates a 'n_flips'x'n_obs' matrix of random +1 and -1.  The
+> ###   first row is made by ones (i.e. the observed test statistic is
+> ###   computed)
+> ### Aliases: make_flips
+> 
+> ### ** Examples
+> 
+> # example code
+> make_flips(n_obs=10,n_flips=20)
+      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
+ [1,]    1    1    1    1    1    1    1    1    1     1
+ [2,]   -1    1   -1   -1    1   -1   -1   -1    1     1
+ [3,]   -1   -1   -1   -1   -1    1    1    1    1    -1
+ [4,]   -1   -1   -1   -1   -1   -1    1   -1   -1     1
+ [5,]    1    1   -1    1   -1   -1    1   -1    1     1
+ [6,]    1    1   -1    1    1    1    1    1   -1    -1
+ [7,]    1   -1    1    1   -1   -1    1    1    1    -1
+ [8,]   -1    1    1    1    1    1    1   -1    1     1
+ [9,]    1    1   -1   -1   -1    1    1   -1   -1     1
+[10,]    1    1   -1   -1   -1    1   -1    1   -1     1
+[11,]   -1   -1    1    1   -1   -1   -1    1    1    -1
+[12,]    1    1    1   -1   -1   -1   -1    1   -1    -1
+[13,]   -1   -1   -1    1    1    1    1   -1    1     1
+[14,]    1    1   -1   -1    1   -1   -1    1    1    -1
+[15,]   -1   -1    1   -1    1   -1    1    1    1    -1
+[16,]    1   -1   -1    1   -1    1    1    1   -1    -1
+[17,]    1   -1   -1   -1   -1    1    1    1    1     1
+[18,]   -1   -1   -1    1   -1   -1    1   -1   -1     1
+[19,]   -1   -1    1   -1   -1    1    1    1    1    -1
+[20,]    1   -1   -1   -1   -1   -1    1   -1    1    -1
+> 
+> 
+> 
+> 
+> ### * <FOOTER>
+> ###
+> cleanEx()
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  36.88 0.58 39.95 NA NA 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')

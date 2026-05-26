@@ -1,0 +1,13 @@
+anova.flipscores        anova.flipscores
+compute_scores          compute_scores
+confint.flipscores      Confidence intervals for flipscores
+custom_contrasts        Build custom contrasts for flip-score tests
+flipscores              Robust testing in GLMs, by sign-flipping score
+                        contributions
+flipscores-method       Methods for flipscores objects
+flipscores_contrasts    Flip-score tests for custom contrasts
+gcor                    Compute Generalized Partial Correlations for
+                        GLM terms
+make_flips              It creates a 'n_flips'x'n_obs' matrix of random
+                        +1 and -1.  The first row is made by ones (i.e.
+                        the observed test statistic is computed)

@@ -105,6 +105,59 @@ anova(mod0,mod)
 #> Model 2 vs Model 1  2 1.445      0.514
 ```
 
+### Custom contrasts
+
+The `flipscores_contrasts()` helper defines factor contrasts with a
+syntax similar to `emmeans`, or accepts a custom coefficient contrast
+matrix in the spirit of `multcomp::glht()`, then applies the flip-score
+test.
+
+``` r
+set.seed(11)
+toy=data.frame(
+  trt=factor(rep(c("A","B"), each=15))
+)
+toy$y=rbinom(30, 1, ifelse(toy$trt=="B", .65, .35))
+
+toy_fit=glm(y~trt, data=toy, family=binomial, x=TRUE)
+
+# Formula interface
+flipscores_contrasts(toy_fit, pairwise ~ trt,
+                     n_flips=500, seed=1)
+
+# Dunnett-like all-versus-one comparisons
+toy3=data.frame(
+  trt=factor(rep(c("Control","Low","High"), each=12),
+             levels=c("Control","Low","High"))
+)
+toy3$y=rbinom(nrow(toy3), 1,
+              ifelse(toy3$trt=="High", .7,
+                     ifelse(toy3$trt=="Low", .55, .35)))
+toy3_fit=glm(y~trt, data=toy3, family=binomial, x=TRUE)
+flipscores_contrasts(toy3_fit, dunnett ~ trt,
+                     n_flips=500, seed=1)
+flipscores_contrasts(toy3_fit, trt.vs.ctrl ~ trt, ref="Low",
+                     n_flips=500, seed=1)
+flipscores_contrasts(toy3_fit, trt.vs.ctrlk ~ trt,
+                     n_flips=500, seed=1)
+
+# If trt is involved in an interaction, the output includes a note unless
+# the interaction partner is included in the contrast specification.
+toy$sex=factor(rep(c("F","M"), length.out=nrow(toy)))
+toy_int=glm(y~trt*sex, data=toy, family=binomial, x=TRUE)
+flipscores_contrasts(toy_int, pairwise ~ trt,
+                     n_flips=500, seed=1)
+flipscores_contrasts(toy_int, pairwise ~ trt | sex,
+                     n_flips=500, seed=1)
+
+# Custom coefficient contrast matrix
+K=matrix(c(0,1), nrow=1)
+colnames(K)=names(coef(toy_fit))
+rownames(K)="B - A"
+flipscores_contrasts(toy_fit, linfct=K,
+                     n_flips=500, seed=1)
+```
+
 ### Negative Binomial
 
 ``` r

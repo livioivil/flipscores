@@ -1,0 +1,13 @@
+flipscores-package	flipscores-package
+anova.flipscores	anova.flipscores
+apply_custom_contrasts	custom_contrasts
+compute_scores	compute_scores
+confint.flipscores	confint.flipscores
+custom_contrasts	custom_contrasts
+flipscores	flipscores
+flipscores-method	flipscores-method
+flipscores_contrasts	flipscores_contrasts
+gcor	gcor
+make_flips	make_flips
+print.flipscores	flipscores-method
+summary.flipscores	flipscores-method

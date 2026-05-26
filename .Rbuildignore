@@ -5,3 +5,8 @@
 ^docs$
 ^pkgdown$
 ^\.github$
+^\.git$
+^\.Rhistory$
+^\.\.Rcheck$
+^flipscores\.Rcheck$
+^flipscores_.*\.tar\.gz$

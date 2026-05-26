@@ -3,7 +3,7 @@
 #' @description It provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are often robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables.
 #' @importFrom MASS glm.nb
 #' @importFrom methods is
-#' @importFrom stats D as.formula model.matrix sd summary.glm update formula getCall terms
+#' @importFrom stats D as.formula model.matrix predict sd summary.glm update formula getCall terms
 #' @examples
 #' set.seed(1)
 #' dt=data.frame(X=rnorm(20),
