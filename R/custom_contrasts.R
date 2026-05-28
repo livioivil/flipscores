@@ -236,6 +236,7 @@ flipscores_contrasts <- function(model, specs = NULL,
   out
 }
 
+#' @export
 print.custom_contrasts <- function(x, ...) {
   cat("Custom contrasts\n")
   cat("Formula: ", deparse1(x$formula), "\n", sep = "")
@@ -248,7 +249,7 @@ print.custom_contrasts <- function(x, ...) {
   }
   invisible(x)
 }
-
+#' @export
 print.custom_contrast_matrix <- function(x, ...) {
   cat("Custom contrast matrix\n")
   cat("Dimensions: ", nrow(x), " contrasts x ", ncol(x), " cells\n\n", sep = "")

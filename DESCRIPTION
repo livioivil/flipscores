@@ -17,7 +17,7 @@ Maintainer: Livio Finos <livio.finos@unipd.it>
 Description: Provides robust tests for testing in GLMs, by sign-flipping score contributions. The tests are robust against overdispersion, heteroscedasticity and, in some cases, ignored nuisance variables. See Hemerik, Goeman and Finos (2020) <doi:10.1111/rssb.12369> and  De Santis, Goeman, Hemerik, Davenport, Finos (2025) <doi:10.1080/01621459.2025.2491775>.
 Depends:
     R (>= 4.1.0)
-Imports: MASS, methods
+Imports: stats, MASS, methods
 Suggests:
     rmarkdown,
     knitr,
