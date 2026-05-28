@@ -10,6 +10,52 @@
 NULL
 
 
+#' Update method for flipscores
+#'
+#' Ensures that \code{update()} on a \code{flipscores} object returns
+#' a proper \code{flipscores} object rather than a plain \code{glm}.
+#'
+#' @param object A \code{flipscores} object.
+#' @param formula. A formula or \code{NULL}. If provided, the model formula
+#'   is updated using \code{\link[stats]{update.formula}}. Supports the
+#'   \code{.} shorthand to refer to the current formula terms, e.g.
+#'   \code{. ~ . + offset(.OFFSET___)}.
+#' @param ... Additional arguments to update in the call, such as
+#'   \code{data}, \code{family}, \code{score_type}, etc.
+#' @return A \code{flipscores} object.
+#' @method update flipscores
+#' @export
+update.flipscores <- function(object, formula. = NULL, ...) {
+
+  call <- object$flipscores_call
+  if (is.null(call))
+    call <- object$call
+
+  extras <- list(...)
+
+  # handle formula update (e.g. . ~ . + offset(.OFFSET___))
+  if (!is.null(formula.)) {
+    # update the formula using the standard stats::update.formula
+    # this correctly resolves '.' using the original formula
+    call$formula <- stats::update.formula(formula(object), formula.)
+  }
+
+  # override any other arguments passed via ...
+  if (length(extras) > 0) {
+    for (a in names(extras))
+      call[[a]] <- extras[[a]]
+  }
+
+  # evaluate in the environment of the original model's terms
+  # so that variables referenced in the formula are found correctly
+  env <- tryCatch(
+    attr(terms(object), ".Environment"),
+    error = function(e) NULL
+  )
+  if (is.null(env)) env <- parent.frame()
+
+  eval(call, envir = env)
+}
 
 #' print.flipscores print method for a flipscores object.
 #' @param x a flipscores object
@@ -22,7 +68,7 @@ NULL
 print.flipscores <- function(x, ...) {
   cat(get_head_flip_out(x))
   cat("Call: ")
-  print(x$call)
+  print(x$flipscores_call)
   cat("\nCoefficients:\n")
   print(x$coefficients)
   # print.default(x)
@@ -36,8 +82,13 @@ print.flipscores <- function(x, ...) {
 #' @docType methods
 #' @export
 
-summary.flipscores <- function (object, ...) {
-  sum_model=summary.glm(object = object)
+summary.flipscores <- function(object, ...) {
+  sum_model <- summary.glm(object = object)
+
+  # replace the call shown in summary with the flipscores call
+  # not the internal glm call
+  sum_model$call <- object$flipscores_call
+
   sum_model$coefficients=sum_model$coefficients[,c(1,1:4,4),drop=FALSE]
   sum_model$coefficients[,-1]=NA
   # temp=sum_model$coefficients

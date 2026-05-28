@@ -9,14 +9,17 @@ combine_contrasts(x, combine_with = "Fisher", ...)
 \arguments{
 \item{x}{A \code{joint_flipscores} object.}
 
-\item{combine_with}{A string specifying the combining method or a function.}
+\item{combine_with}{A string specifying the combining method:
+\code{"Fisher"} (default), \code{"Liptak"}, \code{"Tippett"},
+or a custom function.}
 
 \item{...}{Additional arguments (currently unused).}
 }
 \value{
-A data frame with combined statistics per contrast.
+A data frame with one row per coefficient, with combined
+  test statistic and p-value.
 }
 \description{
-Combines p-values across contrasts (tested terms) from a 
-\code{joint_flipscores} object.
+Combines p-values across models for each tested coefficient
+from a \code{joint_flipscores} object.
 }

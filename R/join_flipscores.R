@@ -2,73 +2,93 @@
 # Embedded and adapted from jointest (https://github.com/livioivil/jointest)
 # Original author: Livio Finos
 
-#' Join Flip Scores
-#'
-#' Runs \code{flipscores()} on multiple models and combines the results
-#' into a \code{joint_flipscores} object.
-#'
-#' @param models A list of \code{glm} objects or formulas.
-#' @param combine_with Combining function: \code{"Fisher"} (default), 
-#'   \code{"Liptak"}, \code{"Tippett"}, or a custom function.
-#' @param score_type Type of score. See \code{\link{flipscores}}.
-#' @param tested_terms Tested terms. See \code{\link{flipscores}}.
-#' @param n_flips Number of flips. See \code{\link{flipscores}}.
-#' @param seed Random seed for reproducibility.
-#' @param ... Additional arguments passed to \code{\link{flipscores}}.
-#'
-#' @return A \code{joint_flipscores} object.
 #' @keywords internal
-join_flipscores <- function(models,
-                            combine_with  = "Fisher",
-                            score_type    = "standardized",
-                            tested_terms  = NULL,
-                            n_flips       = 1000,
-                            seed          = NULL,
-                            ...) {
-  
+.join_flipscores <- function(mods,
+                             to_be_tested  = NULL,
+                             n_flips       = 5000,
+                             flips         = NULL,
+                             score_type    = "standardized",
+                             statistics    = "t",
+                             seed          = NULL,
+                             output_models = TRUE,
+                             ...) {
+
   if (!is.null(seed)) set.seed(seed)
-  
-  if (!is.list(models)) {
-    stop("`models` must be a list of glm objects or formulas.")
+
+  # resolve data in calling frame
+  for (i in seq_along(mods))
+    mods[[i]]$call$data <- eval(mods[[i]]$call$data, parent.frame())
+
+  names(mods) <- .set_mods_names(mods)
+
+  # handle to_be_tested:
+  # NULL   -> get all coefficients from each model
+  # vector -> intersect with each model's coefficients
+  # list   -> use as-is, one element per model
+  if (is.null(to_be_tested)) {
+    to_be_tested <- .get_all_coeff_names_list(mods)
+  } else if (!is.list(to_be_tested)) {
+    temp         <- .get_all_coeff_names_list(mods)
+    to_be_tested <- gsub(" ", "", to_be_tested)
+    to_be_tested <- lapply(temp, function(nms)
+      intersect(to_be_tested, gsub(" ", "", nms)))
   }
-  
-  # Run flipscores on each model
-  results <- lapply(seq_along(models), function(i) {
-    model <- models[[i]]
-    
-    if (!inherits(model, "glm")) {
-      stop(sprintf("Element %d of `models` is not a glm object.", i))
-    }
-    
-    flipscores(
-      formula      = model,
-      score_type   = score_type,
-      tested_terms = tested_terms,
-      n_flips      = n_flips,
+  # if already a list, use as-is
+
+  # compute max n_obs across models
+  n_obs_rn <- sapply(mods, function(mod)
+    max(as.numeric(rownames(model.matrix(mod)))))
+  n_obs_rn <- max(n_obs_rn)
+  n_obs    <- sapply(mods, function(mod) length(mod$y))
+  n_obs    <- max(n_obs, n_obs_rn)
+
+  mods_names <- names(mods)
+
+  # generate shared flips across all models
+  if (is.null(flips)) {
+    FLIPS <- make_flips(n_obs = n_obs, n_flips = n_flips)
+  } else {
+    FLIPS <- flips
+  }
+
+  # run .flipscores_engine on each model
+  # note: mods[[i]] is already a glm object (either passed directly in case 2,
+  # or built from formulas in cases 3 and 4).
+  # we pass:
+  #   formula = mods[[i]]  -> .flipscores_engine handles glm objects directly
+  #   family  = mods[[i]]$family -> extracted from the glm, not from flipscores() args
+  #   data    = NULL        -> data is already embedded inside the glm object
+  #   flips   = FLIPS       -> shared across all models, already evaluated
+  mods <- lapply(seq_along(mods), function(i) {
+    temp <- .flipscores_engine(
+      formula       = mods[[i]],
+      family        = mods[[i]]$family,
+      data          = NULL,
+      score_type    = score_type,
+      flips         = FLIPS,
+      to_be_tested  = to_be_tested[[i]],
+      nobservations = n_obs,
       ...
     )
+    if (statistics %in% "t") {
+      temp$summary_table <- .get_summary_table_from_flipscores(temp)
+    }
+    temp
   })
-  
-  # Name results if models are named
-  if (!is.null(names(models))) {
-    names(results) <- names(models)
+
+  if (is.null(mods_names)) {
+    names(mods) <- paste0("mod", seq_along(mods))
   } else {
-    names(results) <- paste0("model_", seq_along(results))
+    names(mods) <- mods_names
   }
-  
-  # Combine p-values
-  combined <- combine_tests.joint_flipscores(
-    structure(list(results = results), class = "joint_flipscores"),
-    combine_with = combine_with
+
+  out <- list(
+    Tspace        = .get_all_Tspace(mods),
+    summary_table = .get_all_summary_table(mods),
+    mods          = mods,
+    call          = match.call()
   )
-  
-  structure(
-    list(
-      results      = results,
-      combined     = combined,
-      combine_with = combine_with,
-      call         = match.call()
-    ),
-    class = "joint_flipscores"
-  )
+
+  class(out) <- c("joint_flipscores", class(out))
+  out
 }

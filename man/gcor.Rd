@@ -118,9 +118,9 @@ Y=rpois(n=20,lambda=exp(Z+.25*X))
 model1=glm(Y~Z+X,family="poisson")
 gcor(model1)
 gcor(model1, normalize=TRUE)
-normalized_gcor_poisson(model1, "X", verbose = TRUE)[1:3]
+#normalized_gcor_poisson(model1, "X", verbose = TRUE)[1:3]
 model0=glm(Y~Z,family="poisson")
-sapply(c('v','kl','sse','lr','n'),function(type) rsq.partial(model1,model0,type=type)$partial.rsq)
+\dontrun{sapply(c('v','kl','sse','lr','n'),function(type) rsq.partial(model1,model0,type=type)$partial.rsq)}
 
 set.seed(1)
 Z=rnorm(20)
@@ -129,9 +129,9 @@ Y=rbinom(n=20,1,prob=plogis((-.5*Z+1*X)))
 model1=glm(Y~Z+X,family="binomial")
 gcor(model1)
 gcor(model1, normalize=TRUE)
-normalized_gcor_binomial(model1, "X", verbose = TRUE)[1:3]
+#normalized_gcor_binomial(model1, "X", verbose = TRUE)[1:3]
 model0=glm(Y~Z,family="binomial")
-sapply(c('v','kl','sse','lr','n'),function(type) rsq.partial(model1,model0,type=type)$partial.rsq)
+\dontrun{sapply(c('v','kl','sse','lr','n'),function(type) rsq.partial(model1,model0,type=type)$partial.rsq)}#'
 
 set.seed(1)
 Z=rnorm(20)
@@ -141,14 +141,13 @@ model1=glm(Y~Z+X)
 gcor(model1)
 gcor(model1, normalize=TRUE)
 
-library(rsq)
+#library(rsq)
 model0x=glm(X~Z)
 model0y=glm(Y~Z)
-t(.nrmz(resid(model0x)))\%*\% .nrmz(resid(model0y))
-library(ppcor)
-pcor(cbind(X,Z,Y))
-sapply(c('v','kl','sse','lr','n'),function(type) rsq.partial(model1,model0y,type=type)$partial.rsq)
-
+#t(.nrmz(resid(model0x)))\%*\% .nrmz(resid(model0y))
+#library(ppcor)
+#pcor(cbind(X,Z,Y))
+\dontrun{sapply(c('v','kl','sse','lr','n'),function(type) rsq.partial(model1,model0,type=type)$partial.rsq)}
 }
 \author{
 Livio Finos and Paolo Girardi

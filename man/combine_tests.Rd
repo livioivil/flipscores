@@ -9,14 +9,16 @@ combine_tests(x, combine_with = "Fisher", ...)
 \arguments{
 \item{x}{A \code{joint_flipscores} object or a numeric vector of p-values.}
 
-\item{combine_with}{A string specifying the combining method 
-(\code{"Fisher"}, \code{"Liptak"}, \code{"Tippett"}) or a custom function.}
+\item{combine_with}{A string specifying the combining method:
+\code{"Fisher"} (default), \code{"Liptak"}, \code{"Tippett"},
+or a custom function.}
 
 \item{...}{Additional arguments (currently unused).}
 }
 \value{
-A data frame with combined test statistic and p-value.
+A data frame with the combined test statistic and p-value.
 }
 \description{
-Combines p-values from multiple tests using a combining function.
+Combines p-values from a \code{joint_flipscores} object or a numeric
+vector using a combining function.
 }

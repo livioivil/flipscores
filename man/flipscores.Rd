@@ -9,47 +9,99 @@ flipscores(
   family = gaussian(),
   data = NULL,
   score_type = "standardized",
-  tested_terms = NULL,
-  n_flips = 1000,
-  combine_with = "Fisher",
+  n_flips = 5000,
+  alternative = "two.sided",
+  id = NULL,
   seed = NULL,
+  to_be_tested = NULL,
+  flips = NULL,
+  precompute_flips = TRUE,
   ...
 )
 }
 \arguments{
-\item{formula}{A \code{formula}, a list of \code{glm} objects, a list of
-\code{formula} objects, or a \code{formula} with a matrix response.}
+\item{formula}{One of:
+\enumerate{
+  \item A \code{formula} object (standard use, returns \code{flipscores} object)
+  \item A list of fitted \code{glm} objects (returns \code{joint_flipscores} object)
+  \item A list of \code{formula} objects (returns \code{joint_flipscores} object)
+  \item A \code{formula} with matrix response e.g. \code{cbind(y1,y2) ~ x}
+    (returns \code{joint_flipscores} object)
+}}
 
-\item{family}{A description of the error distribution. Used when
-\code{formula} is a single formula or a list of formulas.}
+\item{family}{Error distribution for \code{glm}. Used in cases 1, 3, 4.}
 
-\item{data}{A data frame. Used when \code{formula} is a single formula
-or a list of formulas.}
+\item{data}{A data frame. Used in cases 1, 3, 4.}
 
-\item{score_type}{Type of score to use. One of \code{"standardized"}
-(default), \code{"sign"}, \code{"raw"}, \code{"Williams"}.}
+\item{score_type}{Type of score. One of \code{"standardized"} (default),
+\code{"orthogonalized"}, \code{"effective"}, \code{"basic"}.}
 
-\item{tested_terms}{A character vector of terms to test. If \code{NULL},
-all terms are tested.}
+\item{n_flips}{Number of random flips. Default \code{5000}.}
 
-\item{n_flips}{Number of random flips (sign changes) for the permutation
-distribution. Default is \code{1000}.}
+\item{alternative}{Alternative hypothesis. Default \code{"two.sided"}.}
 
-\item{combine_with}{Combining method for joint tests: \code{"Fisher"}
-(default), \code{"Liptak"}, \code{"Tippett"}, or a custom function.
-Only used in cases 2), 3), 4).}
+\item{id}{Optional cluster id vector.}
 
-\item{seed}{Random seed for reproducibility. Only used in cases 2), 3), 4).}
+\item{seed}{Random seed for reproducibility.}
+
+\item{to_be_tested}{Character vector or list of coefficient names to test.
+If a character vector, the same terms are intersected with each model's
+coefficients. If a list, each element applies to the corresponding model.
+If \code{NULL} all coefficients are tested.}
+
+\item{flips}{Optional matrix of pre-computed flips. If provided, shared
+across all models in cases 2, 3, 4.}
+
+\item{precompute_flips}{Logical, default \code{TRUE}.}
 
 \item{...}{Additional arguments passed to \code{glm()} or the internal
-\code{flipscores} engine.}
+flipscores engine.}
 }
 \value{
 A \code{flipscores} object (case 1) or a \code{joint_flipscores}
   object (cases 2, 3, 4).
 }
 \description{
-Extended version of \code{flipscores()} supporting joint testing via
-\code{join_flipscores()} when \code{formula} is a list of models/formulas
-or a formula with matrix response.
+Extended version of \code{flipscores()} supporting joint testing when
+\code{formula} is a list of glm objects, a list of formulas, or a formula
+with a matrix response.
+}
+\examples{
+set.seed(42)
+n <- 100
+df <- data.frame(
+  y1  = rnorm(n),
+  y2  = rnorm(n),
+  yb  = rbinom(n, 1, 0.5),
+  y1p = rpois(n, lambda = 3),
+  y2p = rpois(n, lambda = 5),
+  x1  = rnorm(n),
+  x2  = rnorm(n)
+)
+
+# Case 1: single formula
+flipscores(y1 ~ x1 + x2, family = gaussian(), data = df)
+
+# Case 2: list of glm objects
+models <- list(
+  glm(y1 ~ x1 + x2, data = df, family = gaussian()),
+  glm(y2 ~ x1 + x2, data = df, family = gaussian()),
+  glm(yb ~ x1 + x2, data = df, family = binomial())
+)
+flipscores(models)
+flipscores(models, to_be_tested = "x1")
+
+# Case 3: list of formulas, same family
+flipscores(
+  list(y1 ~ x1 + x2, y2 ~ x1 + x2),
+  family = gaussian(),
+  data   = df
+)
+
+# Case 4: matrix response, gaussian
+flipscores(cbind(y1, y2) ~ x1 + x2, family = gaussian(), data = df)
+
+# Case 4: matrix response, poisson
+flipscores(cbind(y1p, y2p) ~ x1 + x2, family = poisson(), data = df)
+
 }

@@ -1,124 +1,73 @@
 # utils_jointest.R
-# Internal utilities embedded from jointest
+# Embedded and adapted from jointest (https://github.com/livioivil/jointest)
 # Original author: Livio Finos
 
 #--------------------------------------------
-# Rename jointest class to joint_flipscores
-# Used as a post-processing step if any jointest
-# internals return "jointest" class objects
+# Set model names from their response variables
 #--------------------------------------------
-.rename_jointest_class <- function(x) {
-  if (inherits(x, "jointest")) {
-    class(x) <- gsub("jointest", "joint_flipscores", class(x))
-  }
-  x
-}
-
-
-#--------------------------------------------
-# Validate that a list contains only glm objects
-#--------------------------------------------
-.validate_glm_list <- function(models) {
-  if (!is.list(models)) {
-    stop("`models` must be a list.")
-  }
-  not_glm <- which(!sapply(models, inherits, "glm"))
-  if (length(not_glm) > 0) {
-    stop(sprintf(
-      "Elements at positions %s are not glm objects.",
-      paste(not_glm, collapse = ", ")
-    ))
-  }
-  invisible(TRUE)
-}
-
-#--------------------------------------------
-# Validate that a list contains only formulas
-#--------------------------------------------
-.validate_formula_list <- function(formulas) {
-  if (!is.list(formulas)) {
-    stop("`formulas` must be a list.")
-  }
-  not_formula <- which(!sapply(formulas, inherits, "formula"))
-  if (length(not_formula) > 0) {
-    stop(sprintf(
-      "Elements at positions %s are not formula objects.",
-      paste(not_formula, collapse = ", ")
-    ))
-  }
-  invisible(TRUE)
-}
-
-#--------------------------------------------
-# Extract score table from a flipscores object
-# Handles different possible structures robustly
-#--------------------------------------------
-.get_score_table <- function(fs_obj) {
-  # Try common slot names used in flipscores objects
-  if (!is.null(fs_obj$score_table))   return(fs_obj$score_table)
-  if (!is.null(fs_obj$table))         return(fs_obj$table)
-  if (!is.null(fs_obj$coefficients))  return(fs_obj$coefficients)
-
-  # Try summary
-  s <- tryCatch(summary(fs_obj)$score_table, error = function(e) NULL)
-  if (!is.null(s)) return(s)
-
-  stop("Cannot extract score table from flipscores object.")
-}
-
-#--------------------------------------------
-# Extract p-values from a flipscores object
-#--------------------------------------------
-.get_pvalues <- function(fs_obj) {
-  tbl <- .get_score_table(fs_obj)
-
-  if ("p.value" %in% colnames(tbl)) {
-    return(tbl[, "p.value"])
-  }
-
-  stop("Cannot find p.value column in score table.")
-}
-
-#--------------------------------------------
-# Extract tested terms from a flipscores object
-#--------------------------------------------
-.get_tested_terms <- function(fs_obj) {
-  tbl <- .get_score_table(fs_obj)
-  rownames(tbl)
-}
-
-#--------------------------------------------
-# Safe model name extractor
-# Returns names or generates default ones
-#--------------------------------------------
-.get_model_names <- function(models) {
-  nms <- names(models)
+.set_mods_names <- function(mods) {
+  nms <- names(mods)
   if (is.null(nms) || any(nms == "")) {
-    nms <- paste0("model_", seq_along(models))
+    nms <- sapply(mods, function(mod) {
+      resp <- tryCatch(
+        as.character(formula(mod)[[2]]),
+        error = function(e) NULL
+      )
+      if (is.null(resp))
+        paste0("mod", which(sapply(mods, identical, mod)))
+      else
+        resp
+    })
   }
   nms
 }
 
 #--------------------------------------------
-# Build a summary data frame from a
-# joint_flipscores object (used internally
-# by print/summary/plot methods)
+# Get all coefficient names for each model as a list
 #--------------------------------------------
-.build_summary_df <- function(x) {
-  do.call(rbind, lapply(names(x$results), function(nm) {
-    tbl <- tryCatch(
-      .get_score_table(x$results[[nm]]),
-      error = function(e) NULL
-    )
-    if (is.null(tbl)) return(NULL)
+.get_all_coeff_names_list <- function(mods) {
+  lapply(mods, function(mod) names(coefficients(mod)))
+}
 
-    df <- as.data.frame(tbl)
-    df$model <- nm
-    df$term  <- rownames(tbl)
-    rownames(df) <- NULL
+#--------------------------------------------
+# Bind Tspace from all models column-wise
+#--------------------------------------------
+.get_all_Tspace <- function(mods) {
+  Tspaces <- lapply(mods, function(mod) mod$Tspace)
+  do.call(cbind, Tspaces)
+}
 
-    # Reorder columns: model, term first
-    cols <- c("model", "term", setdiff(colnames(df), c("model", "term")))
-    df[, cols, drop = FALSE]
-  }))
+#--------------------------------------------
+# Bind summary tables from all models,
+# adding a Model column
+#--------------------------------------------
+.get_all_summary_table <- function(mods) {
+  tabs <- lapply(names(mods), function(nm) {
+    tab <- mods[[nm]]$summary_table
+    if (is.null(tab)) return(NULL)
+    cbind(Model = nm, tab)
+  })
+  do.call(rbind, tabs)
+}
+
+#--------------------------------------------
+# Build summary table from a single
+# flipscores object
+#--------------------------------------------
+.get_summary_table_from_flipscores <- function(x) {
+  pvals <- x$p.values
+  if (is.null(pvals)) return(NULL)
+
+  Tobs <- sapply(seq_along(pvals), function(i) {
+    ts <- x$Tspace[, i]
+    ts[nrow(x$Tspace)]
+  })
+
+  data.frame(
+    Coeff             = names(pvals),
+    T_obs             = Tobs,
+    p.value           = pvals,
+    row.names         = NULL,
+    stringsAsFactors  = FALSE
+  )
 }

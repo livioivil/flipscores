@@ -16,10 +16,9 @@
 \item{...}{Additional arguments (currently unused).}
 }
 \value{
-A data frame with columns \code{model}, \code{term},
-  and all columns from the score tables.
+A data frame with all summary tables stacked, with a
+  \code{Model} column prepended.
 }
 \description{
-Extracts all score tables from a \code{joint_flipscores} object
-into a single tidy data frame.
+Coerce joint_flipscores to data frame
 }
