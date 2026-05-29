@@ -43,7 +43,7 @@
 # model, .assign, coefficient, estimate, score, se, z, pcor, p
 #--------------------------------------------
 .get_summary_table_from_flipscores <- function(object){
-  tab = as.data.frame(summary(object)$coefficients)
+  tab = as.data.frame(summary.flipscores(object)$coefficients)
   tab = tab[!is.na(tab[, "Score"]), ]
 
   names(tab) <- c("estimate", "score", "se", "z", "pcor", "p")

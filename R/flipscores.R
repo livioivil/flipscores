@@ -476,6 +476,7 @@ flipscores <- function(formula,
   model$flipscores_call <- fs_call
   model$flip_param_call <- flip_param_call
   model$score_type      <- score_type
+  model$summary_table=.get_summary_table_from_flipscores(model)
 
   if (is.null(param_x_ORIGINAL) || (!param_x_ORIGINAL)) model$x <- NULL
 
