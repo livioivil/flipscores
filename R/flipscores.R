@@ -24,9 +24,8 @@
 #'   If a character vector, the same terms are intersected with each model's
 #'   coefficients. If a list, each element applies to the corresponding model.
 #'   If \code{NULL} all coefficients are tested.
-#' @param tested_coeffs an alias for  \code{to_be_tested}. \code{tested_coeffs} overcomes \code{to_be_tested} if it is not \code{NULL}.
-#' @param flips Optional matrix of pre-computed flips. If provided, shared
-#'   across all models in cases 2, 3, 4.
+#' @param tested_coeffs Alias for \code{to_be_tested} for compatibility.
+#' @param flips Optional matrix of pre-computed flips.
 #' @param precompute_flips Logical, default \code{TRUE}.
 #' @param ... Additional arguments passed to \code{glm()} or the internal
 #'   flipscores engine.
@@ -78,8 +77,7 @@
 #' res=flipscores(cbind(y1p, y2p) ~ x1 + x2, family = poisson(), data = df)
 #' summary(res)
 #'
-#'
-#'# more examples
+#' # more examples
 #'n=20
 #'D=data.frame(X=rnorm(n),Z1=rnorm(n),Z2=rnorm(n))
 #'D$Y=D$Z1+D$X+rnorm(n)
@@ -101,32 +99,20 @@ flipscores <- function(formula,
                        id               = NULL,
                        seed             = NULL,
                        to_be_tested     = NULL,
-                       tested_coeffs    = NULL,  # alias for to_be_tested
+                       tested_coeffs    = NULL,
                        flips            = NULL,
                        precompute_flips = TRUE,
                        ...) {
 
-  # handle tested_coeffs as alias for to_be_tested
-  if (!is.null(tested_coeffs) )
+  # tested_coeffs is an alias for to_be_tested
+  if (!is.null(tested_coeffs) && is.null(to_be_tested))
     to_be_tested <- tested_coeffs
-
-  # ... rest unchanged ...
-
-  # capture the unevaluated data expression HERE
-  # before it gets renamed to `data` inside .flipscores_engine()
-  # this preserves the original symbol name (e.g. `df`) for display
-  data_call <- match.call()$data
 
   ##############################################################
   # CASE 2: list of glm objects
   ##############################################################
   if (is.list(formula) && all(sapply(formula, inherits, "glm"))) {
-   # message("flipscores: list of glm objects detected -> joint test")
-
-    # capture caller environment BEFORE entering .join_flipscores
-    # so that data references in glm calls are resolved correctly
-    caller_env <- parent.frame()
-
+    message("flipscores: list of glm objects detected -> joint test")
     out <- .join_flipscores(
       mods         = formula,
       to_be_tested = to_be_tested,
@@ -134,7 +120,6 @@ flipscores <- function(formula,
       flips        = flips,
       score_type   = score_type,
       seed         = seed,
-      caller_env   = caller_env,
       ...
     )
     out$call <- match.call()
@@ -147,16 +132,18 @@ flipscores <- function(formula,
   if (is.list(formula) && all(sapply(formula, inherits, "formula"))) {
     message("flipscores: list of formulas detected -> converting to glms")
 
-    caller_env <- parent.frame()
     .data   <- data
     .family <- family
 
     models <- lapply(formula, function(f) {
-      do.call(stats::glm, list(
-        formula = stats::as.formula(paste(deparse(f), collapse = " ")),
-        family  = .family,
-        data    = .data
-      ))
+      do.call(
+        stats::glm,
+        list(
+          formula = stats::as.formula(paste(deparse(f), collapse = " ")),
+          family  = .family,
+          data    = .data
+        )
+      )
     })
 
     out <- .join_flipscores(
@@ -166,7 +153,6 @@ flipscores <- function(formula,
       flips        = flips,
       score_type   = score_type,
       seed         = seed,
-      caller_env   = caller_env,
       ...
     )
     out$call <- match.call()
@@ -181,14 +167,13 @@ flipscores <- function(formula,
     rhs <- formula[[3]]
 
     if (.is_matrix_lhs(lhs, data = data, parent_env = parent.frame())) {
-      #message("flipscores: matrix response detected -> converting to list of formulas")
+      message("flipscores: matrix response detected -> converting to list of formulas")
 
-      # capture original call BEFORE recursing
       original_call <- match.call()
+      resp_names    <- .extract_matrix_response_names(lhs)
+      rhs_str       <- paste(deparse(rhs), collapse = " ")
 
-      resp_names <- .extract_matrix_response_names(lhs)
-      rhs_str    <- paste(deparse(rhs), collapse = " ")
-      formulas   <- lapply(resp_names, function(yn) {
+      formulas <- lapply(resp_names, function(yn) {
         stats::as.formula(paste0(yn, " ~ ", rhs_str))
       })
 
@@ -206,7 +191,7 @@ flipscores <- function(formula,
         precompute_flips = precompute_flips,
         ...
       )
-      out$call <- original_call  # overwrite with the true original call
+      out$call <- original_call
       return(out)
     }
   }
@@ -214,7 +199,7 @@ flipscores <- function(formula,
   ##############################################################
   # CASE 1: standard formula -> original flipscores engine
   ##############################################################
-  result <- .flipscores_engine(
+  .flipscores_engine(
     formula          = formula,
     family           = family,
     data             = data,
@@ -228,15 +213,8 @@ flipscores <- function(formula,
     precompute_flips = precompute_flips,
     ...
   )
-
-  # patch the data slot in flipscores_call with the original
-  # unevaluated expression (e.g. `df` instead of the full data frame)
-  if (!is.null(result$flipscores_call) && !is.null(data_call)) {
-    result$flipscores_call$data <- data_call
-  }
-
-  result
 }
+
 
 #--------------------------------------------
 # Helper: detect matrix LHS in formula
@@ -270,62 +248,40 @@ flipscores <- function(formula,
 
 #--------------------------------------------
 # .flipscores_engine: original flipscores() body
-# renamed to avoid infinite dispatch loop
 #--------------------------------------------
-.join_flipscores <- function(mods,
-                             to_be_tested  = NULL,
-                             n_flips       = 5000,
-                             flips         = NULL,
-                             score_type    = "standardized",
-                             statistics    = "t",
-                             seed          = NULL,
-                             output_models = TRUE,
-                             caller_env    = parent.frame(),
-                             ...) {
-
-  if (!is.null(seed)) set.seed(seed)
-
-  # DO NOT modify mods[[i]]$call$data
-  # instead pass data directly when calling .flipscores_engine
-  mods <- lapply(seq_along(mods), function(i) {
-    # extract data directly from the fitted model
-    model_data <- mods[[i]]$model
-
-    temp <- .flipscores_engine(
-      formula       = mods[[i]],
-      family        = mods[[i]]$family,
-      data          = model_data,    # pass extracted data explicitly
-      score_type    = score_type,
-      flips         = FLIPS,
-      to_be_tested  = to_be_tested[[i]],
-      nobservations = n_obs,
-      ...
-    )
-    if (statistics %in% "t") {
-      temp$summary_table <- .get_summary_table_from_flipscores(temp,
-                                                               model_name = names(mods)[i])
-    }
-    temp
-  })
-  names(mods) <- .set_mods_names(mods)
-
-  # ... rest of function unchanged ...
-
+.flipscores_engine <- function(formula,
+                               family,
+                               data,
+                               score_type       = "standardized",
+                               n_flips          = 5000,
+                               alternative      = "two.sided",
+                               id               = NULL,
+                               seed             = NULL,
+                               to_be_tested     = NULL,
+                               flips            = NULL,
+                               precompute_flips = TRUE,
+                               ...) {
   fs_call <- mf <- match.call()
 
-  # save BEFORE anything modifies formula or data
-  original_formula <- formula
-  original_data    <- data
-  # save the UNEVALUATED data argument for display purposes
-  # this preserves the symbol name (e.g. `df`) if user passed a named object
-  original_data_call <- fs_call$data  # still unevaluated at this point
+  # force evaluation of all arguments immediately
+  # to prevent match.call() storing unevaluated symbols
+  # that fail when accessed as logicals later
+  precompute_flips <- force(precompute_flips)
+  alternative      <- force(alternative)
+  score_type       <- force(score_type)
+  n_flips          <- force(n_flips)
+  seed             <- force(seed)
+  id               <- force(id)
 
+  # save original formula, data symbol and data value
+  original_formula   <- formula
+  original_data      <- data
+  original_data_call <- mf$data  # unevaluated symbol e.g. `df`
 
   score_type <- match.arg(score_type,
                           c("orthogonalized", "standardized",
                             "effective", "basic", "my_lab"))
 
-  # identify flip-specific parameters in the call
   m <- match(c("score_type", "n_flips", "alternative", "id",
                "seed", "flips", "precompute_flips"), names(mf), 0L)
   m <- m[m > 0]
@@ -402,9 +358,25 @@ flipscores <- function(formula,
       model$call$family <- family
   } else if (inherits(model, "glm")) {
     param_x_ORIGINAL <- TRUE
-    model <- update(model, x = TRUE)
-    if (is.null(model$call$family))
-      model$call$family <- model$family
+    # refit using do.call to avoid any symbol lookup issues
+    # extract all arguments from the existing model
+    refit_args        <- list(
+      formula = formula(model),
+      family  = model$family,
+      data    = model$model,  # use stored model frame directly
+      x       = TRUE
+    )
+    # preserve any extra arguments (offset, weights, subset etc)
+    extra_args <- model$call[!names(model$call) %in%
+                               c("", "formula", "family", "data", "x")]
+    extra_args[[1]] <- NULL  # remove function name
+    if (length(extra_args) > 0) {
+      for (nm in names(extra_args))
+        refit_args[[nm]] <- eval(extra_args[[nm]],
+                                 envir = model$model)
+    }
+    model <- do.call(stats::glm, refit_args)
+    model$call$family <- model$family
   } else {
     stop("'formula' must be a formula or a glm object.")
   }
@@ -466,20 +438,18 @@ flipscores <- function(formula,
     names(model$p.values) <- to_be_tested
 
   # build a clean glm call for update() - only valid glm() arguments
-  # this is used by update() inside gcor(), anova(), confint(), etc.
   glm_call          <- call("glm")
   glm_call$formula  <- original_formula
   glm_call$family   <- family
-  glm_call$data     <- original_data
+  glm_call$data     <- original_data      # actual data frame
   if (!is.null(mf$offset))  glm_call$offset  <- mf$offset
   if (!is.null(mf$weights)) glm_call$weights <- mf$weights
   if (!is.null(mf$subset))  glm_call$subset  <- mf$subset
 
   # build the full flipscores call for print/summary display
-  # this is stored in model$flipscores_call
   fs_call[[1L]]            <- quote(flipscores)
   fs_call$formula          <- original_formula
-  fs_call$data             <- original_data_call
+  fs_call$data             <- original_data_call  # unevaluated symbol
   fs_call$family           <- family
   fs_call$score_type       <- score_type
   fs_call$n_flips          <- flip_param_call$n_flips
@@ -492,8 +462,6 @@ flipscores <- function(formula,
   fs_call$nobservations    <- NULL
   fs_call$parms_DV         <- NULL
 
-  # model$call       -> clean glm call, used by update(), gcor(), anova()
-  # model$flipscores_call -> full flipscores call, used by print/summary
   model$call            <- glm_call
   model$flipscores_call <- fs_call
   model$flip_param_call <- flip_param_call

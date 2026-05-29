@@ -15,16 +15,17 @@
 
   if (!is.null(seed)) set.seed(seed)
 
-  # resolve data in calling frame
+  # embed actual data frame directly from model$model into each model's call
+  # do NOT use eval() on the data symbol - it may resolve to
+  # stats::D or other functions that shadow the user's variable name
+  # embed actual data frame directly from model$model into each model's call
+  # embed actual data frame directly from model$model into each model's call
   for (i in seq_along(mods))
-    mods[[i]]$call$data <- eval(mods[[i]]$call$data, parent.frame())
+    mods[[i]]$call$data <- mods[[i]]$model
 
   names(mods) <- .set_mods_names(mods)
 
-  # handle to_be_tested:
-  # NULL   -> get all coefficients from each model
-  # vector -> intersect with each model's coefficients
-  # list   -> use as-is, one element per model
+  # handle to_be_tested
   if (is.null(to_be_tested)) {
     to_be_tested <- .get_all_coeff_names_list(mods)
   } else if (!is.list(to_be_tested)) {
@@ -33,11 +34,12 @@
     to_be_tested <- lapply(temp, function(nms)
       intersect(to_be_tested, gsub(" ", "", nms)))
   }
-  # if already a list, use as-is
 
   # compute max n_obs across models
+  # use mod$model directly instead of model.matrix()
+  # to avoid symbol lookup issues with data
   n_obs_rn <- sapply(mods, function(mod)
-    max(as.numeric(rownames(model.matrix(mod)))))
+    max(as.numeric(rownames(mod$model))))
   n_obs_rn <- max(n_obs_rn)
   n_obs    <- sapply(mods, function(mod) length(mod$y))
   n_obs    <- max(n_obs, n_obs_rn)
@@ -52,18 +54,12 @@
   }
 
   # run .flipscores_engine on each model
-  # note: mods[[i]] is already a glm object (either passed directly in case 2,
-  # or built from formulas in cases 3 and 4).
-  # we pass:
-  #   formula = mods[[i]]  -> .flipscores_engine handles glm objects directly
-  #   family  = mods[[i]]$family -> extracted from the glm, not from flipscores() args
-  #   data    = NULL        -> data is already embedded inside the glm object
-  #   flips   = FLIPS       -> shared across all models, already evaluated
+  # pass model$model as data to avoid symbol lookup issues
   mods <- lapply(seq_along(mods), function(i) {
     temp <- .flipscores_engine(
       formula       = mods[[i]],
       family        = mods[[i]]$family,
-      data          = NULL,
+      data          = mods[[i]]$model,
       score_type    = score_type,
       flips         = FLIPS,
       to_be_tested  = to_be_tested[[i]],
@@ -71,24 +67,27 @@
       ...
     )
     if (statistics %in% "t") {
-      temp$summary_table <- .get_summary_table_from_flipscores(temp)
+      temp$summary_table <- .get_summary_table_from_flipscores(
+        temp,
+        model_name = mods_names[i]
+      )
     }
     temp
   })
 
   if (is.null(mods_names)) {
-    names(mods) <- paste0("mod", seq_along(mods))
-  } else {
-    names(mods) <- mods_names
-  }
+        names(mods) <- paste0("mod", seq_along(mods))
+      } else {
+        names(mods) <- mods_names
+      }
 
-  out <- list(
-    Tspace        = .get_all_Tspace(mods),
-    summary_table = .get_all_summary_table(mods),
-    mods          = mods,
-    call          = match.call()
-  )
+      out <- list(
+        Tspace        = .get_all_Tspace(mods),
+        summary_table = .get_all_summary_table(mods),
+        mods          = mods,
+        call          = match.call()
+      )
 
-  class(out) <- c("joint_flipscores", class(out))
-  out
+      class(out) <- c("joint_flipscores", class(out))
+      out
 }

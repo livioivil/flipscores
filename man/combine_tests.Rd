@@ -29,3 +29,34 @@ A \code{joint_flipscores} object with combined results.
 Combines tests from a \code{joint_flipscores} object using a
 non-parametric combination (NPC) method.
 }
+\examples{
+# flipscores jointly on all models and all coefficients
+set.seed(1)
+n <- 50
+df <- data.frame(
+  y1  = rnorm(n),
+  y2  = rnorm(n),
+  yb  = rbinom(n, 1, 0.5),
+  y1p = rpois(n, lambda = 3),
+  y2p = rpois(n, lambda = 5),
+  x1  = rnorm(n),
+  x2  = rnorm(n)
+)
+
+res=flipscores(
+  list(y1 ~ x1 + x2, y2 ~ x1 + x2),
+  family = gaussian(),
+  data   = df
+)
+summary(res)
+summary(combine_tests(res))
+summary(combine_tests(res, by="model"))
+summary(combine_tests(res, by="coefficient"))
+res2=combine_contrasts(res)
+summary(res2)
+#custom combinations:
+coeffs=c("(Intercept)","X","Z1","Z2")
+coeffs_ids=lapply(coeffs,grep,res2$summary_table$Coeff)
+names(coeffs_ids)=coeffs
+summary(combine_tests(res2,by_list =   coeffs_ids))
+}
