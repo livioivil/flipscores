@@ -160,11 +160,16 @@
     param_x_ORIGINAL=mf$x
     mf$x=TRUE
     model <- eval(mf, parent.frame())
-  } else { # input is a model
+  } else if (inherits(model, "glm")) {
     param_x_ORIGINAL <- TRUE
-    model <- update(model,x=TRUE)
+    # embed actual data frame into model$call$data BEFORE update()
+    # to prevent eval() from finding stats::D or other functions
+    # instead of the user's data frame
+    model$call$data <- model$model
+    model <- update(model, x = TRUE)
+    if (is.null(model$call$family))
+      model$call$family <- model$family
   }
-
   if(is.null(model$y)) model$y=model$model[,1]
 
   #compute H0s models

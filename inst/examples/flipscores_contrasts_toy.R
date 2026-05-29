@@ -47,7 +47,7 @@ flipscores_contrasts(
 flipscores_contrasts(
   fit,
   trt.vs.ctrl ~ age_group,
-  ref = "Middle",
+  ref = "Young",
   n_flips = 500,
   seed = 1
 )

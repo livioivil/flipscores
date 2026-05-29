@@ -67,8 +67,8 @@ Extended version of \code{flipscores()} supporting joint testing when
 with a matrix response.
 }
 \examples{
-set.seed(42)
-n <- 100
+set.seed(1)
+n <- 50
 df <- data.frame(
   y1  = rnorm(n),
   y2  = rnorm(n),
@@ -80,7 +80,8 @@ df <- data.frame(
 )
 
 # Case 1: single formula
-flipscores(y1 ~ x1 + x2, family = gaussian(), data = df)
+res=flipscores(y1 ~ x1 + x2, family = gaussian(), data = df)
+summary(res)
 
 # Case 2: list of glm objects
 models <- list(
@@ -88,20 +89,25 @@ models <- list(
   glm(y2 ~ x1 + x2, data = df, family = gaussian()),
   glm(yb ~ x1 + x2, data = df, family = binomial())
 )
-flipscores(models)
-flipscores(models, to_be_tested = "x1")
+res=flipscores(models)
+summary(res)
+res=flipscores(models, to_be_tested = "x1")
+summary(res)
 
 # Case 3: list of formulas, same family
-flipscores(
+res=flipscores(
   list(y1 ~ x1 + x2, y2 ~ x1 + x2),
   family = gaussian(),
   data   = df
 )
+summary(res)
 
 # Case 4: matrix response, gaussian
-flipscores(cbind(y1, y2) ~ x1 + x2, family = gaussian(), data = df)
+res=flipscores(cbind(y1, y2) ~ x1 + x2, family = gaussian(), data = df)
+summary(res)
 
 # Case 4: matrix response, poisson
-flipscores(cbind(y1p, y2p) ~ x1 + x2, family = poisson(), data = df)
+res=flipscores(cbind(y1p, y2p) ~ x1 + x2, family = poisson(), data = df)
+summary(res)
 
 }

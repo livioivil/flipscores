@@ -16,32 +16,31 @@ NULL
 #' a proper \code{flipscores} object rather than a plain \code{glm}.
 #'
 #' @param object A \code{flipscores} object.
-#' @param formula. A formula or \code{NULL}. If provided, the model formula
-#'   is updated using \code{\link[stats]{update.formula}}. Supports the
-#'   \code{.} shorthand to refer to the current formula terms, e.g.
-#'   \code{. ~ . + offset(.OFFSET___)}.
 #' @param ... Additional arguments to update in the call, such as
-#'   \code{data}, \code{family}, \code{score_type}, etc.
+#'   \code{formula}, \code{data}, \code{family}, \code{score_type}, etc.
+#'   Supports the \code{.} shorthand in formula updates, e.g.
+#'   \code{formula = . ~ . + offset(.OFFSET___)}.
 #' @return A \code{flipscores} object.
 #' @method update flipscores
 #' @export
-update.flipscores <- function(object, formula. = NULL, ...) {
+update.flipscores <- function(object, ...) {
 
   call <- object$flipscores_call
   if (is.null(call))
     call <- object$call
 
-  extras <- list(...)
+  extras <- match.call(expand.dots = FALSE)$...
 
-  # handle formula update (e.g. . ~ . + offset(.OFFSET___))
-  if (!is.null(formula.)) {
-    # update the formula using the standard stats::update.formula
-    # this correctly resolves '.' using the original formula
-    call$formula <- stats::update.formula(formula(object), formula.)
-  }
-
-  # override any other arguments passed via ...
   if (length(extras) > 0) {
+    # handle formula update separately using update.formula
+    # to correctly resolve '.' shorthand
+    if ("formula" %in% names(extras)) {
+      call$formula <- stats::update.formula(formula(object),
+                                            eval(extras[["formula"]],
+                                                 parent.frame()))
+      extras[["formula"]] <- NULL
+    }
+    # override remaining arguments
     for (a in names(extras))
       call[[a]] <- extras[[a]]
   }
@@ -85,31 +84,43 @@ print.flipscores <- function(x, ...) {
 summary.flipscores <- function(object, ...) {
   sum_model <- summary.glm(object = object)
 
-  # replace the call shown in summary with the flipscores call
-  # not the internal glm call
-  sum_model$call <- object$flipscores_call
+  display_call <- object$flipscores_call
+  if (!is.null(display_call)) {
+    # replace family with a clean deparsed version
+    fam <- object$family
+    if (!is.null(fam)) {
+      display_call$family <- if (is.character(fam)) {
+        fam
+      } else {
+        str2lang(paste0(fam$family, "(link='", fam$link, "')"))
+      }
+    }
+    # only shorten data if it was NOT passed as a named object
+    # i.e. if it is not a simple symbol like `df` or `mydata`
+    data_arg <- object$flipscores_call$data
+    if (!is.null(data_arg) && !is.symbol(data_arg)) {
+      display_call$data <- as.symbol(
+        paste0("data.frame_", nrow(object$model), "x", ncol(object$model))
+      )
+    }
+  }
 
-  sum_model$coefficients=sum_model$coefficients[,c(1,1:4,4),drop=FALSE]
-  sum_model$coefficients[,-1]=NA
-  # temp=sum_model$coefficients
-  # matrix(NA,length(sum_model$coefficients),6)
-  # rownames(temp)=rownames(sum_model$coefficients)
-  # colnames(temp)=colnames(sum_model$coefficients)
-  # temp[rownames(sum_model$coefficients),]=sum_model$coefficients
-  #sum_model$coefficients=temp
-  sum_model$coefficients[names(object$p.values),-1]=NA
-  sum_model$coefficients[names(object$p.values),2]=unlist(colSums(object$scores))
-  sum_model$coefficients[names(object$p.values),3]=attributes(object$scores)$sd#unlist(sapply(object$scores,sd)*sqrt(nrow(object$scores)))
-  sum_model$coefficients[,4]=sum_model$coefficients[,2]/sum_model$coefficients[,3]
-  sum_model$coefficients[names(object$p.values),5]=(sum_model$coefficients[names(object$p.values),2]/attributes(object$scores)$nrm)[]
-  sum_model$coefficients[names(object$p.values),6]=object$p.values
-  # sum_model$coefficients=sum_model$coefficients[,c(1,4)]
-  colnames(sum_model$coefficients)[c(2,4,5,6)]=c("Score","z value","Part. Cor","Pr(>|z|)")
-
-  sum_model$aliased=rep(FALSE,length(sum_model$aliased))
-  structure(sum_model, heading = get_head_flip_out(object), class = c("data.frame"))
+  sum_model$coefficients <- sum_model$coefficients[, c(1,1:4,4), drop=FALSE]
+  sum_model$coefficients[, -1] <- NA
+  sum_model$coefficients[names(object$p.values), -1] <- NA
+  sum_model$coefficients[names(object$p.values), 2] <- unlist(colSums(object$scores))
+  sum_model$coefficients[names(object$p.values), 3] <- attributes(object$scores)$sd
+  sum_model$coefficients[, 4] <- sum_model$coefficients[, 2] / sum_model$coefficients[, 3]
+  sum_model$coefficients[names(object$p.values), 5] <-
+    (sum_model$coefficients[names(object$p.values), 2] / attributes(object$scores)$nrm)[]
+  sum_model$coefficients[names(object$p.values), 6] <- object$p.values
+  colnames(sum_model$coefficients)[c(2,4,5,6)] <- c("Score", "z value",
+                                                    "Part. Cor", "Pr(>|z|)")
+  sum_model$aliased <- rep(FALSE, length(sum_model$aliased))
+  sum_model$call <- display_call
   sum_model
 }
+
 
 
 ###########

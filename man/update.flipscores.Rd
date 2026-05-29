@@ -4,12 +4,15 @@
 \alias{update.flipscores}
 \title{Update method for flipscores}
 \usage{
-\method{update}{flipscores}(object, formula. = NULL, ...)
+\method{update}{flipscores}(object, ...)
 }
 \arguments{
 \item{object}{A \code{flipscores} object.}
 
-\item{...}{Arguments to update in the call.}
+\item{...}{Additional arguments to update in the call, such as
+\code{formula}, \code{data}, \code{family}, \code{score_type}, etc.
+Supports the \code{.} shorthand in formula updates, e.g.
+\code{formula = . ~ . + offset(.OFFSET___)}.}
 }
 \value{
 A \code{flipscores} object.

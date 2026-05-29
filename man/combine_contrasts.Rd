@@ -4,22 +4,19 @@
 \alias{combine_contrasts}
 \title{Combine Contrasts}
 \usage{
-combine_contrasts(x, combine_with = "Fisher", ...)
+combine_contrasts(mods, comb_funct = "Mahalanobis", tail = 0)
 }
 \arguments{
-\item{x}{A \code{joint_flipscores} object.}
+\item{mods}{A \code{joint_flipscores} object.}
 
-\item{combine_with}{A string specifying the combining method:
-\code{"Fisher"} (default), \code{"Liptak"}, \code{"Tippett"},
-or a custom function.}
+\item{comb_funct}{Combining function. Default \code{"Mahalanobis"}.}
 
-\item{...}{Additional arguments (currently unused).}
+\item{tail}{Tail direction. Default \code{0} (two-sided).}
 }
 \value{
-A data frame with one row per coefficient, with combined
-  test statistic and p-value.
+A \code{joint_flipscores} object with combined results.
 }
 \description{
-Combines p-values across models for each tested coefficient
-from a \code{joint_flipscores} object.
+Combines tests across contrasts of factor variables to obtain
+a global test per factor (analogous to ANOVA).
 }

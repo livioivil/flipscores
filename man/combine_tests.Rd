@@ -4,21 +4,28 @@
 \alias{combine_tests}
 \title{Combine Tests}
 \usage{
-combine_tests(x, combine_with = "Fisher", ...)
+combine_tests(mods, comb_funct = "maxT", by = NULL, by_list = NULL, tail = 0)
 }
 \arguments{
-\item{x}{A \code{joint_flipscores} object or a numeric vector of p-values.}
+\item{mods}{A \code{joint_flipscores} object.}
 
-\item{combine_with}{A string specifying the combining method:
-\code{"Fisher"} (default), \code{"Liptak"}, \code{"Tippett"},
-or a custom function.}
+\item{comb_funct}{Combining function: \code{"maxT"} (default),
+\code{"Mahalanobis"}, \code{"Fisher"}, \code{"Liptak"},
+\code{"Tippett"}, or a custom function.}
 
-\item{...}{Additional arguments (currently unused).}
+\item{by}{Character vector of column names in \code{summary_table}
+to group by before combining. If \code{NULL}, all tests are combined.}
+
+\item{by_list}{A named list of integer vectors specifying custom groupings
+of column indices in \code{Tspace}. Overrides \code{by} if provided.}
+
+\item{tail}{Tail direction: \code{0} = two-sided (default),
+\code{1} = right, \code{-1} = left.}
 }
 \value{
-A data frame with the combined test statistic and p-value.
+A \code{joint_flipscores} object with combined results.
 }
 \description{
-Combines p-values from a \code{joint_flipscores} object or a numeric
-vector using a combining function.
+Combines tests from a \code{joint_flipscores} object using a
+non-parametric combination (NPC) method.
 }

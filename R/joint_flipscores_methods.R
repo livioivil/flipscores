@@ -2,42 +2,47 @@
 # S3 methods for the "joint_flipscores" class
 
 #--------------------------------------------
-#' Print method for joint_flipscores
-#'
-#' @param x A \code{joint_flipscores} object.
-#' @param ... Additional arguments (currently unused).
-#' @export
-print.joint_flipscores <- function(x, ...) {
-  cat("\n=== Joint Flip Scores ===\n")
-  cat("Number of models:", length(x$mods), "\n\n")
-
-  cat("--- Summary table ---\n")
-  print(x$summary_table, row.names = FALSE)
-
+# internal helper: print first and last n rows
+# adapted from jointest
+#--------------------------------------------
+.trim <- function(x, n = 2, ...) {
+  nr <- nrow(x)
+  if (is.null(nr) || nr <= 2 * n) {
+    print(x, ...)
+  } else {
+    print(head(x, n), ...)
+    cat(sprintf("... %s rows ...\n", nr - 2 * n))
+    print(tail(x, n), ...)
+  }
   invisible(x)
 }
 
+#--------------------------------------------
+#' Print method for joint_flipscores
+#'
+#' @param x A \code{joint_flipscores} object.
+#' @param n Number of rows to show at head and tail of summary table.
+#' @param ... Additional arguments (currently unused).
+#' @export
+print.joint_flipscores <- function(x, n = 2, ...) {
+  msg <- "== Joining n = %s models"
+  cat(sprintf(msg, length(unique(x$summary_table$Model))))
+  cat("\n\n")
+  .trim(x$summary_table, n = n)
+  invisible(x)
+}
 
 #--------------------------------------------
 #' Summary method for joint_flipscores
 #'
 #' @param object A \code{joint_flipscores} object.
+#' @param digits Number of digits to print. Default \code{4}.
 #' @param ... Additional arguments (currently unused).
 #' @export
-summary.joint_flipscores <- function(object, ...) {
-  cat("\n=== Summary: Joint Flip Scores ===\n")
-  cat("Number of models:", length(object$mods), "\n\n")
-
-  cat("--- Per-model results ---\n")
-  for (nm in names(object$mods)) {
-    cat(sprintf("\n[%s]\n", nm))
-    tab <- object$mods[[nm]]$summary_table
-    if (!is.null(tab)) print(tab, row.names = FALSE)
-  }
-
-  cat("\n--- Overall summary table ---\n")
-  print(object$summary_table, row.names = FALSE)
-
+summary.joint_flipscores <- function(object, digits = 4, ...) {
+  tab <- object$summary_table
+  tab$.assign <- NULL   # remove internal column if present
+  print(tab, digits = digits)
   invisible(object)
 }
 
