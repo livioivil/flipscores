@@ -158,3 +158,54 @@ get_head_flip_out <- function(x){
   }
   has_intercept
 }
+
+
+.set_tail <- function(Tspace,tail=0){
+  if((tail==0)|(tail=="two.sided"))
+    Tspace=abs(Tspace) else
+      if((tail<0)|(tail=="less"))
+        Tspace=-Tspace
+
+      Tspace
+}
+
+.t2p_only_first <- function(Tspace,tail=0){
+  Tspace=.set_tail(Tspace,tail=tail)
+  if(is.vector(Tspace)){
+    P = mean(Tspace>=Tspace[1])
+  } else if(ncol(Tspace)==1){
+    P = mean(Tspace[,]>=Tspace[1,1])
+  } else    {
+    P = apply(Tspace,2, function(Tsp)mean(Tspace>=Tspace[1]))
+  }
+  P
+}
+
+.find_common_pattern <- function(vettore) {
+  if (length(vettore) < 2) {
+    return(vettore)
+  }
+
+  if(length(grep(":",vettore[1]))>0){
+    vettore_splt=strsplit(vettore,":")
+    pttrns=sapply(1:length(vettore_splt[[1]]),function(i){
+      .find_common_pattern (sapply(vettore_splt,function(x) x[i]) )
+    })
+    return(paste(pttrns,collapse=":"))
+  }
+
+  chars=sapply(vettore,strsplit,"")
+  #matrix of all chracters
+  charsMat=suppressWarnings(do.call(cbind,chars))
+  # ask row-wise if they are all equals
+  all_eqs=apply(charsMat,1,function(x)length(unique(x))==1)
+  # this is the first different character
+  if(all(all_eqs)) {
+    common_pattern=vettore[1]
+  } else {
+    common_pattern=substr(vettore[1],1,max(which.min(all_eqs)-1,1))
+  }
+
+
+  return(common_pattern)
+}

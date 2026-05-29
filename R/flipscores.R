@@ -79,15 +79,16 @@
 #'
 #' # more examples
 #'n=20
-#'D=data.frame(X=rnorm(n),Z1=rnorm(n),Z2=rnorm(n))
-#'D$Y=D$Z1+D$X+rnorm(n)
+#'DD=data.frame(X=rnorm(n),Z1=rnorm(n),Z2=rnorm(n))
+#'DD$Y=DD$Z1+DD$X+rnorm(n)
 #'# Run four glms abd combine it in a list
-#'mod1=glm(Y~X+Z1+Z2,data=D)
-#'mod2=glm(Y~X+poly(Z1,2)+Z2,data=D)
-#'mod3=glm(Y~X+poly(Z1,2)+poly(Z2,2),data=D)
-#'mod4=glm(Y~X+Z1+poly(Z2,2),data=D)
+#'mod1=glm(Y~X+Z1+Z2,data=DD)
+#'mod2=glm(Y~X+poly(Z1,2)+Z2,data=DD)
+#'mod3=glm(Y~X+poly(Z1,2)+poly(Z2,2),data=DD)
+#'mod4=glm(Y~X+Z1+poly(Z2,2),data=DD)
 #'mods=list(mod1=mod1,mod2=mod2,mod3=mod3,mod4=mod4)
 #'res=flipscores(mods, to_be_tested = "X")
+#'summary(res)
 #'
 #' @export
 flipscores <- function(formula,
@@ -112,10 +113,14 @@ flipscores <- function(formula,
   # CASE 2: list of glm objects
   ##############################################################
   if (is.list(formula) && all(sapply(formula, inherits, "glm"))) {
-    message("flipscores: list of glm objects detected -> joint test")
+    #message("flipscores: list of glm objects detected -> joint test")
+
+    for(i in 1:length(formula))
+      formula[[i]]$call$data=eval(formula[[i]]$call$data, parent.frame())
+
     out <- .join_flipscores(
       mods         = formula,
-      to_be_tested = to_be_tested,
+      tested_coeffs = to_be_tested,
       n_flips      = n_flips,
       flips        = flips,
       score_type   = score_type,
@@ -130,25 +135,23 @@ flipscores <- function(formula,
   # CASE 3: list of formulas
   ##############################################################
   if (is.list(formula) && all(sapply(formula, inherits, "formula"))) {
-    message("flipscores: list of formulas detected -> converting to glms")
+    #message("flipscores: list of formulas detected -> converting to glms")
 
-    .data   <- data
-    .family <- family
 
     models <- lapply(formula, function(f) {
       do.call(
         stats::glm,
         list(
           formula = stats::as.formula(paste(deparse(f), collapse = " ")),
-          family  = .family,
-          data    = .data
+          family  = family,
+          data    = data
         )
       )
     })
 
     out <- .join_flipscores(
       mods         = models,
-      to_be_tested = to_be_tested,
+      tested_coeffs = to_be_tested,
       n_flips      = n_flips,
       flips        = flips,
       score_type   = score_type,
@@ -167,26 +170,31 @@ flipscores <- function(formula,
     rhs <- formula[[3]]
 
     if (.is_matrix_lhs(lhs, data = data, parent_env = parent.frame())) {
-      message("flipscores: matrix response detected -> converting to list of formulas")
+     # message("flipscores: matrix response detected -> converting to list of formulas")
 
       original_call <- match.call()
       resp_names    <- .extract_matrix_response_names(lhs)
       rhs_str       <- paste(deparse(rhs), collapse = " ")
 
-      formulas <- lapply(resp_names, function(yn) {
-        stats::as.formula(paste0(yn, " ~ ", rhs_str))
+      mods <- lapply(resp_names, function(yn) {
+        do.call(
+          stats::glm,
+          list(
+            formula = stats::as.formula(paste0(yn, " ~ ", rhs_str)),
+            family  = family,
+            data    = data
+          )
+        )
       })
 
-      out <- flipscores(
-        formula          = formulas,
-        family           = family,
-        data             = data,
+      out <- .join_flipscores(
+        mods          = mods,
         score_type       = score_type,
         n_flips          = n_flips,
         alternative      = alternative,
         id               = id,
         seed             = seed,
-        to_be_tested     = to_be_tested,
+        tested_coeffs     = to_be_tested,
         flips            = flips,
         precompute_flips = precompute_flips,
         ...
@@ -360,23 +368,25 @@ flipscores <- function(formula,
     param_x_ORIGINAL <- TRUE
     # refit using do.call to avoid any symbol lookup issues
     # extract all arguments from the existing model
-    refit_args        <- list(
-      formula = formula(model),
-      family  = model$family,
-      data    = model$model,  # use stored model frame directly
-      x       = TRUE
-    )
-    # preserve any extra arguments (offset, weights, subset etc)
-    extra_args <- model$call[!names(model$call) %in%
-                               c("", "formula", "family", "data", "x")]
-    extra_args[[1]] <- NULL  # remove function name
-    if (length(extra_args) > 0) {
-      for (nm in names(extra_args))
-        refit_args[[nm]] <- eval(extra_args[[nm]],
-                                 envir = model$model)
-    }
-    model <- do.call(stats::glm, refit_args)
-    model$call$family <- model$family
+    # refit_args        <- list(
+    #   formula = formula(model),
+    #   family  = model$family,
+    #   data    = model$model,  # use stored model frame directly
+    #   x       = TRUE
+    # )
+    # # preserve any extra arguments (offset, weights, subset etc)
+    # extra_args <- model$call[!names(model$call) %in%
+    #                            c("", "formula", "family", "data", "x")]
+    # extra_args[[1]] <- NULL  # remove function name
+    # if (length(extra_args) > 0) {
+    #   for (nm in names(extra_args))
+    #     refit_args[[nm]] <- eval(extra_args[[nm]],
+    #                              envir = model$model)
+    # }
+    # model <- do.call(stats::glm, refit_args)
+    # model$call$family <- model$family
+    model <- update(model,x=TRUE)
+
   } else {
     stop("'formula' must be a formula or a glm object.")
   }

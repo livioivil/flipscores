@@ -42,64 +42,36 @@
 # matches jointest column structure:
 # model, .assign, coefficient, estimate, score, se, z, pcor, p
 #--------------------------------------------
-.get_summary_table_from_flipscores <- function(x, model_name = NULL) {
-  pvals  <- x$p.values
-  if (is.null(pvals)) return(NULL)
+.get_summary_table_from_flipscores <- function(object){
+  tab = as.data.frame(summary(object)$coefficients)
+  tab = tab[!is.na(tab[, "Score"]), ]
 
-  # observed test statistics (last row of Tspace = observed)
-  Tobs <- sapply(seq_along(pvals), function(i) {
-    x$Tspace[nrow(x$Tspace), i]
-  })
+  names(tab) <- c("estimate", "score", "se", "z", "pcor", "p")
+  # colnames(tab)[ncol(tab)]="p"
+  mm=model.matrix(object)
+  .assign=attr(mm,"assign")
+  .assign=.assign[dimnames(mm)[[2]]%in%rownames(tab)]
 
-  # coefficient estimates
-  estimates <- tryCatch(x$coefficients[names(pvals)], error = function(e) rep(NA, length(pvals)))
-
-  # standard errors and z values from scores attributes
-  sd_scores <- attributes(x$scores)$sd
-  if (is.null(sd_scores)) sd_scores <- rep(NA, length(pvals))
-
-  z_vals <- Tobs / sd_scores
-
-  # partial correlations
-  nrm <- attributes(x$scores)$nrm
-  if (is.null(nrm)) nrm <- rep(NA, length(pvals))
-  pcor <- unlist(colSums(x$scores)) / nrm
-
-  # .assign: term assignment from model matrix
-  assign_vec <- tryCatch(
-    attr(model.matrix(x), "assign"),
-    error = function(e) rep(NA, length(pvals))
-  )
-  names(assign_vec) <- colnames(model.matrix(x))
-  assign_vals <- assign_vec[names(pvals)]
-
-  data.frame(
-    model       = if (!is.null(model_name)) model_name else NA_character_,
-    .assign     = assign_vals,
-    coefficient = names(pvals),
-    estimate    = estimates,
-    score       = unlist(colSums(x$scores)),
-    se          = sd_scores,
-    z           = z_vals,
-    pcor        = pcor,
-    p           = pvals,
-    row.names   = NULL,
-    stringsAsFactors = FALSE
-  )
+  tab = cbind( .assign=.assign,
+               coefficient = rownames(tab),
+               tab)
 }
+
 
 #--------------------------------------------
 # Bind summary tables from all models
 #--------------------------------------------
-.get_all_summary_table <- function(mods) {
-  tabs <- lapply(names(mods), function(nm) {
-    tab <- mods[[nm]]$summary_table
-    if (is.null(tab)) return(NULL)
-    tab$model <- nm
-    tab
+.get_all_summary_table <- function(mods,mods_name=NULL){
+  if(is.null(mods_name)) mods_name=names(mods)
+  res=lapply(1:length(mods), function(i) {
+    cbind(model=names(mods)[i],
+          mods[[i]]$summary_table)
   })
-  do.call(rbind, tabs)
+  res=do.call(rbind,res)
+  rownames(res)=NULL
+  res
 }
+
 
 #--------------------------------------------
 # Bind summary tables from combined results
