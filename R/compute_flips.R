@@ -26,7 +26,7 @@ compute_flips<- function(scores,alternative="two.sided",
                                        #output_flips=output_flips,
                                        seed=seed,
                                        precompute_flips=precompute_flips)
-  p.values=.t2p(ftail(unlist(Tspace)))
+  p.values=.t2p_only_first(ftail(unlist(Tspace)))
   # named vector?
 
   out=list(Tspace=Tspace,p.values=p.values)

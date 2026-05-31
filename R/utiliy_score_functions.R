@@ -91,10 +91,6 @@ score2t <- function(Tspace,nrms=NULL,ns=NULL){
 #   dev_resid=(sumY2-(Tvector^2/n))
 #   Tvector/sqrt(dev_resid/(n-1)*n)
 # }
-#### compute p-value
-.t2p  <- function(pvls){
-  mean(as.vector(pvls)>=pvls[1])
-}
 
 #################################
 mahalanobis_npc <- function(permT){

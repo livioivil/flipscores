@@ -60,11 +60,16 @@ mod4=glm(Y~X+Z1+poly(Z2,2),data=D)
 mods=list(mod1=mod1,mod2=mod2,mod3=mod3,mod4=mod4)
 
 # Let us analyze the tests related to coefficient "X" and combine them
-res=join_flipscores(mods,n_flips = 5000, seed = 1, tested_coeffs = "X")
+res=flipscores(mods,n_flips = 5000, seed = 1, tested_coeffs = "X")
 summary(combine_tests(res))
 # Second (continued) example
 # flipscores jointly on all models and all coefficients
-res=join_flipscores(mods,n_flips = 2000)
+mod1=glm(Y~X+Z1+Z2,data=D)
+mod2=glm(Y~X+poly(Z1,2)+Z2,data=D)
+mod3=glm(Y~X+poly(Z1,2)+poly(Z2,2),data=D)
+mod4=glm(Y~X+Z1+poly(Z2,2),data=D)
+mods=list(mod1=mod1,mod2=mod2,mod3=mod3,mod4=mod4)
+res=flipscores(mods,n_flips = 2000)
 summary(combine_tests(res))
 summary(combine_tests(res, by="model"))
 summary(combine_tests(res, by="coefficient"))
@@ -72,7 +77,7 @@ res2=combine_contrasts(res)
 summary(res2)
 #custom combinations:
 coeffs=c("(Intercept)","X","Z1","Z2")
-coeffs_ids=lapply(coeffs,grep,res2$summary_table$Coeff)
+coeffs_ids=lapply(coeffs,grep,res2$summary_table$coeff)
 names(coeffs_ids)=coeffs
 summary(combine_tests(res2,by_list =   coeffs_ids))
 }
