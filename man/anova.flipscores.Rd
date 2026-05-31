@@ -16,7 +16,7 @@
 Default is "orthogonalized". "effective" and "orthogonalized" take into account the nuisance estimation. The default is \code{NULL}, in this case the value is taken from \code{object}.}
 
 \item{n_flips}{The number of random flips of the score contributions.
-When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed. 
+When \code{n_flips} is equal or larger than the maximum number of possible flips (i.e. n^2), all possible flips are performed.
 Default is 5000.}
 
 \item{id}{a \code{vector} identifying the clustered observations. If \code{NULL} (default) observations are assumed to be independent. NOTE: if \code{object} is a \code{flipscores} and \code{model$flip_param_call$id} is not \code{NULL}, this is considered in the inference.}

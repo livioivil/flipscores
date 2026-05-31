@@ -121,7 +121,38 @@ summary.flipscores <- function(object, ...) {
   sum_model
 }
 
+#' @description \code{p.adjust} method for class "\code{joint_flipscores}" and "\code{flipscores}".
+#' Add adjusted p-values into the \code{joint_flipscores}and \code{flipscores} object.
+#' @rdname joint_flipscores-methods
+#' @param object an object of class \code{joint_flipscores} and \code{flipscores}.
+#' @param method any method implemented in \code{flip.adjust} or
+#' a custom function. In the last case it must be a function that uses a matrix
+#' as input and returns a vector of adjusted p-values equal to the number of columns of the inputed matrix.
+#' @param tail argument: expresses the tail direction of the alternative hypothesis.
+#' It can be "two.sided" (or 0, the default), "less" (or -1) or "greater" (or +1).
+#' @param ... additional arguments to be passed
+#' @docType methods
+#' @export
 
+p.adjust <- function (object, method = "maxT", tail = 0, ...)
+{
+  if(is.character(method)){
+    if(method=="maxT"){
+      #      if("alphas"%in%names(as.list(match.call())))
+      p.adj=maxT.light(.set_tail(object$Tspace, tail = tail),...)
+    } else
+      if(method%in%c("minp","minP","Tippet","Tippett") ) {
+        p.adj=maxT.light(-.t2p(object$Tspace, tail = tail),...)
+      } else
+        p.adj = flip.adjust(.set_tail(object$Tspace, tail = tail),
+                            method = method)
+  } else if(is.function(method)){
+    p.adj = method(.set_tail(object$Tspace, tail = tail))
+  }
+  object$summary_table$p.adj <- p.adj
+  object$p.adjust.method <- method
+  object
+}
 
 ###########
 get_head_flip_out <- function(x){
