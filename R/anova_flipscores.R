@@ -60,9 +60,9 @@ anova.flipscores <- function(object, model1=NULL,
     heading2=attributes(out_param)$heading[2]
     out_param = out_param[-1,]
     out_param = out_param[,-c(1:2,4)]
-    names(out_param)[2]="Score"
+    names(out_param)[2]="ccore"
     out_param[[2]]=dst[1]
-    names(out_param)[3]="Pr(>Score)"
+    names(out_param)[3]="p"
     out_param[[3]]=.t2p(dst)
     rownames(out_param)[1]="Model 2 vs Model 1"
 
@@ -84,9 +84,9 @@ anova.flipscores <- function(object, model1=NULL,
     heading2=paste0("Model: ",deparse1(formula(object)))
     out_param = out_param[-1,]
     out_param = out_param[,-(2:4)]
-    names(out_param)[2]="Score"
+    names(out_param)[2]="score"
     out_param[[2]]=res[1,]
-    names(out_param)[3]="Pr(>Score)"
+    names(out_param)[3]="p"
     out_param[[3]]=apply(res,2,.t2p_only_first)
   } # closes if
   #make up

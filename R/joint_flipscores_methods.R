@@ -69,7 +69,7 @@ plot.joint_flipscores <- function(x, ...) {
         ts <- x$mods[[nm]]$Tspace[, 1]
         hist(ts,
              main   = nm,
-             xlab   = "Score",
+             xlab   = "score",
              col    = "steelblue",
              border = "white",
              ...)

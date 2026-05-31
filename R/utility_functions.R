@@ -114,8 +114,8 @@ summary.flipscores <- function(object, ...) {
   sum_model$coefficients[names(object$p.values), 5] <-
     (sum_model$coefficients[names(object$p.values), 2] / attributes(object$scores)$nrm)[]
   sum_model$coefficients[names(object$p.values), 6] <- object$p.values
-  colnames(sum_model$coefficients)[c(2,4,5,6)] <- c("Score", "z value",
-                                                    "Part. Cor", "Pr(>|z|)")
+  colnames(sum_model$coefficients)[c(1,2,3,4,5,6)] <- c("estimate","score", "se","z",
+                                                    "pcor", "p")
   sum_model$aliased <- rep(FALSE, length(sum_model$aliased))
   sum_model$call <- display_call
   sum_model
