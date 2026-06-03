@@ -247,14 +247,14 @@ print.custom_contrasts <- function(x, ...) {
   if (nrow(x$matrix) > 0) {
     print(utils::head(x$matrix, min(5, nrow(x$matrix))))
   }
-  invisible(x)
+  (x)
 }
 #' @export
 print.custom_contrast_matrix <- function(x, ...) {
   cat("Custom contrast matrix\n")
   cat("Dimensions: ", nrow(x), " contrasts x ", ncol(x), " cells\n\n", sep = "")
   print(utils::head(unclass(x), min(5, nrow(x))))
-  invisible(x)
+  (x)
 }
 
 #' @export
@@ -266,7 +266,7 @@ print.flipscores_contrasts <- function(x, ...) {
   if (length(x$notes) > 0) {
     cat("\n", paste(x$notes, collapse = "\n"), "\n", sep = "")
   }
-  invisible(x)
+  (x)
 }
 
 .fs_resolve_linfct <- function(model, specs = NULL, linfct = NULL,

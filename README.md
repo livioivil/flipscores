@@ -29,6 +29,11 @@ De Santis, R., Goeman, J. J., Hemerik, J., Davenport, S., & Finos, L.
 Misspecified Variances. Journal of the American Statistical Association,
 1–10. <https://doi.org/10.1080/01621459.2025.2491775>
 
+De Santis, R., Goeman, J. J., Davenport, S., Hemerik, J., & Finos, L.
+(2025) Permutation-based multiple testing when fitting many generalized
+linear models Electronic Journal of Statistics 19 (2), 3317-3332
+<https://doi.org/10.1214/25-EJS2409>
+
 ## Some examples
 
 ``` r
@@ -41,17 +46,17 @@ mod=flipscores(Y~Z+X,data=dt,family="poisson",x=TRUE)
 summary(mod)
 #> 
 #> Call:
-#> flipscores(formula = Y ~ Z + X, family = "poisson", data = dt, 
-#>     x = TRUE)
+#> flipscores(formula = Y ~ Z + X, family = "poisson(link='log')", 
+#>     data = data, score_type = "standardized", n_flips = 5000, 
+#>     alternative = "two.sided", to_be_tested = c("(Intercept)", 
+#>     "ZB", "ZC", "X"), precompute_flips = TRUE, x = TRUE)
 #> 
 #> Coefficients:
-#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)  
-#> (Intercept)  -0.1026 -0.7229     2.7127 -0.2665    -0.088   0.7454  
-#> ZB           -0.1501 -0.7125     2.1789 -0.3270    -0.104   0.6456  
-#> ZC            0.1633  0.8106     2.2232  0.3646     0.117   0.6908  
-#> X             0.9439 16.2058     4.7272  3.4282     0.671   0.0104 *
-#> ---
-#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#>             estimate    score       se        z     pcor     p
+#> (Intercept) -0.10259 -0.72287  2.71274 -0.26647 -0.08824 0.755
+#> ZB          -0.15010 -0.71249  2.17890 -0.32699 -0.10415 0.667
+#> ZC           0.16332  0.81062  2.22317  0.36462  0.11735 0.678
+#> X            0.94385 16.20584  4.72718  3.42823  0.67119 0.011
 #> 
 #> (Dispersion parameter for poisson family taken to be 1)
 #> 
@@ -70,11 +75,9 @@ anova(mod)
 #> Inference is provided by FlipScores approach (5000 sign flips).
 #> 
 #> Model: Y ~ Z + X
-#>   Df   Score Pr(>Score)  
-#> Z  2 0.74371     0.6986  
-#> X  1 0.02941     0.0104 *
-#> ---
-#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#>   Ncoeff Mahalanobis      p
+#> Z      2     0.75546 0.6994
+#> X      1     0.02941 0.0114
 # or
 mod0=flipscores(Y~Z,data=dt,family="poisson",x=TRUE)
 anova(mod0,mod)
@@ -86,10 +89,8 @@ anova(mod0,mod)
 #> 
 #> Model 1: Y ~ Z
 #> Model 2: Y ~ Z + X
-#>                    Df    Score Pr(>Score)  
-#> Model 2 vs Model 1  1 0.029274     0.0114 *
-#> ---
-#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#>                    Ncoeff Mahalanobis      p
+#> Model 2 vs Model 1      1     0.02898 0.0134
 # and
 mod0=flipscores(Y~X,data=dt,family="poisson")
 anova(mod0,mod)
@@ -97,12 +98,12 @@ anova(mod0,mod)
 #> 
 #> Model: poisson, link: log
 #> 
-#> Inference is provided by FlipScores approach (5000 sign flips).
+#> Inference is provided by FlipScores approach ( sign flips).
 #> 
 #> Model 1: Y ~ X
 #> Model 2: Y ~ Z + X
-#>                    Df Score Pr(>Score)
-#> Model 2 vs Model 1  2 1.445      0.514
+#>                    Ncoeff Mahalanobis     p
+#> Model 2 vs Model 1      2      1.4212 0.522
 ```
 
 ### Custom contrasts
@@ -124,6 +125,11 @@ toy_fit=glm(y~trt, data=toy, family=binomial, x=TRUE)
 # Formula interface
 flipscores_contrasts(toy_fit, pairwise ~ trt,
                      n_flips=500, seed=1)
+#> Flip-score custom contrasts
+#> score_type = standardized, n_flips = 500, alternative = two.sided
+#> 
+#>  contrast  estimate     Score p.value
+#>     A - B -3.332205 -3.409809   0.002
 
 # Dunnett-like all-versus-one comparisons
 toy3=data.frame(
@@ -136,10 +142,28 @@ toy3$y=rbinom(nrow(toy3), 1,
 toy3_fit=glm(y~trt, data=toy3, family=binomial, x=TRUE)
 flipscores_contrasts(toy3_fit, dunnett ~ trt,
                      n_flips=500, seed=1)
+#> Flip-score custom contrasts
+#> score_type = standardized, n_flips = 500, alternative = two.sided
+#> 
+#>        contrast estimate    Score p.value
+#>   Low - Control 1.609438 1.732051   0.092
+#>  High - Control 1.945910 2.108185   0.042
 flipscores_contrasts(toy3_fit, trt.vs.ctrl ~ trt, ref="Low",
                      n_flips=500, seed=1)
+#> Flip-score custom contrasts
+#> score_type = standardized, n_flips = 500, alternative = two.sided
+#> 
+#>       contrast   estimate      Score p.value
+#>  Control - Low -1.6094379 -1.7320508   0.092
+#>     High - Low  0.3364722  0.4096732   0.714
 flipscores_contrasts(toy3_fit, trt.vs.ctrlk ~ trt,
                      n_flips=500, seed=1)
+#> Flip-score custom contrasts
+#> score_type = standardized, n_flips = 500, alternative = two.sided
+#> 
+#>        contrast   estimate      Score p.value
+#>  Control - High -1.9459101 -2.1081851   0.042
+#>      Low - High -0.3364722 -0.4096732   0.670
 
 # If trt is involved in an interaction, the output includes a note unless
 # the interaction partner is included in the contrast specification.
@@ -147,8 +171,21 @@ toy$sex=factor(rep(c("F","M"), length.out=nrow(toy)))
 toy_int=glm(y~trt*sex, data=toy, family=binomial, x=TRUE)
 flipscores_contrasts(toy_int, pairwise ~ trt,
                      n_flips=500, seed=1)
+#> Flip-score custom contrasts
+#> score_type = standardized, n_flips = 500, alternative = two.sided
+#> 
+#>  contrast  estimate     Score p.value
+#>     A - B -19.07689 -2.561738   0.012
+#> 
+#> NOTE: Results may be misleading due to involvement in interactions: trt:sex
 flipscores_contrasts(toy_int, pairwise ~ trt | sex,
                      n_flips=500, seed=1)
+#> Flip-score custom contrasts
+#> score_type = standardized, n_flips = 500, alternative = two.sided
+#> 
+#>   contrast   estimate     Score p.value
+#>  A - B | F -19.076894 -2.561738   0.012
+#>  A - B | M  -2.862201 -2.324174   0.034
 
 # Custom coefficient contrast matrix
 K=matrix(c(0,1), nrow=1)
@@ -156,6 +193,11 @@ colnames(K)=names(coef(toy_fit))
 rownames(K)="B - A"
 flipscores_contrasts(toy_fit, linfct=K,
                      n_flips=500, seed=1)
+#> Flip-score custom contrasts
+#> score_type = standardized, n_flips = 500, alternative = two.sided
+#> 
+#>  contrast estimate    Score p.value
+#>     B - A 3.332205 3.409809   0.002
 ```
 
 ### Negative Binomial
@@ -197,15 +239,16 @@ mod=flipscores(y~x+z, data=D, family = "negbinom")
 summary(mod)
 #> 
 #> Call:
-#> flipscores(formula = y ~ x + z, family = "negbinom", data = D)
+#> flipscores(formula = y ~ x + z, family = "Negative Binomial(7.9727)(link='log')", 
+#>     data = data, score_type = "standardized", n_flips = 5000, 
+#>     alternative = "two.sided", to_be_tested = c("(Intercept)", 
+#>     "x", "z"), precompute_flips = TRUE)
 #> 
 #> Coefficients:
-#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)   
-#> (Intercept) -0.15365 -1.84162    3.42399 -0.53786    -0.087   0.5864   
-#> x            0.92089 14.93128    4.42610  3.37346     0.547   0.0016 **
-#> z           -0.01282 -0.72457    7.24491 -0.10001    -0.016   0.9584   
-#> ---
-#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#>             estimate    score       se        z     pcor     p
+#> (Intercept) -0.15365 -1.84162  3.42399 -0.53786 -0.08725 0.570
+#> x            0.92089 14.93128  4.42610  3.37346  0.54725 0.001
+#> z           -0.01282 -0.72457  7.24491 -0.10001 -0.01622 0.952
 #> 
 #> (Dispersion parameter for Negative Binomial(7.9727) family taken to be 0.9960228)
 #> 

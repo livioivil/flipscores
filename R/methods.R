@@ -92,7 +92,8 @@ summary.flipscores <- function(object, ...) {
       display_call$family <- if (is.character(fam)) {
         fam
       } else {
-        str2lang(paste0(fam$family, "(link='", fam$link, "')"))
+        #str2lang
+        (paste0(fam$family, "(link='", fam$link, "')"))
       }
     }
     # only shorten data if it was NOT passed as a named object
