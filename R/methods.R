@@ -9,52 +9,52 @@
 
 NULL
 
-
-#' Update method for flipscores
 #'
-#' Ensures that \code{update()} on a \code{flipscores} object returns
-#' a proper \code{flipscores} object rather than a plain \code{glm}.
+#' #' Update method for flipscores
+#' #'
+#' #' Ensures that \code{update()} on a \code{flipscores} object returns
+#' #' a proper \code{flipscores} object rather than a plain \code{glm}.
+#' #'
+#' #' @param object A \code{flipscores} object.
+#' #' @param ... Additional arguments to update in the call, such as
+#' #'   \code{formula}, \code{data}, \code{family}, \code{score_type}, etc.
+#' #'   Supports the \code{.} shorthand in formula updates, e.g.
+#' #'   \code{formula = . ~ . + offset(.OFFSET___)}.
+#' #' @return A \code{flipscores} object.
+#' #' @method update flipscores
+#' #' @export
+#' update.flipscores <- function(object, ...) {
 #'
-#' @param object A \code{flipscores} object.
-#' @param ... Additional arguments to update in the call, such as
-#'   \code{formula}, \code{data}, \code{family}, \code{score_type}, etc.
-#'   Supports the \code{.} shorthand in formula updates, e.g.
-#'   \code{formula = . ~ . + offset(.OFFSET___)}.
-#' @return A \code{flipscores} object.
-#' @method update flipscores
-#' @export
-update.flipscores <- function(object, ...) {
-
-  call <- object$flipscores_call
-  if (is.null(call))
-    call <- object$call
-
-  extras <- match.call(expand.dots = FALSE)$...
-
-  if (length(extras) > 0) {
-    # handle formula update separately using update.formula
-    # to correctly resolve '.' shorthand
-    if ("formula" %in% names(extras)) {
-      call$formula <- stats::update.formula(formula(object),
-                                            eval(extras[["formula"]],
-                                                 parent.frame()))
-      extras[["formula"]] <- NULL
-    }
-    # override remaining arguments
-    for (a in names(extras))
-      call[[a]] <- extras[[a]]
-  }
-
-  # evaluate in the environment of the original model's terms
-  # so that variables referenced in the formula are found correctly
-  env <- tryCatch(
-    attr(terms(object), ".Environment"),
-    error = function(e) NULL
-  )
-  if (is.null(env)) env <- parent.frame()
-
-  eval(call, envir = env)
-}
+#'   call <- object$flipscores_call
+#'   if (is.null(call))
+#'     call <- object$call
+#'
+#'   extras <- match.call(expand.dots = FALSE)$...
+#'
+#'   if (length(extras) > 0) {
+#'     # handle formula update separately using update.formula
+#'     # to correctly resolve '.' shorthand
+#'     if ("formula" %in% names(extras)) {
+#'       call$formula <- stats::update.formula(formula(object),
+#'                                             eval(extras[["formula"]],
+#'                                                  parent.frame()))
+#'       extras[["formula"]] <- NULL
+#'     }
+#'     # override remaining arguments
+#'     for (a in names(extras))
+#'       call[[a]] <- extras[[a]]
+#'   }
+#'
+#'   # evaluate in the environment of the original model's terms
+#'   # so that variables referenced in the formula are found correctly
+#'   env <- tryCatch(
+#'     attr(terms(object), ".Environment"),
+#'     error = function(e) NULL
+#'   )
+#'   if (is.null(env)) env <- parent.frame()
+#'
+#'   eval(call, envir = env)
+#' }
 
 #' print.flipscores print method for a flipscores object.
 #' @param x a flipscores object

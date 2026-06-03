@@ -23,7 +23,7 @@
 #' @export
 
 compute_scores <- function(model0, model1, score_type = "standardized", ...){
-  score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic","my_lab"))
+  score_type=match.arg(score_type,c("standardized","effective","basic","orthogonalized","my_lab"))
   if(missing(score_type))
     stop("test type is not specified or recognized")
   X=get_X(model0,model1)

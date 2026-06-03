@@ -40,6 +40,7 @@ Statistical Society Series B: Statistical Methodology, Volume 82, Issue
 
 De Santis, R., Goeman, J. J., Hemerik, J., Davenport, S., & Finos, L. (2025). Inference in Generalized Linear Models with Robustness to Misspecified Variances. Journal of the American Statistical Association, 1–10. <https://doi.org/10.1080/01621459.2025.2491775>
 
+De Santis, R., Goeman,  J. J., Davenport, S., Hemerik, J., & Finos, L. (2025) Permutation-based multiple testing when fitting many generalized linear models Electronic Journal of Statistics 19 (2), 3317-3332 <https://doi.org/10.1214/25-EJS2409>
 
 ## Some examples
 
