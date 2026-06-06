@@ -140,7 +140,7 @@ apply_custom_contrasts <- function(contrasts, model = NULL) {
 #' @param flips optional precomputed flip matrix.
 #' @param precompute_flips whether to precompute the flip matrix.
 #' @param ... currently unused.
-#' @return an object of class \code{flipscores_contrasts}.
+#' @return an object of class \code{fs_contrasts}.
 #' @export
 flipscores_contrasts <- function(model, specs = NULL,
                                  linfct = NULL,
@@ -153,6 +153,7 @@ flipscores_contrasts <- function(model, specs = NULL,
                                  flips = NULL,
                                  precompute_flips = TRUE,
                                  ...) {
+  user_call <- match.call()
   score_type <- match.arg(score_type,
                           c("orthogonalized", "standardized",
                             "effective", "basic"))
@@ -216,7 +217,7 @@ flipscores_contrasts <- function(model, specs = NULL,
   )
 
   out <- list(
-    call = match.call(),
+    call = user_call,
     model = model,
     contrasts = resolved$contrasts,
     linfct = resolved$coef_linfct,
@@ -232,7 +233,7 @@ flipscores_contrasts <- function(model, specs = NULL,
   )
   colnames(out$Tspace) <- table$contrast
   names(out$p.values) <- table$contrast
-  class(out) <- "flipscores_contrasts"
+  class(out) <- "fs_contrasts"
   out
 }
 
@@ -258,15 +259,38 @@ print.custom_contrast_matrix <- function(x, ...) {
 }
 
 #' @export
-print.flipscores_contrasts <- function(x, ...) {
+print.fs_contrasts <- function(x, ...) {
+  summary(x, ...)
+  invisible(x)
+}
+
+#' @export
+summary.fs_contrasts <- function(object, digits = 4, ...) {
+  out <- list(
+    call = object$call,
+    table = object$table,
+    notes = object$notes,
+    score_type = object$score_type,
+    n_flips = object$n_flips,
+    alternative = object$alternative
+  )
+  class(out) <- "summary.fs_contrasts"
+  print(out, digits = digits, ...)
+  invisible(out)
+}
+
+#' @export
+print.summary.fs_contrasts <- function(x, digits = 4, ...) {
   cat("Flip-score custom contrasts\n")
+  cat("Call: ")
+  print(x$call)
   cat("score_type = ", x$score_type, ", n_flips = ", x$n_flips,
       ", alternative = ", x$alternative, "\n\n", sep = "")
-  print(x$table, row.names = FALSE)
+  print(x$table, row.names = FALSE, digits = digits)
   if (length(x$notes) > 0) {
     cat("\n", paste(x$notes, collapse = "\n"), "\n", sep = "")
   }
-  (x)
+  invisible(x)
 }
 
 .fs_resolve_linfct <- function(model, specs = NULL, linfct = NULL,
@@ -527,10 +551,10 @@ print.flipscores_contrasts <- function(x, ...) {
 }
 
 .fs_model_with_x <- function(model) {
-  if (is.null(model$x)) {
+  if (is.null(model[["x"]])) {
     model <- stats::update(model, x = TRUE)
   }
-  if (is.null(model$y)) {
+  if (is.null(model[["y"]])) {
     model$y <- stats::model.response(stats::model.frame(model))
   }
   if (is.null(model$family)) {

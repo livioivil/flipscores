@@ -59,8 +59,8 @@
 
     out=list(Tspace=.get_all_Tspace(mods),
              summary_table=.get_all_summary_table(mods),
-             mods=mods,
+             objects=mods,
              call = match.call())
-    class(out) <- unique(c("joint_flipscores", class(out)))
+    class(out) <- unique(c("jfs", class(out)))
     out
   }

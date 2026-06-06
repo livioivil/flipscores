@@ -9,52 +9,52 @@
 
 NULL
 
+
+#' Update method for flipscores
 #'
-#' #' Update method for flipscores
-#' #'
-#' #' Ensures that \code{update()} on a \code{flipscores} object returns
-#' #' a proper \code{flipscores} object rather than a plain \code{glm}.
-#' #'
-#' #' @param object A \code{flipscores} object.
-#' #' @param ... Additional arguments to update in the call, such as
-#' #'   \code{formula}, \code{data}, \code{family}, \code{score_type}, etc.
-#' #'   Supports the \code{.} shorthand in formula updates, e.g.
-#' #'   \code{formula = . ~ . + offset(.OFFSET___)}.
-#' #' @return A \code{flipscores} object.
-#' #' @method update flipscores
-#' #' @export
-#' update.flipscores <- function(object, ...) {
+#' Ensures that \code{update()} on a \code{flipscores} object returns
+#' a proper \code{flipscores} object rather than a plain \code{glm}.
 #'
-#'   call <- object$flipscores_call
-#'   if (is.null(call))
-#'     call <- object$call
-#'
-#'   extras <- match.call(expand.dots = FALSE)$...
-#'
-#'   if (length(extras) > 0) {
-#'     # handle formula update separately using update.formula
-#'     # to correctly resolve '.' shorthand
-#'     if ("formula" %in% names(extras)) {
-#'       call$formula <- stats::update.formula(formula(object),
-#'                                             eval(extras[["formula"]],
-#'                                                  parent.frame()))
-#'       extras[["formula"]] <- NULL
-#'     }
-#'     # override remaining arguments
-#'     for (a in names(extras))
-#'       call[[a]] <- extras[[a]]
-#'   }
-#'
-#'   # evaluate in the environment of the original model's terms
-#'   # so that variables referenced in the formula are found correctly
-#'   env <- tryCatch(
-#'     attr(terms(object), ".Environment"),
-#'     error = function(e) NULL
-#'   )
-#'   if (is.null(env)) env <- parent.frame()
-#'
-#'   eval(call, envir = env)
-#' }
+#' @param object A \code{flipscores} object.
+#' @param ... Additional arguments to update in the call, such as
+#'   \code{formula}, \code{data}, \code{family}, \code{score_type}, etc.
+#'   Supports the \code{.} shorthand in formula updates, e.g.
+#'   \code{formula = . ~ . + offset(.OFFSET___)}.
+#' @return A \code{flipscores} object.
+#' @method update flipscores
+#' @export
+update.flipscores <- function(object, ...) {
+
+  call <- object$flipscores_call
+  if (is.null(call))
+    call <- object$call
+
+  extras <- match.call(expand.dots = FALSE)$...
+
+  if (length(extras) > 0) {
+    # handle formula update separately using update.formula
+    # to correctly resolve '.' shorthand
+    if ("formula" %in% names(extras)) {
+      call$formula <- stats::update.formula(formula(object),
+                                            eval(extras[["formula"]],
+                                                 parent.frame()))
+      extras[["formula"]] <- NULL
+    }
+    # override remaining arguments
+    for (a in names(extras))
+      call[[a]] <- extras[[a]]
+  }
+
+  # evaluate in the environment of the original model's terms
+  # so that variables referenced in the formula are found correctly
+  env <- tryCatch(
+    attr(terms(object), ".Environment"),
+    error = function(e) NULL
+  )
+  if (is.null(env)) env <- parent.frame()
+
+  eval(call, envir = env)
+}
 
 #' print.flipscores print method for a flipscores object.
 #' @param x a flipscores object
@@ -67,7 +67,7 @@ NULL
 print.flipscores <- function(x, ...) {
   cat(get_head_flip_out(x))
   cat("Call: ")
-  print(x$flipscores_call)
+  print(.fs_display_call(x))
   cat("\nCoefficients:\n")
   print(x$coefficients)
   # print.default(x)
@@ -84,27 +84,7 @@ print.flipscores <- function(x, ...) {
 summary.flipscores <- function(object, ...) {
   sum_model <- summary.glm(object = object)
 
-  display_call <- object$flipscores_call
-  if (!is.null(display_call)) {
-    # replace family with a clean deparsed version
-    fam <- object$family
-    if (!is.null(fam)) {
-      display_call$family <- if (is.character(fam)) {
-        fam
-      } else {
-        #str2lang
-        (paste0(fam$family, "(link='", fam$link, "')"))
-      }
-    }
-    # only shorten data if it was NOT passed as a named object
-    # i.e. if it is not a simple symbol like `df` or `mydata`
-    data_arg <- object$flipscores_call$data
-    if (!is.null(data_arg) && !is.symbol(data_arg)) {
-      display_call$data <- as.symbol(
-        paste0("data.frame_", nrow(object$model), "x", ncol(object$model))
-      )
-    }
-  }
+  display_call <- .fs_display_call(object)
 
   sum_model$coefficients <- sum_model$coefficients[, c(1,1:4,4), drop=FALSE]
   sum_model$coefficients[, -1] <- NA
@@ -122,10 +102,40 @@ summary.flipscores <- function(object, ...) {
   sum_model
 }
 
-#' @description \code{p.adjust} method for class "\code{joint_flipscores}" and "\code{flipscores}".
-#' Add adjusted p-values into the \code{joint_flipscores}and \code{flipscores} object.
-#' @rdname joint_flipscores-methods
-#' @param object an object of class \code{joint_flipscores} and \code{flipscores}.
+.fs_display_call <- function(object) {
+  display_call <- object$flipscores_call
+  if (is.null(display_call)) {
+    display_call <- object$call
+  }
+  if (is.null(display_call)) {
+    return(NULL)
+  }
+
+  display_call <- as.call(as.list(display_call))
+
+  fam <- object$family
+  if (!is.null(fam) && !is.null(display_call$family)) {
+    display_call$family <- if (is.character(fam)) {
+      fam
+    } else {
+      paste0(fam$family, "(link='", fam$link, "')")
+    }
+  }
+
+  data_arg <- display_call$data
+  if (!is.null(data_arg) && !is.symbol(data_arg)) {
+    display_call$data <- as.symbol(
+      paste0("data.frame_", nrow(object$model), "x", ncol(object$model))
+    )
+  }
+
+  display_call
+}
+
+#' @description \code{p.adjust} method for class "\code{jfs}" and "\code{flipscores}".
+#' Add adjusted p-values into the \code{jfs}and \code{flipscores} object.
+#' @rdname jfs-methods
+#' @param object an object of class \code{jfs} and \code{flipscores}.
 #' @param method any method implemented in \code{flip.adjust} or
 #' a custom function. In the last case it must be a function that uses a matrix
 #' as input and returns a vector of adjusted p-values equal to the number of columns of the inputed matrix.

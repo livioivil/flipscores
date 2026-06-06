@@ -7,10 +7,10 @@
 #' @param formula One of:
 #'   \enumerate{
 #'     \item A \code{formula} object (standard use, returns \code{flipscores} object)
-#'     \item A list of fitted \code{glm} objects (returns \code{joint_flipscores} object)
-#'     \item A list of \code{formula} objects (returns \code{joint_flipscores} object)
+#'     \item A list of fitted \code{glm} objects (returns \code{jfs} object)
+#'     \item A list of \code{formula} objects (returns \code{jfs} object)
 #'     \item A \code{formula} with matrix response e.g. \code{cbind(y1,y2) ~ x}
-#'       (returns \code{joint_flipscores} object)
+#'       (returns \code{jfs} object)
 #'   }
 #' @param family Error distribution for \code{glm}. Used in cases 1, 3, 4.
 #' @param data A data frame. Used in cases 1, 3, 4.
@@ -30,7 +30,7 @@
 #' @param ... Additional arguments passed to \code{glm()} or the internal
 #'   flipscores engine.
 #'
-#' @return A \code{flipscores} object (case 1) or a \code{joint_flipscores}
+#' @return A \code{flipscores} object (case 1) or a \code{jfs}
 #'   object (cases 2, 3, 4).
 #'
 #' @examples
@@ -219,6 +219,7 @@ flipscores <- function(formula,
     to_be_tested     = to_be_tested,
     flips            = flips,
     precompute_flips = precompute_flips,
+    .user_call       = match.call(),
     ...
   )
 }
@@ -268,8 +269,11 @@ flipscores <- function(formula,
                                to_be_tested     = NULL,
                                flips            = NULL,
                                precompute_flips = TRUE,
+                               .user_call       = NULL,
                                ...) {
-  fs_call <- mf <- match.call()
+  mf <- match.call()
+  mf$.user_call <- NULL
+  fs_call <- if (is.null(.user_call)) mf else .user_call
 
   # force evaluation of all arguments immediately
   # to prevent match.call() storing unevaluated symbols
@@ -283,8 +287,9 @@ flipscores <- function(formula,
 
   # save original formula, data symbol and data value
   original_formula   <- formula
+  original_formula_call <- fs_call$formula
   original_data      <- data
-  original_data_call <- mf$data  # unevaluated symbol e.g. `df`
+  original_data_call <- fs_call$data  # unevaluated symbol e.g. `df`
 
   score_type <- match.arg(score_type,
                           c("orthogonalized", "standardized",
@@ -456,21 +461,12 @@ flipscores <- function(formula,
   if (!is.null(mf$weights)) glm_call$weights <- mf$weights
   if (!is.null(mf$subset))  glm_call$subset  <- mf$subset
 
-  # build the full flipscores call for print/summary display
-  fs_call[[1L]]            <- quote(flipscores)
-  fs_call$formula          <- original_formula
-  fs_call$data             <- original_data_call  # unevaluated symbol
-  fs_call$family           <- family
-  fs_call$score_type       <- score_type
-  fs_call$n_flips          <- flip_param_call$n_flips
-  fs_call$alternative      <- alternative
-  fs_call$id               <- id
-  fs_call$seed             <- seed
-  fs_call$to_be_tested     <- to_be_tested
-  fs_call$precompute_flips <- precompute_flips
-  fs_call$flips            <- NULL
-  fs_call$nobservations    <- NULL
-  fs_call$parms_DV         <- NULL
+  # build the user-facing flipscores call for print/summary/update
+  fs_call[[1L]]         <- quote(flipscores)
+  fs_call$formula       <- original_formula_call
+  fs_call$data          <- original_data_call
+  fs_call$nobservations <- NULL
+  fs_call$parms_DV      <- NULL
 
   model$call            <- glm_call
   model$flipscores_call <- fs_call

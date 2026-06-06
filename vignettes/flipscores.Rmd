@@ -47,7 +47,7 @@ anova(mod)
 mod0 <- flipscores(Y~Z,data=dt,family="poisson",x=TRUE)
 anova(mod0,mod)
 # and
-mod0 <- flipscores(Y~X,data=dt,family="poisson")
+mod0 <- flipscores(Y~X,data=dt,family="poisson",x=TRUE)
 anova(mod0,mod)
 ```
 
@@ -104,5 +104,73 @@ confint(mod, parm = 4, flips = flps) # parm == to_be_tested!
 confint(mod, parm = 4, level = 0.99, flips = flps)
 confint(mod, parm = 4, alternative = "greater", flips = flps)
 confint(mod, parm = 4, type = "symmetric", flips = flps)
+```
+## Other examples
+
+```{r}
+set.seed(123)
+
+dat <- data.frame(
+  treatment = factor(rep(c("Control", "Drug"), each = 30)),
+  sex = factor(rep(c("F", "M"), times = 30)),
+  age_group = factor(rep(c("Young", "Old", "Middle"), length.out = 60)),
+  severity = runif(60, 0, 1)
+)
+
+eta <- with(dat,
+  -1 + 1.2 * (treatment == "Drug") * (sex == "M") +
+    0.6 * (age_group == "Old") - 0.3 * severity
+)
+dat$y <- rbinom(nrow(dat), 1, plogis(eta))
+
+
+flips=make_flips(60,5000)
+fit1 <- glm(
+  y ~ treatment * sex + age_group + severity,
+  data = dat,
+  family = binomial
+)
+
+# Formula interface: build contrasts and apply flip-score tests.
+cntr1=flipscores_contrasts(
+  fit1,
+  pairwise ~ treatment,
+  flips = flips,
+  seed = 1
+)
+
+fit2 <- flipscores(
+  y ~ treatment + sex * age_group + severity,
+  data = dat,
+  family = binomial,
+  flips = flips
+)
+summary(fit2)
+# Formula interface: build contrasts and apply flip-score tests.
+cntr2=flipscores_contrasts(
+  fit2,
+  pairwise ~ treatment,
+  flips = flips,
+  seed = 1
+)
+
+cmbn=combine_contrasts(fit2)
+summary(cmbn) #perchè non coimbina tra livelli di group??
+
+cres=flipscores:::c.jfs(cntr1,cntr2,fit2,cmbn)
+#deve funzionare anche per flipscores, flipscores_contrasts, jcobines o come si chiama
+#rivedere il nome degli objects: mode1 (evitare duplicati, cambia nome in caso) e credo anche .assign della summary_table
+#aggiungere pcor nel summary dei contrasti?
+
+combine_contrasts(fit2) #non combine per livelli di age_group perchè non è un oggetto joint_flipscores
+
+combine_contrasts(cres) #invece funziona
+
+combine_tests(cres)
+combine_tests(cres,by="coefficient",comb_funct = "Fisher")
+
+#ora construire la selezione [[]] usa .assign
+length(cres$objects)
+
 ```
 

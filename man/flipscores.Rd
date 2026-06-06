@@ -24,10 +24,10 @@ flipscores(
 \item{formula}{One of:
 \enumerate{
   \item A \code{formula} object (standard use, returns \code{flipscores} object)
-  \item A list of fitted \code{glm} objects (returns \code{joint_flipscores} object)
-  \item A list of \code{formula} objects (returns \code{joint_flipscores} object)
+  \item A list of fitted \code{glm} objects (returns \code{jfs} object)
+  \item A list of \code{formula} objects (returns \code{jfs} object)
   \item A \code{formula} with matrix response e.g. \code{cbind(y1,y2) ~ x}
-    (returns \code{joint_flipscores} object)
+    (returns \code{jfs} object)
 }}
 
 \item{family}{Error distribution for \code{glm}. Used in cases 1, 3, 4.}
@@ -60,7 +60,7 @@ If \code{NULL} all coefficients are tested.}
 flipscores engine.}
 }
 \value{
-A \code{flipscores} object (case 1) or a \code{joint_flipscores}
+A \code{flipscores} object (case 1) or a \code{jfs}
   object (cases 2, 3, 4).
 }
 \description{

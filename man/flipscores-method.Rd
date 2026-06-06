@@ -22,11 +22,4 @@
 Methods for \code{flipscores} objects.
 The following are methods to extract and manipulate relevant information from
 a \code{flipscores} object.
-
-call <- object$flipscores_call
-  if (is.null(call))
-    call <- object$call
-}
-\details{
-
 }

@@ -9,13 +9,13 @@ test_that("formula interface reports interaction notes when appropriate", {
   fit <- glm(y ~ trt * sex, data = toy, family = binomial, x = TRUE)
 
   out <- flipscores_contrasts(fit, pairwise ~ trt, n_flips = 20, seed = 1)
-  expect_s3_class(out, "flipscores_contrasts")
+  expect_s3_class(out, "fs_contrasts")
   expect_equal(nrow(out$table), 1)
   expect_match(out$notes, "trt:sex", fixed = TRUE)
 
   out_by <- flipscores_contrasts(fit, pairwise ~ trt | sex,
                                  n_flips = 20, seed = 1)
-  expect_s3_class(out_by, "flipscores_contrasts")
+  expect_s3_class(out_by, "fs_contrasts")
   expect_equal(nrow(out_by$table), 2)
   expect_length(out_by$notes, 0)
 })
@@ -83,7 +83,7 @@ test_that("lm and flipscores objects are accepted", {
   lm_out <- flipscores_contrasts(lm_fit, pairwise ~ trt,
                                  n_flips = 20, seed = 1)
 
-  expect_s3_class(lm_out, "flipscores_contrasts")
+  expect_s3_class(lm_out, "fs_contrasts")
   expect_equal(nrow(lm_out$table), 1)
 
   set.seed(13)
@@ -97,7 +97,41 @@ test_that("lm and flipscores objects are accepted", {
   fs_out <- flipscores_contrasts(fs_fit, linfct = c(trtB = 1),
                                  n_flips = 20, seed = 1)
 
-  expect_s3_class(fs_out, "flipscores_contrasts")
+  expect_s3_class(fs_out, "fs_contrasts")
   expect_equal(nrow(fs_out$table), 1)
   expect_equal(fs_out$table$estimate, unname(coef(fs_fit)["trtB"]))
+})
+
+test_that("joint_flipscores uses objects and c combines mixed result types", {
+  set.seed(21)
+  toy <- data.frame(
+    y = rnorm(16),
+    x = rnorm(16),
+    trt = factor(rep(c("A", "B"), length.out = 16))
+  )
+
+  fit_x <- glm(y ~ x, data = toy)
+  fit_trt <- glm(y ~ trt, data = toy)
+
+  joint <- flipscores(list(x_model = fit_x, trt_model = fit_trt),
+                      n_flips = 20, seed = 1)
+  contrast <- flipscores_contrasts(
+    glm(y ~ trt, data = toy, x = TRUE),
+    pairwise ~ trt,
+    n_flips = 20,
+    seed = 1
+  )
+  combined <- combine_tests(joint)
+
+  out <- c(joint, contrast, combined)
+
+  expect_s3_class(out, "jfs")
+  expect_named(out, c("Tspace", "summary_table", "objects", "call"))
+  expect_null(out$mods)
+  expect_equal(nrow(out$summary_table), ncol(out$Tspace))
+  expect_true(all(c("model", "coefficient", "p", "stat") %in%
+                    names(out$summary_table)))
+  expect_s3_class(out$objects[[length(out$objects)]], "flipscores")
+  expect_s3_class(out$objects[[length(out$objects) - 1]], "flipscores")
+  expect_s3_class(out$objects[[3]], "fs_contrasts")
 })

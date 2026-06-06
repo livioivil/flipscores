@@ -1,9 +1,12 @@
 
 ###########
 get_head_flip_out <- function(x){
-  if(is.null(dim(x$n_flips)))
-    n_flips=x$n_flips else
-      n_flips=nrow(x$n_flips)
+  n_flips <- x$n_flips
+  if (is.null(n_flips) && !is.null(x$flip_param_call)) {
+    n_flips <- x$flip_param_call$n_flips
+  }
+  if(!is.null(dim(n_flips)))
+    n_flips=nrow(n_flips)
   if(length(grep("Negative Binomial",x$family$family))==0)
   {paste("Flip Score Test:
          score_type =",x$score_type,

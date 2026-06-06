@@ -5,14 +5,14 @@
 \alias{combine-methods}
 \alias{combine_tests}
 \alias{combine_contrasts}
-\title{Nonparametric combination of \code{joint_flipscores} objects}
+\title{Nonparametric combination of \code{jfs} objects}
 \usage{
 combine_tests(mods, comb_funct = "maxT", by = NULL, by_list=NULL, tail = 0)
 
 combine_contrasts(mods, comb_funct = "Mahalanobis", tail = 0)
 }
 \arguments{
-\item{mods}{a \code{joint_flipscores} object.}
+\item{mods}{a \code{jfs} object.}
 
 \item{comb_funct}{combining function to be used.
 Several functions are implemented: "mean", "median", "Fisher", "Liptak", (equal to) "Stoufer", "Tippet", (equal to) "minp", "maxT", "Mahalanobis".
@@ -31,10 +31,10 @@ If the vectors in the list are characters, these refer to names(mods$Tspace).}
 \item{tail}{direction of the alternative hypothesis. It can be "two.sided" (or 0, the default), "less" (or -1) or "greater" (or +1).}
 }
 \value{
-The function returns a \code{joint_flipscores}-object.
+The function returns a \code{jfs}-object.
 }
 \description{
-Methods for combining \code{joint_flipscores} objects.
+Methods for combining \code{jfs} objects.
 
 \code{combine_tests} combines the tests derived from multiverse models.
 

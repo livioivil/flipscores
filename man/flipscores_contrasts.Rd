@@ -52,7 +52,7 @@ except for \code{trt.vs.ctrlk}, where the default is the last level/cell.}
 \item{...}{currently unused.}
 }
 \value{
-an object of class \code{flipscores_contrasts}.
+an object of class \code{fs_contrasts}.
 }
 \description{
 Defines factor contrasts from a formula or accepts fully custom coefficient

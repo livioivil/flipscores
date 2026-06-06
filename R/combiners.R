@@ -1,14 +1,14 @@
-#' @title Nonparametric combination of \code{joint_flipscores} objects
-#' @description Methods for combining \code{joint_flipscores} objects.
+#' @title Nonparametric combination of \code{jfs} objects
+#' @description Methods for combining \code{jfs} objects.
 #' @docType methods
 #' @name combine-methods
-#' @param mods a \code{joint_flipscores} object.
+#' @param mods a \code{jfs} object.
 #' @param comb_funct  combining function to be used.
 #' Several functions are implemented: "mean", "median", "Fisher", "Liptak", (equal to) "Stoufer", "Tippet", (equal to) "minp", "maxT", "Mahalanobis".
 #' Alternatively it can be a custom function that has a Tspace matrix as input.
 #' For \code{combine_tests} the default is \code{comb_funct="maxT"},
 #' while for \code{combine_contrasts} the default is \code{comb_funct="Mahalanobis"}.
-#' @returns The function returns a \code{joint_flipscores}-object.
+#' @returns The function returns a \code{jfs}-object.
 #' @param by if \code{NULL} (default), it combines all test statistics.
 #' If a characters, it refers to the column's name of \code{summary_table} (and printed by something like \code{summary(mods)}).
 #' The elements with the same value will be combined. If \code{by} is a vector, the values are defined by row-wise concatenation of the values of the columns in \code{by}.
@@ -71,8 +71,10 @@ combine_tests <- function (mods, comb_funct = "maxT", by = NULL, by_list=NULL, t
   res = lapply(1:length(combined), .npc2jointest,
                mods = mods, combined = combined, tail = tail, comb_funct = comb_funct)
   names(res) = names(combined)
-  res=list(Tspace=.get_all_Tspace(res),summary_table=.get_all_summary_table(res))
-  class(res) <- unique(c("jcombined", "joint_flipscores", class(res)))
+  res=list(Tspace=.get_all_Tspace(res),
+           summary_table=.get_all_summary_table(res),
+           objects=.joint_objects(mods))
+  class(res) <- unique(c("fs_combined", "jfs", class(res)))
   res
 }
 

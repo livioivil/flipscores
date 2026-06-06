@@ -57,19 +57,129 @@
                tab)
 }
 
+.get_summary_table_from_fs_contrasts <- function(object) {
+  tab <- object$table
+  if (is.null(tab)) {
+    stop("A fs_contrasts object must contain a table.", call. = FALSE)
+  }
+
+  out <- data.frame(
+    .assign = NA_integer_,
+    coefficient = tab$contrast,
+    estimate = tab$estimate,
+    score = tab$Score,
+    p = tab$p.value,
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+  extra <- tab[setdiff(names(tab), c("contrast", "estimate", "Score", "p.value"))]
+  data.frame(out, extra, check.names = FALSE)
+}
+
+.get_summary_table_from_object <- function(object) {
+  if (inherits(object, "flipscores")) {
+    return(.get_summary_table_from_flipscores(object))
+  }
+  if (inherits(object, c("fs_contrasts", "contrast_flipscores",
+                        "contrasts_flipscores"))) {
+    return(.get_summary_table_from_fs_contrasts(object))
+  }
+  if (!is.null(object$summary_table)) {
+    return(object$summary_table)
+  }
+  stop("Cannot extract a summary table from this object.", call. = FALSE)
+}
+
+.joint_objects <- function(object) {
+  objects <- object$objects
+  if (is.null(objects)) {
+    objects <- object$mods
+  }
+  if (is.null(objects)) {
+    objects <- list(object)
+  }
+  objects
+}
+
+.as_jfs_component <- function(object, name = NULL) {
+  if (inherits(object, "jfs")) {
+    out <- object
+    if (is.null(out$objects)) {
+      out$objects <- .joint_objects(out)
+    }
+    return(out)
+  }
+
+  if (inherits(object, "glm") && !inherits(object, "flipscores")) {
+    object <- flipscores(object)
+  }
+
+  if (!inherits(object, c("flipscores", "fs_contrasts",
+                         "contrast_flipscores", "contrasts_flipscores"))) {
+    stop("Cannot combine object of class ",
+         paste(class(object), collapse = ", "), ".", call. = FALSE)
+  }
+
+  objects <- list(object)
+  if (!is.null(name) && nzchar(name)) {
+    names(objects) <- name
+  }
+  if (is.null(names(objects)) || !nzchar(names(objects)[1])) {
+    names(objects) <- "object1"
+  }
+
+  out <- list(
+    Tspace = object$Tspace,
+    summary_table = .get_all_summary_table(objects),
+    objects = objects,
+    call = object$call
+  )
+  class(out) <- unique(c("jfs", class(out)))
+  out
+}
+
+.rbind_fill <- function(tabs) {
+  tabs <- Filter(Negate(is.null), tabs)
+  if (length(tabs) == 0) {
+    return(data.frame())
+  }
+
+  all_names <- unique(unlist(lapply(tabs, names), use.names = FALSE))
+  tabs <- lapply(tabs, function(tab) {
+    missing <- setdiff(all_names, names(tab))
+    for (nm in missing) {
+      tab[[nm]] <- NA
+    }
+    tab[all_names]
+  })
+
+  out <- do.call(rbind, tabs)
+  rownames(out) <- NULL
+  out
+}
+
 
 #--------------------------------------------
 # Bind summary tables from all models
 #--------------------------------------------
 .get_all_summary_table <- function(mods,mods_name=NULL){
   if(is.null(mods_name)) mods_name=names(mods)
+  if (is.null(mods_name)) mods_name <- rep("", length(mods))
   res=lapply(1:length(mods), function(i) {
-    cbind(model=names(mods)[i],
-          mods[[i]]$summary_table)
+    tab <- .get_summary_table_from_object(mods[[i]])
+    label <- mods_name[i]
+    if (is.na(label) || identical(label, "")) {
+      label <- paste0("object", i)
+    }
+    if (!"model" %in% names(tab)) {
+      tab <- data.frame(model = rep(label, nrow(tab)), tab,
+                        check.names = FALSE)
+    } else if (all(is.na(tab$model) | tab$model == "")) {
+      tab$model <- label
+    }
+    tab
   })
-  res=do.call(rbind,res)
-  rownames(res)=NULL
-  res
+  .rbind_fill(res)
 }
 
 
@@ -84,36 +194,4 @@
     tab
   })
   do.call(rbind, tabs)
-}
-#' Print method for joint_flipscores
-#'
-#' @param x A \code{joint_flipscores} object.
-#' @param n Number of rows to show at head and tail of summary table.
-#' @param ... Additional arguments (currently unused).
-#' @export
-print.joint_flipscores <- function(x, n = 2, ...) {
-  cat("\nCall: ")
-  print(x$call)
-  cat("\n")
-  msg <- "== Joining n = %s models"
-  cat(sprintf(msg, length(unique(x$summary_table$model))))
-  cat("\n\n")
-  .trim(x$summary_table, n = n)
-  invisible(x)
-}
-
-#' Summary method for joint_flipscores
-#'
-#' @param object A \code{joint_flipscores} object.
-#' @param digits Number of digits to print. Default \code{4}.
-#' @param ... Additional arguments (currently unused).
-#' @export
-summary.joint_flipscores <- function(object, digits = 4, ...) {
-  cat("\nCall: ")
-  print(object$call)
-  cat("\n")
-  tab <- object$summary_table
-  tab$.assign <- NULL  # remove internal column
-  print(tab, digits = digits)
-  invisible(object)
 }
