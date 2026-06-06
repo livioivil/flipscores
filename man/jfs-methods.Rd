@@ -19,8 +19,6 @@ as input and returns a vector of adjusted p-values equal to the number of column
 It can be "two.sided" (or 0, the default), "less" (or -1) or "greater" (or +1).}
 
 \item{...}{additional arguments to be passed}
-
-\item{x}{an object of class \code{jfs}}
 }
 \description{
 Collection of methods for objects of class \code{jfs}.

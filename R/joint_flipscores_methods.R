@@ -2,7 +2,6 @@
 #' @name jfs-methods
 #' @description
 #' Collection of methods for objects of class \code{jfs}.
-#' @param x an object of class \code{jfs}
 #' @param ... additional arguments
 NULL
 
@@ -98,7 +97,7 @@ plot.jfs <- function(x, ...) {
 #' @return A \code{jfs} object.
 #' @method c jfs
 #' @export
-c.jfs <- function(..., recursive = FALSE) {
+c.jfs <- function(...) {
   dots <- list(...)
   if (length(dots) == 0) {
     return(NULL)
