@@ -74,7 +74,7 @@ combine_tests <- function (mods, comb_funct = "maxT", by = NULL, by_list=NULL, t
   res=list(Tspace=.get_all_Tspace(res),
            summary_table=.get_all_summary_table(res),
            objects=.joint_objects(mods))
-  class(res) <- unique(c("fs_combined", "jfs", class(res)))
+  class(res) <- unique(c("jfs", "fs_combined",class(res)))
   res
 }
 
@@ -123,6 +123,7 @@ combine_contrasts <- function (mods, comb_funct = "Mahalanobis", tail = 0)
   for(i in 1:length(assigns)){
     res$summary_table$Model[as_ids[[i]]]=gsub(assigns[i],"",res$summary_table$Model[as_ids[[i]]])
   }
+  class(res) <- unique(c("jfs", "fs_combined",class(res)))
   res
 }
 #######################

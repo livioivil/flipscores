@@ -24,8 +24,8 @@ compute_flips<- function(scores,alternative="two.sided",
                                        n_flips=n_flips,
                                        .score_fun=.score_fun,
                                        #output_flips=output_flips,
-                                       seed=seed,
-                                       precompute_flips=precompute_flips)
+                            seed=seed,
+                            precompute_flips=precompute_flips)
   p.values=.t2p_only_first(ftail(unlist(Tspace)))
   # named vector?
 
@@ -35,27 +35,30 @@ compute_flips<- function(scores,alternative="two.sided",
 }
 
 .flip_test_no_pval<- function(scores,
-                      flips=NULL,
-                      n_flips=NULL,
-                      .score_fun,
-                      #output_flips=FALSE,
-                      seed=NULL,
-                      precompute_flips=TRUE,
-                      ...){
+                              flips=NULL,
+                              n_flips=NULL,
+                              .score_fun,
+                              #output_flips=FALSE,
+                              seed=NULL,
+                              precompute_flips=TRUE,
+                              ...){
 
 
   ##########################################
 
   #      browser()
-  n_obs=nrow(scores)
+
   #      set.seed(seed)
   if(!is.null(flips)){
     #  browser()
+    n_flips=nrow(flips)
+    flips=flips[,rownames(scores)]
     Tspace=as.vector(c(sapply(1:(n_flips),
                               function(i).score_fun(flips[i,],scores)))
-                     )
+    )
 
   } else {
+    n_obs=nrow(scores)
     set.seed(seed)
     Tspace=as.vector(c(.score_fun(rep(1,n_obs),scores),replicate(n_flips-1,{
       .score_fun(sample(c(-1,1),n_obs, replace = T),scores)

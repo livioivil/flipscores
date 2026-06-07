@@ -157,10 +157,30 @@ cntr2=flipscores_contrasts(
 cmbn=combine_contrasts(fit2)
 summary(cmbn) #perchè non coimbina tra livelli di group??
 
+
+# jfs è la vecchia classe join_flipscores
+
 cres=flipscores:::c.jfs(cntr1,cntr2,fit2,cmbn)
-#deve funzionare anche per flipscores, flipscores_contrasts, jcobines o come si chiama
+#deve funzionare anche per flipscores, fs_contrasts, fs_cobine,jfs
+#forse meglio chiamarla join_fs() o fualcosa del genere?
 #rivedere il nome degli objects: mode1 (evitare duplicati, cambia nome in caso) e credo anche .assign della summary_table
+
 #aggiungere pcor nel summary dei contrasti?
+
+#Le classi fs_contrast (e clip, flip2sss etc) devono avere i seguenti methods:
+#model.matrix per gli obs_names
+#as.jfs  convertire ciascuno così poi il c() è più facile
+#update indispensabile per refit con stessa matrice flip
+
+#fs_contrast (e clip, flip2sss etc devono avere gli argomenti n_flips (forse questo non serve in realtà) e flips in modo che poi l'update(flips=FLIP) funzioni
+
+
+# fs_combine è in pratica un offetto jfs (che non serva nemmeno farne un metodo a parte?)
+
+
+#IMPORTANTE: c() o come lo chiamiamo non controlla la coerenza dei flip (altrimenti fs_combine non può essere agganciato). il controllo lo fa flipscores() - usando quindi model.matrix e update. 
+
+
 
 combine_contrasts(fit2) #non combine per livelli di age_group perchè non è un oggetto joint_flipscores
 

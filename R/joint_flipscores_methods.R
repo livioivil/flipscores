@@ -91,8 +91,7 @@ plot.jfs <- function(x, ...) {
 #' Combine jfs objects
 #'
 #' @param ... Objects to combine. Supported objects are \code{jfs},
-#'   \code{flipscores}, \code{glm}, \code{fs_contrasts}, and
-#'   \code{fs_combined}.
+#'   \code{flipscores}, \code{glm} and \code{fs_contrasts}.
 #'
 #' @return A \code{jfs} object.
 #' @method c jfs

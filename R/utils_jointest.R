@@ -81,7 +81,7 @@
     return(.get_summary_table_from_flipscores(object))
   }
   if (inherits(object, c("fs_contrasts", "contrast_flipscores",
-                        "contrasts_flipscores"))) {
+                         "contrasts_flipscores"))) {
     return(.get_summary_table_from_fs_contrasts(object))
   }
   if (!is.null(object$summary_table)) {
@@ -115,7 +115,7 @@
   }
 
   if (!inherits(object, c("flipscores", "fs_contrasts",
-                         "contrast_flipscores", "contrasts_flipscores"))) {
+                          "contrast_flipscores", "contrasts_flipscores"))) {
     stop("Cannot combine object of class ",
          paste(class(object), collapse = ", "), ".", call. = FALSE)
   }

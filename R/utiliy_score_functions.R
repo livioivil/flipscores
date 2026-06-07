@@ -50,8 +50,8 @@ get_std_dev_score <- function(fit,x2){
   # if(any((sumY2-(stat^2)/n)*(n/(n-1))<0)) browser()
   stat=stat/sqrt((sumY2-(stat^2)/n)*(n/(n-1)))
   # print(stat)
-# if(any(is.na(stat))) browser()
-    stat
+  # if(any(is.na(stat))) browser()
+  stat
 }
 
 .score2t <-function(tspace,nrm,n){
@@ -168,7 +168,7 @@ socket_compute_scores <- function(i,model,score_type,nobservations=NULL,parms_DV
   model_i <-update(model)
   # print(flip_param_call$score_type)
   # browser()
-    scores=compute_scores(model0 = model_i,model1 = tested_X,score_type=score_type,nobservations=nobservations,parms_DV=parms_DV)
+  scores=compute_scores(model0 = model_i,model1 = tested_X,score_type=score_type,nobservations=nobservations,parms_DV=parms_DV)
 }
 
 
@@ -176,25 +176,26 @@ socket_compute_scores <- function(i,model,score_type,nobservations=NULL,parms_DV
 # i and exclude are indices of the columns of model.frame x
 socket_compute_flip <- function(scores,flip_param_call){
 
-#  flip_param_call$score_type=attributes(scores)$score_type
-
+  #  flip_param_call$score_type=attributes(scores)$score_type
+  flip_param_call$flip=flip_param_call$flip[,rownames(scores)]
+  colnames(flip_param_call$flip)=NULL
 
   # scores=as.matrix(unlist(scores[,]))
   if(is.null(flip_param_call$alternative)) flip_param_call$alternative = "two.sided"
   if(flip_param_call$alternative=="two.sided") flip_param_call$ftail <- function(Tspace) abs(Tspace) else
     if(flip_param_call$alternative=="less") flip_param_call$ftail <- function(Tspace) -Tspace else
       if(flip_param_call$alternative=="greater") flip_param_call$ftail <- function(Tspace) Tspace
-      flip_param_call$alternative=NULL
+  flip_param_call$alternative=NULL
 
-      score_type=attributes(scores)$score_type
-      score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
-      if(score_type=="standardized") flip_param_call$.score_fun <- .score_std else
-        flip_param_call$.score_fun <- .score
+  score_type=attributes(scores)$score_type
+  score_type=match.arg(score_type,c("orthogonalized","standardized","effective","basic"))
+  if(score_type=="standardized") flip_param_call$.score_fun <- .score_std else
+    flip_param_call$.score_fun <- .score
 
-      # if(flip_param_call$precompute_flips){
-      #   set.seed(seed)
-      #   flip_param_call$flips=.make_flips(nrow(scores),flip_param_call$n_flips)
-      # }
+  # if(flip_param_call$precompute_flips){
+  #   set.seed(seed)
+  #   flip_param_call$flips=.make_flips(nrow(scores),flip_param_call$n_flips)
+  # }
   results=lapply(1:ncol(scores), function(id_col){
     score1=scores[,id_col,drop=FALSE]
     attributes(score1)$scale_objects=attributes(scores)$scale_objects[[id_col]]

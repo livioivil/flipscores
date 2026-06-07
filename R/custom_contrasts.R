@@ -178,6 +178,30 @@ flipscores_contrasts <- function(model, specs = NULL,
     resolved$coef_linfct <- resolved$coef_linfct[, active, drop = FALSE]
   }
 
+  TODO GESTIRE I FLIPS. da flipscores:
+  # # handle flips
+  # if (!is.null(flip_param_call$flips)) {
+  #   if(length(setdiff(rownames(model.matrix(model)),colnames(flips)))>0){
+  #     stop("flip matrix of flips has wrong observation names (i.e. the union of the rownames of the model.matrix of the models).")
+  #   }
+  #   flip_param_call$precompute_flips <- FALSE
+  #   flip_param_call$n_flips <- nrow(flip_param_call$flips)
+  #
+  # } else if (flip_param_call$precompute_flips) {
+  #   set.seed(seed)
+  #   flip_param_call$flips <- .make_flips(
+  #     max(nrow(model$model),
+  #         ifelse(is.null(flip_param_call$nobservations),
+  #                0L,
+  #                flip_param_call$nobservations)),
+  #     flip_param_call$n_flips,
+  #     flip_param_call$id
+  #   )
+  #   if(exists("obs_names"))
+  #     colnames(flip_param_call$flips)=obs_names else
+  #       colnames(flip_param_call$flips)=1:ncol(flip_param_call$flips)
+  # }
+
   if (!is.null(flips)) {
     n_flips <- nrow(flips)
     precompute_flips <- FALSE
@@ -207,7 +231,7 @@ flipscores_contrasts <- function(model, specs = NULL,
     )
   }
 
-  table <- data.frame(
+  summary_table <- data.frame(
     contrast = rownames(resolved$coef_linfct),
     estimate = estimates,
     Score = vapply(tests, function(x) x$Tspace[1], numeric(1)),
@@ -218,21 +242,20 @@ flipscores_contrasts <- function(model, specs = NULL,
 
   out <- list(
     call = user_call,
-    model = model,
+    Tspace = do.call(cbind, lapply(tests, `[[`, "Tspace")),
+    summary_table = table,
+
+    objects = model,
     contrasts = resolved$contrasts,
     linfct = resolved$coef_linfct,
     contrast_matrix = resolved$contrast_matrix,
     reference_grid = resolved$reference_grid,
-    Tspace = do.call(cbind, lapply(tests, `[[`, "Tspace")),
-    p.values = table$p.value,
-    table = table,
     notes = resolved$notes,
     score_type = score_type,
     n_flips = n_flips,
     alternative = alternative
   )
   colnames(out$Tspace) <- table$contrast
-  names(out$p.values) <- table$contrast
   class(out) <- "fs_contrasts"
   out
 }
@@ -286,7 +309,7 @@ print.summary.fs_contrasts <- function(x, digits = 4, ...) {
   print(x$call)
   cat("score_type = ", x$score_type, ", n_flips = ", x$n_flips,
       ", alternative = ", x$alternative, "\n\n", sep = "")
-  print(x$table, row.names = FALSE, digits = digits)
+  print(x$summary_table, row.names = FALSE, digits = digits)
   if (length(x$notes) > 0) {
     cat("\n", paste(x$notes, collapse = "\n"), "\n", sep = "")
   }
