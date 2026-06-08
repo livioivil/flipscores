@@ -73,7 +73,7 @@
       names(mods) = mods_names
 
     out=list(Tspace=.get_all_Tspace(mods),
-             summary_table=.get_all_summary_table(mods),
+             summary_table=do.call(cbind,lapply(mods,function(x)x$summary_table)),
              objects=mods,
              call = match.call())
     class(out) <- unique(c("jfs", class(out)))

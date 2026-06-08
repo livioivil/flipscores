@@ -166,6 +166,7 @@ formula_to_matrices <- function(formula, data) {
   rownames(summary_table)=NULL
   list(Tspace=Tspace,
        summary_table=summary_table,
+       alternative=alternative,
        info=list(formula=formula,
                 D=D))
 }

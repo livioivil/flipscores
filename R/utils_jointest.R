@@ -58,7 +58,7 @@
 }
 
 .get_summary_table_from_fs_lm <- function(object){
-  p.values=apply(object$Tspace,2,flipscores:::.t2p_only_first, object$alternative)
+  p.values=apply(object$Tspace,2,.t2p_only_first, object$alternative)
   out=data.frame(.assign = NA_integer_,
              model=colnames(object$scores),
              score= colSums(object$scores),
