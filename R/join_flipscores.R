@@ -53,14 +53,18 @@
     }
 
     mods = lapply(1:length(mods), function(i) {
+      if(inherits(mods[[i]], c("glm"))){#,"fs_contrasts","fs_lm"))
       temp = flipscores(formula = eval(mods[[i]],parent.frame()), score_type = score_type,
                         flips = eval(FLIPS), to_be_tested = tested_coeffs[[i]],
                         output_flips=FALSE,obs_names,...
       )
-      # if (statistics %in% c("t")) {
       temp$summary_table=.get_summary_table_from_flipscores(temp)
+      } else if(inherits(mods[[i]], c("flipscores","fs_contrasts","fs_lm","jfs"))){
+        temp = update( eval(mods[[i]],parent.frame()),flips = eval(FLIPS),...)
+      } else {
+        stop("formula may be a list of objects from the 'glm', 'flipscores', 'fs_contrasts' or 'fs_lm' classes only. ")
+      }
       temp
-      # }
     })
 
     if(is.null(mods_names)){
@@ -75,3 +79,30 @@
     class(out) <- unique(c("jfs", class(out)))
     out
   }
+
+#' @title Coerce fs_contrasts to jfs
+#' @name as.jfs
+#' @description Coerces an \code{fs_contrasts} object to class \code{jfs}.
+#' @param x an object of class \code{fs_contrasts}
+#' @param ... further arguments (currently unused)
+#' @return an object of class \code{jfs}
+#' @export
+as.jfs <- function(x, ...) {
+  UseMethod("as.jfs")
+}
+
+as.jfs.default <- function(object, ...) {
+  Tspace=object$Tspace
+  summary_table=object$summary_table
+  call=object$call
+
+  object$call <- object$Tspace <- object$summary_table <- NULL
+  jfs_obj <- list(
+    call      = call,
+    summary_table = summary_table,
+    Tspace = Tspace,
+    objects      = object,
+  )
+  class(jfs_obj) <- "jfs"
+  jfs_obj
+}

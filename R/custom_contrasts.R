@@ -138,7 +138,6 @@ apply_custom_contrasts <- function(contrasts, model = NULL) {
 #' @param id optional cluster id.
 #' @param seed optional random seed.
 #' @param flips optional precomputed flip matrix.
-#' @param precompute_flips whether to precompute the flip matrix.
 #' @param ... currently unused.
 #' @return an object of class \code{fs_contrasts}.
 #' @export
@@ -151,7 +150,6 @@ flipscores_contrasts <- function(model, specs = NULL,
                                  id = NULL,
                                  seed = NULL,
                                  flips = NULL,
-                                 precompute_flips = TRUE,
                                  ...) {
   user_call <- match.call()
   score_type <- match.arg(score_type,
@@ -178,36 +176,30 @@ flipscores_contrasts <- function(model, specs = NULL,
     resolved$coef_linfct <- resolved$coef_linfct[, active, drop = FALSE]
   }
 
-  TODO GESTIRE I FLIPS. da flipscores:
-  # # handle flips
-  # if (!is.null(flip_param_call$flips)) {
-  #   if(length(setdiff(rownames(model.matrix(model)),colnames(flips)))>0){
-  #     stop("flip matrix of flips has wrong observation names (i.e. the union of the rownames of the model.matrix of the models).")
-  #   }
-  #   flip_param_call$precompute_flips <- FALSE
-  #   flip_param_call$n_flips <- nrow(flip_param_call$flips)
-  #
-  # } else if (flip_param_call$precompute_flips) {
-  #   set.seed(seed)
-  #   flip_param_call$flips <- .make_flips(
-  #     max(nrow(model$model),
-  #         ifelse(is.null(flip_param_call$nobservations),
-  #                0L,
-  #                flip_param_call$nobservations)),
-  #     flip_param_call$n_flips,
-  #     flip_param_call$id
-  #   )
-  #   if(exists("obs_names"))
-  #     colnames(flip_param_call$flips)=obs_names else
-  #       colnames(flip_param_call$flips)=1:ncol(flip_param_call$flips)
-  # }
-
+  #  TODO GESTIRE I FLIPS. da flipscores:
+  # handle flips
   if (!is.null(flips)) {
-    n_flips <- nrow(flips)
-    precompute_flips <- FALSE
-  } else if (precompute_flips) {
+    if(!is.null(colnames(flips)))
+      if(length(setdiff(rownames(model.matrix(model)),colnames(flips)))>0){
+        stop("flip matrix of flips has wrong observation names (i.e. the union of the rownames of the model.matrix of the models).")
+      }
+    user_call$n_flips <- nrow(user_call$flips)
+
+  } else {
     set.seed(seed)
-    flips <- .make_flips(nrow(model$x), n_flips, id)
+    nobservations=max(nrow(model$model),
+                      ifelse(is.null(user_call$nobservations),
+                             0L,
+                             user_call$nobservations))
+
+    user_call$flips <- .make_flips(
+      nobservations,
+      n_flips,
+      id
+    )
+    if(exists("obs_names"))
+      colnames(user_call$flips)=obs_names else
+        colnames(user_call$flips)=1:ncol(user_call$flips)
   }
 
   tests <- vector("list", nrow(resolved$coef_linfct))
@@ -226,9 +218,7 @@ flipscores_contrasts <- function(model, specs = NULL,
       n_flips = n_flips,
       alternative = alternative,
       seed = seed,
-      flips = flips,
-      precompute_flips = precompute_flips
-    )
+      flips = flips)
   }
 
   summary_table <- data.frame(
@@ -240,11 +230,11 @@ flipscores_contrasts <- function(model, specs = NULL,
     check.names = FALSE
   )
 
+  user_call$flips=NULL
   out <- list(
     call = user_call,
     Tspace = do.call(cbind, lapply(tests, `[[`, "Tspace")),
-    summary_table = table,
-
+    summary_table = summary_table,
     objects = model,
     contrasts = resolved$contrasts,
     linfct = resolved$coef_linfct,
@@ -255,10 +245,167 @@ flipscores_contrasts <- function(model, specs = NULL,
     n_flips = n_flips,
     alternative = alternative
   )
-  colnames(out$Tspace) <- table$contrast
+  colnames(out$Tspace) <- summary_table$contrast
   class(out) <- "fs_contrasts"
   out
 }
+
+###############################################################################
+# Methods for the 'fs_contrasts' class
+###############################################################################
+
+#' Model matrix for fs_contrasts objects
+#'
+#' Extract the model matrix from the underlying fitted model stored in an
+#' `fs_contrasts` object.
+#'
+#' @param object An object of class `fs_contrasts`.
+#' @param ... Additional arguments passed to `model.matrix` (e.g., `data`).
+#'
+#' @return The model matrix (design matrix) of the original model.
+#' @export
+model.matrix.fs_contrasts <- function(object, ...) {
+  # The fs_contrasts object should contain a component 'model' which is the
+  # fitted model (e.g., glm, lm). We simply call model.matrix on it.
+  if (is.null(object$objects$model)) {
+    stop("The fs_contrasts object does not contain a 'model' component.", call. = FALSE)
+  }
+  stats::model.matrix(object$objects, ...)
+}
+
+#' Convert an fs_contrasts object to a jfs object
+#'
+#' This method creates a `jfs` object from a fitted model and a set of
+#' contrasts. The resulting object can be used with `flipscores` for joint
+#' permutation testing across multiple contrasts or models.
+#'
+#' @param object An object of class `fs_contrasts`.
+#' @param ... Additional arguments passed to `joint_flipscores` or used to
+#'   modify the `jfs` object (e.g., `score_type`, `n_flips`).
+#'
+#' @return An object of class `jfs` (joint flipscores) that contains the
+#'   original model, the contrast matrix, and other relevant information.
+#' @export
+# as.jfs.fs_contrasts <- function(object, ...) {
+#   # Required components: model (fitted model) and linfct (contrast matrix)
+#   if (is.null(object$model)) {
+#     stop("The fs_contrasts object has no 'model' component.", call. = FALSE)
+#   }
+#   if (is.null(object$linfct)) {
+#     stop("The fs_contrasts object has no 'linfct' (contrast matrix).", call. = FALSE)
+#   }
+#
+#   # Additional arguments that may affect the joint flipscores procedure
+#   dots <- list(...)
+#
+#   # Build a jfs object. In the flipscores package, a jfs object is typically
+#   # a list with at least:
+#   #   - models   : a list of glm objects (here a single element)
+#   #   - formulas : a list of formulas (extracted from the model)
+#   #   - family   : the family of the model
+#   #   - score_type, n_flips, ... (from dots or defaults)
+#   #   - contrasts: the contrast matrix (linfct) and optionally rhs
+#   #   - call     : the call that created the jfs object
+#   Tspace=object$Tspace
+#   summary_table=object$summary_table
+#   call=object$call
+#
+#   object$call <- object$Tspace <- object$summary_table <- NULL
+#   jfs_obj <- list(
+#     call      = call,
+#     summary_table = summary_table,
+#     Tspace = Tspace,
+#     objects      = object,
+#     )
+#   class(jfs_obj) <- "jfs"
+#   jfs_obj
+# }
+
+#' Update an fs_contrasts object
+#'
+#' Update the underlying model or the contrast specification. This method
+#' allows modification of the model formula, data, family, or the contrast
+#' matrix, and returns a new `fs_contrasts` object.
+#'
+#' @param object An object of class `fs_contrasts`.
+#' @param formula. Changes to the formula – see [update.formula()] for details.
+#' @param data New data frame.
+#' @param family New family for the GLM.
+#' @param linfct New contrast matrix (or formula to generate it).
+#' @param ... Additional arguments passed to `update()` for the underlying
+#'   model, or to the contrast‑generating function.
+#'
+#' @return An updated object of class `fs_contrasts`.
+#' @export
+#'
+update.fs_contrasts <- function(object, formula. , ...,evaluate = TRUE) {
+  # Step 1: Update the underlying fitted model
+  if (is.null(object$objects$model)) {
+    stop("Cannot update: the fs_contrasts object has no 'model' component.", call. = FALSE)
+  }
+
+  if (is.null(call <- getCall(object)))
+    stop("need an object with call component")
+  extras <- match.call(expand.dots = FALSE)$...
+  if (!missing(formula.))
+    call$formula <- update(formula(object), formula.)
+  if (length(extras)) {
+    existing <- !is.na(match(names(extras), names(call)))
+    for (a in names(extras)[existing]) call[[a]] <- extras[[a]]
+    if (any(!existing)) {
+      call <- c(as.list(call), extras[!existing])
+      call <- as.call(call)
+    }
+  }
+  if (evaluate)
+    eval(call, parent.frame())
+  else call
+  #
+  #
+  # # Build the call to update the model
+  # new_model <- object$model
+  # if (!missing(formula.) || !is.null(data) || !is.null(family) || length(list(...)) > 0) {
+  #   # Use the generic update function on the model, passing all relevant args
+  #   new_model <- stats::update(object$model, formula. = formula., data = data,
+  #                              family = family, ...)
+  # }
+  #
+  # # Step 2: Update the contrast matrix if requested
+  # new_linfct <- object$linfct
+  # if (!is.null(linfct)) {
+  #   # If linfct is a formula, we need to evaluate it in the context of the
+  #   # new model's coefficients or model matrix. Here we assume a simple matrix
+  #   # or a function that returns a matrix.
+  #   if (inherits(linfct, "formula")) {
+  #     # Example: ~ group1 - group2 would be converted to a contrast matrix
+  #     # using model.matrix and a custom function. For simplicity, we call a
+  #     # helper (not defined here) or leave it to the user to supply a matrix.
+  #     stop("Formula for linfct not directly supported; please supply a matrix.", call. = FALSE)
+  #   } else {
+  #     new_linfct <- linfct
+  #   }
+  # }
+  #
+  # # Step 3: Build the new fs_contrasts object
+  # # Preserve other components (like rhs, vcov) but allow them to be updated
+  # # via ...? For simplicity we copy all components and overwrite changed ones.
+  # updated_obj <- object
+  # updated_obj$model  <- new_model
+  # updated_obj$linfct <- new_linfct
+  # # If the model changed, the vcov might need recomputation; we set it to NULL
+  # # so that later code recomputes it (or keep it if unchanged).
+  # if (!identical(object$model, new_model)) {
+  #   updated_obj$vcov <- NULL
+  # }
+  # # Update the call to reflect the change
+  # updated_obj$call <- match.call()
+  #
+  # # Keep the class unchanged
+  # class(updated_obj) <- class(object)
+  # updated_obj
+}
+
+#######################
 
 #' @export
 print.custom_contrasts <- function(x, ...) {
@@ -291,7 +438,7 @@ print.fs_contrasts <- function(x, ...) {
 summary.fs_contrasts <- function(object, digits = 4, ...) {
   out <- list(
     call = object$call,
-    table = object$table,
+    summary_table = object$summary_table,
     notes = object$notes,
     score_type = object$score_type,
     n_flips = object$n_flips,
@@ -455,8 +602,7 @@ print.summary.fs_contrasts <- function(x, digits = 4, ...) {
 }
 
 .fs_one_contrast_test <- function(model, coef_contrast, score_type, n_flips,
-                                  alternative, seed, flips,
-                                  precompute_flips) {
+                                  alternative, seed, flips) {
   if (all(abs(coef_contrast) < .Machine$double.eps)) {
     stop("A contrast maps to a zero coefficient contrast.", call. = FALSE)
   }
@@ -496,8 +642,7 @@ print.summary.fs_contrasts <- function(x, digits = 4, ...) {
     n_flips = n_flips,
     alternative = alternative,
     flips = flips,
-    seed = seed,
-    precompute_flips = precompute_flips
+    seed = seed
   ))
   socket_compute_flip(scores, flip_call)[[1]]
 }

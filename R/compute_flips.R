@@ -21,9 +21,9 @@ compute_flips<- function(scores,alternative="two.sided",
 
 
   Tspace=.flip_test_no_pval(scores,flips=flips,
-                                       n_flips=n_flips,
-                                       .score_fun=.score_fun,
-                                       #output_flips=output_flips,
+                            n_flips=n_flips,
+                            .score_fun=.score_fun,
+                            #output_flips=output_flips,
                             seed=seed,
                             precompute_flips=precompute_flips)
   p.values=.t2p_only_first(ftail(unlist(Tspace)))
@@ -64,6 +64,23 @@ compute_flips<- function(scores,alternative="two.sided",
       .score_fun(sample(c(-1,1),n_obs, replace = T),scores)
     })))
   }
+
+  return(Tspace)
+}
+
+
+
+.flip_test_lm<- function(scores,
+                         flips=NULL,
+                         n_flips=NULL,
+                         seed=NULL,
+                         ...){
+
+
+  Tspace=sapply(1:nrow(flips),
+                function(i).score_std(flips[i,],scores))
+  if(is.matrix(Tspace)) Tspace=t(Tspace)
+  if(is.vector(Tspace)) Tspace=matrix(Tspace)
 
   return(Tspace)
 }

@@ -108,7 +108,7 @@ confint(mod, parm = 4, type = "symmetric", flips = flps)
 ## Other examples
 
 ```{r}
-set.seed(123)
+set.seed(1)
 
 dat <- data.frame(
   treatment = factor(rep(c("Control", "Drug"), each = 30)),
@@ -160,6 +160,8 @@ summary(cmbn) #perchè non coimbina tra livelli di group??
 
 # jfs è la vecchia classe join_flipscores
 
+flipscores(list(cntr1,cntr2,fit2))
+
 cres=flipscores:::c.jfs(cntr1,cntr2,fit2,cmbn)
 #deve funzionare anche per flipscores, fs_contrasts, fs_cobine,jfs
 #forse meglio chiamarla join_fs() o fualcosa del genere?
@@ -169,8 +171,9 @@ cres=flipscores:::c.jfs(cntr1,cntr2,fit2,cmbn)
 
 #Le classi fs_contrast (e clip, flip2sss etc) devono avere i seguenti methods:
 #model.matrix per gli obs_names
-#as.jfs  convertire ciascuno così poi il c() è più facile
 #update indispensabile per refit con stessa matrice flip
+#as.jfs  convertire ciascuno così poi il c() è più facile. c'è già un default che dovrebbe coprire quasi tutti i casi: basta che nell'oggetto ci sia una $call, una $summary_table e un $Tspace, il resto viene cacciato in $objects)
+
 
 #fs_contrast (e clip, flip2sss etc devono avere gli argomenti n_flips (forse questo non serve in realtà) e flips in modo che poi l'update(flips=FLIP) funzioni
 
@@ -191,6 +194,43 @@ combine_tests(cres,by="coefficient",comb_funct = "Fisher")
 
 #ora construire la selezione [[]] usa .assign
 length(cres$objects)
+
+###############
+set.seed(1)
+n <- 50
+df <- data.frame(
+  y1  = rnorm(n),
+  y2  = rnorm(n),
+  yb  = rbinom(n, 1, 0.5),
+  y1p = rpois(n, lambda = 3),
+  y2p = rpois(n, lambda = 5),
+  x1  = rnorm(n),
+  x2  = rnorm(n)
+)
+#'
+# Case 1: single formula
+res=flipscores(y1 ~ x1 + x2, family = gaussian(), data = df)
+summary(res)
+#'
+# Case 2: list of glm objects
+
+res_lm=flipscores_lm(y1 ~ x1 + x2, data = df, tested_coeffs = "x2")
+summary(res_lm)
+
+models <- list(
+  glm(y1 ~ x1 + x2, data = df, family = gaussian()),
+  cntr1,
+  cntr2,
+  fit2,
+  res_lm
+)
+
+res=flipscores(models, family = gaussian(), data = df)
+
+summary(res)
+
+
+fs_lm(y1 ~ x1 + x2, data = df)
 
 ```
 

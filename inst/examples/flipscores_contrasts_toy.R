@@ -29,12 +29,21 @@ flipscores_contrasts(
 )
 
 # Formula interface: build contrasts and apply flip-score tests.
-flipscores_contrasts(
+res=flipscores_contrasts(
   fit,
   pairwise ~ treatment | sex,
   n_flips = 500,
   seed = 1
 )
+
+res=model.matrix(res) ##??
+flipscores:::model.matrix.fs_contrasts(res)
+res=update(res,flip=make_flips(n_obs = nrow(flipscores:::model.matrix.fs_contrasts(res)),
+                               10))
+res=update(res)
+
+res=flipscores:::as.jfs.fs_contrasts(res)
+as.jfs(res) #metodo generico?
 
 # Dunnett-like all-versus-one comparisons.
 flipscores_contrasts(

@@ -110,7 +110,7 @@ combine_tests <- function (mods, comb_funct = "maxT", by = NULL, by_list=NULL, t
 combine_contrasts <- function (mods, comb_funct = "Mahalanobis", tail = 0)
 {
   names(mods) = .set_mods_names(mods)
-   if(is.null(mods$summary_table$model)){
+  if(is.null(mods$summary_table$model)){
     suffix <-as.integer(factor(sub(".*_model\\.*", "", colnames(mods$Tspace))))
     mods$summary_table$model <- paste0("model", suffix)
   }

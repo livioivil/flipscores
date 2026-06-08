@@ -11,9 +11,9 @@
 #'
 make_flips <- function(n_obs,n_flips,obs_names=NULL){
   FL=.make_flips(n_obs,n_flips)
-  if(!is.null(obs_names)){
-    colnames(FL)=obs_names
-  }
+  if(is.null(obs_names)) obs_names=1:n_obs
+  colnames(FL)=obs_names
+
   FL
 }
 

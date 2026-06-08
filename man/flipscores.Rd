@@ -54,7 +54,7 @@ If \code{NULL} all coefficients are tested.}
 
 \item{flips}{Optional matrix of pre-computed flips.}
 
-\item{precompute_flips}{Logical, default \code{TRUE}.}
+\item{precompute_flips}{Logical, default \code{TRUE}. WARNING: if a \code{jfs-class} object is returned and \code{precompute_flips=FALSE} the merging among scores from different models is solely based on their ordering and not on their rownames.}
 
 \item{...}{Additional arguments passed to \code{glm()} or the internal
 flipscores engine.}

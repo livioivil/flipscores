@@ -10,13 +10,13 @@ test_that("formula interface reports interaction notes when appropriate", {
 
   out <- flipscores_contrasts(fit, pairwise ~ trt, n_flips = 20, seed = 1)
   expect_s3_class(out, "fs_contrasts")
-  expect_equal(nrow(out$table), 1)
+  expect_equal(nrow(out$summary_table), 1)
   expect_match(out$notes, "trt:sex", fixed = TRUE)
 
   out_by <- flipscores_contrasts(fit, pairwise ~ trt | sex,
                                  n_flips = 20, seed = 1)
   expect_s3_class(out_by, "fs_contrasts")
-  expect_equal(nrow(out_by$table), 2)
+  expect_equal(nrow(out_by$summary_table), 2)
   expect_length(out_by$notes, 0)
 })
 
@@ -36,11 +36,11 @@ test_that("custom coefficient contrasts accept matrix, vector, and list input", 
   out_list <- flipscores_contrasts(fit, linfct = list("B - A" = c(trtB = 1)),
                                    n_flips = 20, seed = 1)
 
-  expect_equal(out_matrix$table$estimate, unname(coef(fit)["trtB"]))
-  expect_equal(out_vector$table$estimate, out_matrix$table$estimate)
-  expect_equal(out_list$table$estimate, out_matrix$table$estimate)
-  expect_equal(out_matrix$table$p.value, out_vector$table$p.value)
-  expect_equal(out_matrix$table$p.value, out_list$table$p.value)
+  expect_equal(out_matrix$summary_table$estimate, unname(coef(fit)["trtB"]))
+  expect_equal(out_vector$summary_table$estimate, out_matrix$summary_table$estimate)
+  expect_equal(out_list$summary_table$estimate, out_matrix$summary_table$estimate)
+  expect_equal(out_matrix$summary_table$p.value, out_vector$summary_table$p.value)
+  expect_equal(out_matrix$summary_table$p.value, out_list$summary_table$p.value)
 })
 
 test_that("Dunnett-like formula contrasts compare all levels to one control", {
@@ -58,18 +58,18 @@ test_that("Dunnett-like formula contrasts compare all levels to one control", {
 
   out <- flipscores_contrasts(fit, dunnett ~ trt,
                               n_flips = 20, seed = 1)
-  expect_equal(out$table$contrast, c("Low - Control", "High - Control"))
-  expect_equal(nrow(out$table), 2)
+  expect_equal(out$summary_table$contrast, c("Low - Control", "High - Control"))
+  expect_equal(nrow(out$summary_table), 2)
   expect_equal(unname(out$linfct[, "trtLow"]), c(1, 0))
   expect_equal(unname(out$linfct[, "trtHigh"]), c(0, 1))
 
   out_ref_name <- flipscores_contrasts(fit, trt.vs.ctrl ~ trt,
                                        ref = "Low", n_flips = 20, seed = 1)
-  expect_equal(out_ref_name$table$contrast, c("Control - Low", "High - Low"))
+  expect_equal(out_ref_name$summary_table$contrast, c("Control - Low", "High - Low"))
 
   out_ref_last <- flipscores_contrasts(fit, trt.vs.ctrlk ~ trt,
                                        n_flips = 20, seed = 1)
-  expect_equal(out_ref_last$table$contrast,
+  expect_equal(out_ref_last$summary_table$contrast,
                c("Control - High", "Low - High"))
 })
 
@@ -84,7 +84,7 @@ test_that("lm and flipscores objects are accepted", {
                                  n_flips = 20, seed = 1)
 
   expect_s3_class(lm_out, "fs_contrasts")
-  expect_equal(nrow(lm_out$table), 1)
+  expect_equal(nrow(lm_out$summary_table), 1)
 
   set.seed(13)
   fs_dat <- data.frame(
@@ -98,8 +98,8 @@ test_that("lm and flipscores objects are accepted", {
                                  n_flips = 20, seed = 1)
 
   expect_s3_class(fs_out, "fs_contrasts")
-  expect_equal(nrow(fs_out$table), 1)
-  expect_equal(fs_out$table$estimate, unname(coef(fs_fit)["trtB"]))
+  expect_equal(nrow(fs_out$summary_table), 1)
+  expect_equal(fs_out$summary_table$estimate, unname(coef(fs_fit)["trtB"]))
 })
 
 test_that("joint_flipscores uses objects and c combines mixed result types", {

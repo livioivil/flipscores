@@ -102,6 +102,32 @@ summary.flipscores <- function(object, ...) {
   sum_model
 }
 
+
+#' @export
+summary.fs_lm <- function(object, digits = 4, ...) {
+  object$summary_table$.assign=NULL
+  cat("Flip-score Linear Model\n")
+  cat("Call: ")
+  print(object$call)
+  cat("score_type = Standardized, n_flips = ", object$n_flips,
+      ", alternative = ", object$alternative, "\n\n", sep = "")
+  print(object$summary_table, row.names = FALSE, digits = digits)
+  invisible(object)
+}
+
+#' @export
+print.fs_lm <- function(object, digits = 4, ...) {
+  objects#$summary_table
+}
+
+#' @export
+model.matrix.fs_lm <- function(object, ...) {
+
+  object$info$D$X
+}
+
+#########################
+
 .fs_display_call <- function(object) {
   display_call <- object$flipscores_call
   if (is.null(display_call)) {

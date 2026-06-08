@@ -15,7 +15,6 @@ flipscores_contrasts(
   id = NULL,
   seed = NULL,
   flips = NULL,
-  precompute_flips = TRUE,
   ...
 )
 }
@@ -46,8 +45,6 @@ except for \code{trt.vs.ctrlk}, where the default is the last level/cell.}
 \item{seed}{optional random seed.}
 
 \item{flips}{optional precomputed flip matrix.}
-
-\item{precompute_flips}{whether to precompute the flip matrix.}
 
 \item{...}{currently unused.}
 }

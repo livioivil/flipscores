@@ -4,12 +4,11 @@
 \alias{c.jfs}
 \title{Combine jfs objects}
 \usage{
-\method{c}{jfs}(..., recursive = FALSE)
+\method{c}{jfs}(...)
 }
 \arguments{
 \item{...}{Objects to combine. Supported objects are \code{jfs},
-\code{flipscores}, \code{glm}, \code{fs_contrasts}, and
-\code{fs_combined}.}
+\code{flipscores}, \code{glm} and \code{fs_contrasts}.}
 }
 \value{
 A \code{jfs} object.

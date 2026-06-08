@@ -112,7 +112,7 @@ flipscores <- function(formula,
   ##############################################################
   # CASE 2: list of glm objects
   ##############################################################
-  if (is.list(formula) && all(sapply(formula, inherits, "glm"))) {
+  if (is.list(formula) && all(sapply(formula, inherits, c("glm","jfs","flipscores","fs_contrasts","fs_lm")))) {
     #message("flipscores: list of glm objects detected -> joint test")
 
     for(i in 1:length(formula))
@@ -167,104 +167,10 @@ flipscores <- function(formula,
   ##############################################################
   if (inherits(formula, "formula")) {
 
-    ## TODO: se family gaussian e link=identity fare funzioncina per lm simile
+    ## TODO: se family gaussian e link=identity fare funzionina per lm simile
     # a clip e poi direttamente as.jfs
     #
-    # original_call <- match.call()
-    #
-    # n_obs=length(cluster_names)
-    # #TODO sistemare i obs_names
-    #
-    #
-    # if(!is.null(seed)) set.seed(seed)
-    #
-    # if(is.null(flips)){
-    #   flips=make_flips(n_obs=n_obs,n_flips=n_flips,obs_names=obs_names)
-    # }
-    # out=.clip(formula, data, cluster,flips,alternative,
-    #           cluster_names=cluster_names,tested_coeffs=tested_coeffs)
-    #
-    # out$call <- original_call
-    # class(out) <- c("fs_lm", class(out))
-    # return(out)
-    #
-    # .clip <- function(formula, dataflips,alternative,
-    #                   tested_coeffs=NULL){
-    #   D <- formula_to_matrices(formula, data = data) trovala in remmm
-    #   names_X=colnames(D$X)
-    #   if(is.null(tested_coeffs)) tested_coeffs=names_X
-    #   scores=lapply(tested_coeffs,function(i).get_scores(X=D$X[,i,drop=FALSE],
-    #                                                      Y=D$Y,
-    #                                                      Z=D$X[,setdiff(names_X,i),drop=FALSE],
-    #                                                      cluster=cluster,
-    #                                                      cluster_names=cluster_names))
-    #   Tspace=lapply(scores,.flip_test,
-    #                 flips=flips)
-    #   names(Tspace) <- names(scores) <- tested_coeffs
-    #
-    #
-    #   summary_table=lapply(names(scores),function(i)
-    #     cbind(coefficient=i,.make_summary_table(scores[[i]],Tspace[[i]],alternative)))
-    #
-    #   Tspace=do.call(cbind,Tspace)
-    #   summary_table=do.call(rbind,summary_table)
-    #   summary_table=summary_table[,c(2,1,3:ncol(summary_table))]
-    #   rownames(summary_table)=NULL
-    #   list(Tspace=Tspace,summary_table=summary_table,mod=list(formula=formula,
-    #                                                           x_names=colnames(D$X),
-    #                                                           y_names=colnames(D$Y)))
-    # }
-    #
-    #
-    #
-    # # for standardized (see in flipscores):
-    # .score_std=function(flp,scores_objs) {
-    #   # scr_eff # un vettore
-    #   numerator=crossprod(flp,scores_objs$scores) #t(scr_eff)%*%flp
-    #   if (all(sign(flp)==1)|(all(sign(flp)==-1))){
-    #     denominator = 1
-    #   } else {
-    #     denominator = 1 - sum((colSums(scores_objs$vars_objs$A[flp==1,,drop=FALSE])
-    #                            -colSums(scores_objs$vars_objs$A[flp==-1,,drop=FALSE]))^2)
-    #   }
-    #   as.vector(numerator/((denominator)**0.5))
-    # }
-    #
-    # ######################
-    # #X solo colonna
-    # .get_scores<- function(X,Y,Z){
-    #   Yr <- .get_IH(Z)%*%Y
-    #   Q=qr.Q(qr(Z))
-    #   Xr=crossprod(diag(nrow(Z))-tcrossprod(Q),X)
-    #   m = sum(Xr^2)
-    #   # we divide it by sqrt(m) which is the sd scaling factor of the observed test stat (i.e. effective and standardized have the same observed test stat)
-    #   A=Xr[,]*Q/sqrt(m)
-    #   scores=Xr[,]*Yr
-    #
-    #   temp=fill_scores_by_cluster(list(scores=scores,A=A),cluster_names)
-    #   A=temp$A
-    #   scores=temp$scores
-    #   rm(temp)
-    #   attr(scores,"scale_objects")=list(A=A)
-    #   scores
-    # }
-    #
-    # ###################
-    #
-    # .flip_test<- function(scores,
-    #                       flips=NULL,
-    #                       n_flips=NULL,
-    #                       seed=NULL,
-    #                       ...){
-    #
-    #
-    #     Tspace=sapply(1:nrow(flips),
-    #                   function(i).score_std(flips[i,],scores))
-    #     if(is.matrix(Tspace)) Tspace=t(Tspace)
-    #     if(is.vector(Tspace)) Tspace=matrix(Tspace)
-    #
-    #   return(Tspace)
-    # }
+
 
     lhs <- formula[[2]]
     rhs <- formula[[3]]
@@ -512,7 +418,8 @@ flipscores <- function(formula,
   }
 
   # handle flips
-  if (!is.null(flip_param_call$flips)) {
+  if (!is.null(flips)) {
+    if(!is.null(colnames(flips)))
     if(length(setdiff(rownames(model.matrix(model)),colnames(flips)))>0){
       stop("flip matrix of flips has wrong observation names (i.e. the union of the rownames of the model.matrix of the models).")
     }

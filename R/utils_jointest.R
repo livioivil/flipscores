@@ -57,8 +57,16 @@
                tab)
 }
 
+.get_summary_table_from_fs_lm <- function(object){
+  p.values=apply(object$Tspace,2,flipscores:::.t2p_only_first, object$alternative)
+  out=data.frame(.assign = NA_integer_,
+             model=colnames(object$scores),
+             score= colSums(object$scores),
+             p.values=p.values)
+}
+
 .get_summary_table_from_fs_contrasts <- function(object) {
-  tab <- object$table
+  tab <- object$summary_table
   if (is.null(tab)) {
     stop("A fs_contrasts object must contain a table.", call. = FALSE)
   }
@@ -80,9 +88,11 @@
   if (inherits(object, "flipscores")) {
     return(.get_summary_table_from_flipscores(object))
   }
-  if (inherits(object, c("fs_contrasts", "contrast_flipscores",
-                         "contrasts_flipscores"))) {
+  if (inherits(object, c("fs_contrasts"))) {
     return(.get_summary_table_from_fs_contrasts(object))
+  }
+  if (inherits(object, c("fs_lm"))) {
+    return(.get_summary_table_from_fs_lm(object))
   }
   if (!is.null(object$summary_table)) {
     return(object$summary_table)

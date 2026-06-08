@@ -2,10 +2,10 @@
 % Please edit documentation in R/make_flips.R
 \name{make_flips}
 \alias{make_flips}
-\title{It creates a \code{n_flips}x\code{n_obs} matrix of random +1 and -1. 
+\title{It creates a \code{n_flips}x\code{n_obs} matrix of random +1 and -1.
 The first row is made by ones (i.e. the observed test statistic is computed)}
 \usage{
-make_flips(n_obs, n_flips)
+make_flips(n_obs, n_flips, obs_names = NULL)
 }
 \arguments{
 \item{n_obs}{number of observations}
@@ -13,7 +13,7 @@ make_flips(n_obs, n_flips)
 \item{n_flips}{number of flips}
 }
 \description{
-It creates a \code{n_flips}x\code{n_obs} matrix of random +1 and -1. 
+It creates a \code{n_flips}x\code{n_obs} matrix of random +1 and -1.
 The first row is made by ones (i.e. the observed test statistic is computed)
 }
 \examples{
