@@ -230,7 +230,7 @@ res=flipscores(models, family = gaussian(), data = df)
 summary(res)
 
 
-fs_lm(y1 ~ x1 + x2, data = df)
+flipscores_lm(y1 ~ x1 + x2, data = df)
 
 ```
 

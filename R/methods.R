@@ -117,7 +117,7 @@ summary.fs_lm <- function(object, digits = 4, ...) {
 
 #' @export
 print.fs_lm <- function(object, digits = 4, ...) {
-  objects#$summary_table
+  object#$summary_table
 }
 
 #' @export

@@ -7,19 +7,9 @@
 #--------------------------------------------
 .set_mods_names <- function(mods) {
   nms <- names(mods)
-  if (is.null(nms) || any(nms == "")) {
-    nms <- sapply(mods, function(mod) {
-      resp <- tryCatch(
-        as.character(formula(mod)[[2]]),
-        error = function(e) NULL
-      )
-      if (is.null(resp))
-        paste0("mod", which(sapply(mods, identical, mod)))
-      else
-        resp
-    })
-  }
-  nms
+  if (is.null(nms))
+    nms=paste0("mod",1:length(mods) )
+  return(nms)
 }
 
 #--------------------------------------------
@@ -52,7 +42,9 @@
   .assign=attr(mm,"assign")
   .assign=.assign[dimnames(mm)[[2]]%in%rownames(tab)]
 
+
   tab = cbind( .assign=.assign,
+               response=all.vars(formula(object)[[2]]),
                coefficient = rownames(tab),
                tab)
 }
@@ -60,7 +52,7 @@
 .get_summary_table_from_fs_lm <- function(object){
   p.values=apply(object$Tspace,2,.t2p_only_first, object$alternative)
   out=data.frame(.assign = NA_integer_,
-             model=colnames(object$scores),
+             response=colnames(object$scores),
              score= colSums(object$scores),
              p.values=p.values)
 }
@@ -73,6 +65,7 @@
 
   out <- data.frame(
     .assign = NA_integer_,
+    response= all.vars(formula(object$model)[[2]]),
     coefficient = tab$contrast,
     estimate = tab$estimate,
     score = tab$Score,

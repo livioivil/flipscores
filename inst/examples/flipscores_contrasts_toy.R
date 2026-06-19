@@ -82,7 +82,7 @@ rownames(K) <- c("Drug effect in F", "Drug effect difference M vs F")
 K["Drug effect in F", "treatmentDrug"] <- 1
 K["Drug effect difference M vs F", "treatmentDrug:sexM"] <- 1
 
-flipscores_contrasts(
+res=flipscores_contrasts(
   fit,
   linfct = K,
   n_flips = 500,

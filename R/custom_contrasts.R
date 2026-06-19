@@ -230,12 +230,15 @@ flipscores_contrasts <- function(model, specs = NULL,
     check.names = FALSE
   )
 
+  Tspace = do.call(cbind, lapply(tests, `[[`, "Tspace"))
+  scores=do.call(cbind, lapply(tests, `[[`, "scores"))
   user_call$flips=NULL
   out <- list(
     call = user_call,
-    Tspace = do.call(cbind, lapply(tests, `[[`, "Tspace")),
+    Tspace=Tspace,
+    scores = scores,
     summary_table = summary_table,
-    objects = model,
+    model = model,
     contrasts = resolved$contrasts,
     linfct = resolved$coef_linfct,
     contrast_matrix = resolved$contrast_matrix,
@@ -245,7 +248,7 @@ flipscores_contrasts <- function(model, specs = NULL,
     n_flips = n_flips,
     alternative = alternative
   )
-  colnames(out$Tspace) <- summary_table$contrast
+  colnames(out$Tspace) <- colnames(out$scores) <- summary_table$contrast
   class(out) <- "fs_contrasts"
   out
 }

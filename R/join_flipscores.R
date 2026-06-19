@@ -18,6 +18,7 @@
       mods[[i]]$call$data=eval(mods[[i]]$call$data, parent.frame())
 
     names(mods) = .set_mods_names(mods)
+    mods_names=names(mods)
     if (is.null(tested_coeffs)) {
       tested_coeffs = .get_all_coeff_names_list(mods)
     }
@@ -29,10 +30,17 @@
                                                            gsub(" ", "", nms)))
     }
 
-    obsy_names = lapply(mods, function(mod) names(mod$y))
-    obsy_names = unique(unlist(obsy_names))
-    obs_names = lapply(mods, function(mod) rownames(model.matrix(mod)))
-    obs_names = unique(c(unlist(obs_names),unlist(obsy_names)))
+    obs_names = lapply(mods, function(mod)
+      if(inherits(mod,c("flipscores","fs_contrasts"))) {
+        rownames(mod$scores)
+      } else if(inherits(mod,c("jfs"))) {
+        unlist(lapply(mod$objects, function(md)rownames(md$scores)))
+      } else if(inherits(mod,c("fs_lm"))) {
+        unlist(lapply(mod$scores,function(md)rownames(md)))
+      } else if(inherits(mod,c("glm"))) {
+        rownames(model.matrix(mod))
+      })
+    obs_names = unique(unlist(obs_names))
 
     #n_obs=length(obs_names)
 
@@ -42,7 +50,7 @@
     # n_obs=max(n_obs,n_obs_rn)
 
 
-    mods_names=names(mods)
+
     if(is.null(eval(match.call()$flips,parent.frame()))){
       FLIPS=make_flips(n_obs=length(obs_names),n_flips=n_flips,obs_names=obs_names)
     }else{

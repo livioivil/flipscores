@@ -112,7 +112,7 @@ flipscores <- function(formula,
   ##############################################################
   # CASE 2: list of glm objects
   ##############################################################
-  if (is.list(formula) && all(sapply(formula, inherits, c("glm","jfs","flipscores","fs_contrasts","fs_lm")))) {
+  if (is.list(formula) && all(sapply(formula, inherits, c("glm","clip","jfs","flipscores","fs_contrasts","fs_lm")))) {
     #message("flipscores: list of glm objects detected -> joint test")
 
     for(i in 1:length(formula))
@@ -213,21 +213,25 @@ flipscores <- function(formula,
   ##############################################################
   # CASE 1: standard formula -> original flipscores engine
   ##############################################################
-  .flipscores_engine(
-    formula          = formula,
-    family           = family,
-    data             = data,
-    score_type       = score_type,
-    n_flips          = n_flips,
-    alternative      = alternative,
-    id               = id,
-    seed             = seed,
-    to_be_tested     = to_be_tested,
-    flips            = flips,
-    precompute_flips = precompute_flips,
-    .user_call       = match.call(),
-    ...
-  )
+  if(inherits(formula, c("fs_lm","fs_contrasts"))){
+    return(do.call(update,match.call()))
+  } else {
+    .flipscores_engine(
+      formula          = formula,
+      family           = family,
+      data             = data,
+      score_type       = score_type,
+      n_flips          = n_flips,
+      alternative      = alternative,
+      id               = id,
+      seed             = seed,
+      to_be_tested     = to_be_tested,
+      flips            = flips,
+      precompute_flips = precompute_flips,
+      .user_call       = match.call(),
+      ...
+    )
+  }
 }
 
 

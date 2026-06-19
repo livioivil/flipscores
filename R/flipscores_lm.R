@@ -81,11 +81,11 @@
 #' data$y2  = data$x1+  rnorm(n, mean = 0, sd = 1)   # pure noise (null holds)
 #'
 #' # Test the coefficient of x1
-#' res <- fs_lm(cbind(y,y2) ~ x1 + x2, data = data, n_flips = 999, alternative = "two.sided")
+#' res <- flipscores_lm(cbind(y,y2) ~ x1 + x2, data = data, n_flips = 999, alternative = "two.sided")
 #' flipscores:::summary.fs_lm(res)
 #'
 #' # Test only x2
-#' res2 <- fs_lm(y ~ x1 + x2, data = data, tested_coeffs = "x2")
+#' res2 <- flipscores_lm(y ~ x1 + x2, data = data, tested_coeffs = "x2")
 #' flipscores:::summary.fs_lm(res2)
 #'
 #' @export
@@ -162,10 +162,12 @@ formula_to_matrices <- function(formula, data) {
   })
 
   Tspace=do.call(cbind,Tspace)
+  scores=do.call(cbind,scores)
   summary_table=do.call(rbind,summary_table)
   rownames(summary_table)=NULL
   list(Tspace=Tspace,
        summary_table=summary_table,
+       scores=scores,
        alternative=alternative,
        info=list(formula=formula,
                 D=D))
@@ -176,12 +178,13 @@ formula_to_matrices <- function(formula, data) {
 # for standardized (see in flipscores):
 .score_std=function(flp,scores_objs) {
   # scr_eff # un vettore
+
   numerator=crossprod(flp,scores_objs$scores) #t(scr_eff)%*%flp
   if (all(sign(flp)==1)|(all(sign(flp)==-1))){
     denominator = 1
   } else {
-    denominator = 1 - sum((colSums(scores_objs$vars_objs$A[flp==1,,drop=FALSE])
-                           -colSums(scores_objs$vars_objs$A[flp==-1,,drop=FALSE]))^2)
+    denominator = 1 - sum((colSums(attributes(scores)$scale_objects$A[flp==1,,drop=FALSE])
+                          -colSums(attributes(scores)$scale_objects$A[flp==-1,,drop=FALSE]))^2)
   }
   as.vector(numerator/((denominator)**0.5))
 }
