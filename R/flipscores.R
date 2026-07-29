@@ -112,7 +112,7 @@ flipscores <- function(formula,
   ##############################################################
   # CASE 2: list of glm objects
   ##############################################################
-  if (is.list(formula) && all(sapply(formula, inherits, c("glm","clip","jfs","flipscores","fs_contrasts","fs_lm")))) {
+  if (is.list(formula) && all(sapply(formula, inherits, c("glm","jfs","flipscores","fs_contrasts","fs_lm")))) {
     #message("flipscores: list of glm objects detected -> joint test")
 
     for(i in 1:length(formula))

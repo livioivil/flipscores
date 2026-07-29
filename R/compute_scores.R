@@ -49,7 +49,6 @@ compute_scores <- function(model0, model1, score_type = "standardized", ...){
   # no variables in the null model
   if(ncol(model0$x)==0){
     scores=matrix(model0$y)
-    rownames(scores)=names(model0$fitted.values)
     scale_objects=list(list(nrm = crossprod(model0$y)^.5*length(model0$y)^.5))
     score_type="basic"
     Xr <- sqrtinvV_vect_times_residuals <- matrix(1,nrow(model0$x),1)
@@ -149,7 +148,7 @@ compute_scores <- function(model0, model1, score_type = "standardized", ...){
         }
   }
 
-  rownames(scores)=names(sqrtinvV_vect_times_residuals)
+  rownames(scores)=names(model0$fitted.values)
 
   if(is.null(list(...)$obs_names)){
     nobservations=list(...)$nobservations} else
