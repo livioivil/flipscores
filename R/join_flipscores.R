@@ -84,6 +84,11 @@
              summary_table=do.call(rbind,lapply(mods,function(x)x$summary_table)),
              objects=mods,
              call = match.call())
+
+    # TODO check if is correct and make sense
+    mod_index <- sapply(mods, function(x) nrow(x$summary_table))
+    mod_index <- rep(names(mod_index), mod_index)
+    out$summary_table <- cbind(model = mod_index, out$summary_table)
     class(out) <- unique(c("jfs", class(out)))
     out
   }
