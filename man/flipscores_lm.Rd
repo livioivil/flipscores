@@ -90,11 +90,11 @@ data <- data.frame(
 data$y2  = data$x1+  rnorm(n, mean = 0, sd = 1)   # pure noise (null holds)
 
 # Test the coefficient of x1
-res <- fs_lm(cbind(y,y2) ~ x1 + x2, data = data, n_flips = 999, alternative = "two.sided")
+res <- flipscores_lm(cbind(y,y2) ~ x1 + x2, data = data, n_flips = 999, alternative = "two.sided")
 flipscores:::summary.fs_lm(res)
 
 # Test only x2
-res2 <- fs_lm(y ~ x1 + x2, data = data, tested_coeffs = "x2")
+res2 <- flipscores_lm(y ~ x1 + x2, data = data, tested_coeffs = "x2")
 flipscores:::summary.fs_lm(res2)
 
 }

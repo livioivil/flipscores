@@ -440,10 +440,12 @@ flipscores <- function(formula,
       flip_param_call$n_flips,
       flip_param_call$id
     )
-    if(exists("obs_names"))
-      colnames(flip_param_call$flips)=obs_names else
-        colnames(flip_param_call$flips)=1:ncol(flip_param_call$flips)
   }
+
+  if(is.null(colnames(flip_param_call$flips)))
+    if(exists("obs_names"))
+    colnames(flip_param_call$flips)=obs_names else
+      colnames(flip_param_call$flips)=1:ncol(flip_param_call$flips)
 
   # compute scores for each tested coefficient
   results <- lapply(to_be_tested,
