@@ -5,12 +5,12 @@
 #' @param score_type The type of score that is computed. It is "orthogonalized", "effective" or "basic".
 #' "effective" and "orthogonalized" take into account the nuisance estimation.
 #' @param ... other arguments.
-#' @description
+#' @description Computes Score contributions for variables in \code{model1} (or derived from ) under the null model \code{model0}.
 #' Same usage as \code{anova.glm}.
 #' The parameter \code{id}  is used too,
 #' if present in \code{model0} (with priority) or in \code{model1}.
 #'
-#' @author Jesse Hemerik, Riccardo De Santis, Vittorio Giatti, Jelle Goeman and Livio Finos
+#' @author Jesse Hemerik, Riccardo De Santis, Jelle Goeman and Livio Finos
 #' @examples
 #' set.seed(1)
 #' Z=rnorm(20)

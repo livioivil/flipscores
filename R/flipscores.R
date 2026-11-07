@@ -125,6 +125,7 @@ flipscores <- function(formula,
       flips        = flips,
       score_type   = score_type,
       seed         = seed,
+      id           = id,
       ...
     )
     out$call <- match.call()
@@ -156,6 +157,7 @@ flipscores <- function(formula,
       flips        = flips,
       score_type   = score_type,
       seed         = seed,
+      id           = id,
       ...
     )
     out$call <- match.call()
@@ -303,7 +305,7 @@ flipscores <- function(formula,
 
   score_type <- match.arg(score_type,
                           c("orthogonalized", "standardized",
-                            "effective", "basic", "my_lab"))
+                            "effective", "basic"))
 
   m <- match(c("score_type", "n_flips", "alternative", "id",
                "seed", "flips", "precompute_flips"), names(mf), 0L)
