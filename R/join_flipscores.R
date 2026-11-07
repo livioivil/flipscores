@@ -39,6 +39,7 @@ as.jfs.fs_contrasts <- function(x, ...) {
                              statistics    = "t",
                              seed          = NULL,
                              output_models = TRUE,
+                             id            = NULL,
                              ...) {
     if(!is.null(seed)) set.seed(seed)
 
@@ -92,7 +93,8 @@ as.jfs.fs_contrasts <- function(x, ...) {
       if(inherits(mods[[i]], c("glm"))){#,"fs_contrasts","fs_lm"))
       temp = flipscores(formula = eval(mods[[i]],parent.frame()), score_type = score_type,
                         flips = eval(FLIPS), to_be_tested = tested_coeffs[[i]],
-                        output_flips=FALSE,obs_names,...
+                        output_flips=FALSE,obs_names,
+                        id= id,...
       )
       temp$summary_table=.get_summary_table_from_flipscores(temp)
       } else if(inherits(mods[[i]], c("flipscores","fs_contrasts","fs_lm","jfs"))){

@@ -7,7 +7,7 @@
 \method{anova}{flipscores}(object, model1 = NULL, score_type = NULL, n_flips = 5000, id = NULL, ...)
 }
 \arguments{
-\item{object}{(the object) \code{glm} (or \code{flipscores}) object with the model under the null hypothesis (i.e. the covariates, the nuisance parameters).}
+\item{object}{\code{glm} (or \code{flipscores}) object with the model under the null hypothesis (i.e. the covariates, the nuisance parameters).}
 
 \item{model1}{a \code{glm} (or \code{flipscores}) or a \code{matrix} (or \code{vector}). If it is a \code{glm} object, it has the model under the alternative hypothesis. The variables in \code{model1} are the same variables in \code{object} plus one or more variables to be tested.  Alternatively, if
 \code{model1} is a \code{matrix}, it contains the tested variables column-wise.}

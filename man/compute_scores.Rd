@@ -18,6 +18,7 @@ compute_scores(model0, model1, score_type = "standardized", ...)
 \item{...}{other arguments.}
 }
 \description{
+Computes Score contributions for variables in \code{model1} (or derived from ) under the null model \code{model0}.
 Same usage as \code{anova.glm}.
 The parameter \code{id}  is used too,
 if present in \code{model0} (with priority) or in \code{model1}.
@@ -33,5 +34,5 @@ scr0=compute_scores(model0 = mod0, model1 = X)
 head(scr0)
 }
 \author{
-Jesse Hemerik, Riccardo De Santis, Vittorio Giatti, Jelle Goeman and Livio Finos
+Jesse Hemerik, Riccardo De Santis, Jelle Goeman and Livio Finos
 }
