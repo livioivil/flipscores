@@ -31,6 +31,6 @@ Suggests:
 VignetteBuilder: knitr
 Encoding: UTF-8
 License: GPL-2
-RoxygenNote: 7.3.3
 Config/testthat/edition: 3
 URL: https://livioivil.github.io/flipscores/
+Config/roxygen2/version: 8.1.0

@@ -224,7 +224,7 @@ flipscores_contrasts <- function(model, specs = NULL,
   summary_table <- data.frame(
     contrast = rownames(resolved$coef_linfct),
     estimate = estimates,
-    Score = vapply(tests, function(x) x$Tspace[1], numeric(1)),
+    Score = vapply(tests, function(x) sum(x$scores), numeric(1)),
     p.value = vapply(tests, function(x) x$p.values[[1]], numeric(1)),
     row.names = NULL,
     check.names = FALSE
@@ -288,48 +288,7 @@ model.matrix.fs_contrasts <- function(object, ...) {
 #'
 #' @return An object of class `jfs` (joint flipscores) that contains the
 #'   original model, the contrast matrix, and other relevant information.
-#' @export
-# as.jfs.fs_contrasts <- function(object, ...) {
-#   # Required components: model (fitted model) and linfct (contrast matrix)
-#   if (is.null(object$model)) {
-#     stop("The fs_contrasts object has no 'model' component.", call. = FALSE)
-#   }
-#   if (is.null(object$linfct)) {
-#     stop("The fs_contrasts object has no 'linfct' (contrast matrix).", call. = FALSE)
-#   }
-#
-#   # Additional arguments that may affect the joint flipscores procedure
-#   dots <- list(...)
-#
-#   # Build a jfs object. In the flipscores package, a jfs object is typically
-#   # a list with at least:
-#   #   - models   : a list of glm objects (here a single element)
-#   #   - formulas : a list of formulas (extracted from the model)
-#   #   - family   : the family of the model
-#   #   - score_type, n_flips, ... (from dots or defaults)
-#   #   - contrasts: the contrast matrix (linfct) and optionally rhs
-#   #   - call     : the call that created the jfs object
-#   Tspace=object$Tspace
-#   summary_table=object$summary_table
-#   call=object$call
-#
-#   object$call <- object$Tspace <- object$summary_table <- NULL
-#   jfs_obj <- list(
-#     call      = call,
-#     summary_table = summary_table,
-#     Tspace = Tspace,
-#     objects      = object,
-#     )
-#   class(jfs_obj) <- "jfs"
-#   jfs_obj
-# }
-
-#' Update an fs_contrasts object
-#'
-#' Update the underlying model or the contrast specification. This method
-#' allows modification of the model formula, data, family, or the contrast
-#' matrix, and returns a new `fs_contrasts` object.
-#'
+#' @export as.jfs.fs_contrasts
 #' @param object An object of class `fs_contrasts`.
 #' @param formula. Changes to the formula – see [update.formula()] for details.
 #' @param data New data frame.

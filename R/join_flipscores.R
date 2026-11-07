@@ -1,6 +1,34 @@
 # join_flipscores.R
 # Embedded and adapted from jointest (https://github.com/livioivil/jointest)
 # Original author: Livio Finos
+#' Coerce to jfs objects
+#'
+#' Generic function to coerce objects to class 'jfs'.
+#'
+#' @param x An object.
+#' @param ... Additional arguments passed to methods.
+#' @export
+as.jfs <- function(x, ...) {
+  UseMethod("as.jfs")
+}
+
+#' Coerce to jfs objects from contrasts
+#'
+#' Coerce contrast objects to class 'jfs'.
+#'
+#' @param x An object (typically from contrast methods).
+#' @param ... Additional arguments passed to methods.
+#' @export
+as.jfs.fs_contrasts <- function(x, ...) {
+  # Implementazione della coercizione per i contrasti di flipscores
+  if (!inherits(x, "fs_contrasts")) {
+    stop("The object must be of class 'fs_contrasts'")
+  }
+
+  # Aggiungi qui la logica specifica o restituisci l'oggetto con classe aggiornata
+  class(x) <- unique(c("jfs", class(x)))
+  return(x)
+}
 
 #' @keywords internal
 .join_flipscores <- function(mods,
@@ -99,10 +127,7 @@
 #' @param x an object of class \code{fs_contrasts}
 #' @param ... further arguments (currently unused)
 #' @return an object of class \code{jfs}
-#' @export
-as.jfs <- function(x, ...) {
-  UseMethod("as.jfs")
-}
+#' @export as.jfs
 
 as.jfs.default <- function(object, ...) {
   Tspace=object$Tspace

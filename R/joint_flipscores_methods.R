@@ -62,6 +62,7 @@ summary.jfs <- function(object, digits = 4, ...) {
 #' @param x A \code{jfs} object.
 #' @param ... Additional arguments passed to \code{plot}.
 #' @noRd
+#' @exportS3Method
 plot.jfs <- function(x, ...) {
   objects <- .joint_objects(x)
   n_models <- length(objects)

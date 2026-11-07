@@ -33,18 +33,13 @@ Useful links:
   \item \url{https://livioivil.github.io/flipscores/}
 }
 
-
-Useful links:
-\itemize{
-  \item \url{https://livioivil.github.io/flipscores/}
-}
-
 }
 \author{
 \strong{Maintainer}: Livio Finos \email{livio.finos@unipd.it} (\href{https://orcid.org/0000-0003-3181-8078}{ORCID})
 
 Authors:
 \itemize{
+  \item Livio Finos \email{livio.finos@unipd.it} (\href{https://orcid.org/0000-0003-3181-8078}{ORCID})
   \item Angela Andreella
   \item Anna Vesely
 }

@@ -2,9 +2,12 @@
 % Please edit documentation in R/join_flipscores.R
 \name{as.jfs}
 \alias{as.jfs}
-\title{Coerce fs_contrasts to jfs}
+\alias{as.jfs.default}
+\title{Coerce to jfs objects}
 \usage{
 as.jfs(x, ...)
+
+\method{as.jfs}{default}(object, ...)
 }
 \arguments{
 \item{x}{an object of class \code{fs_contrasts}}
@@ -15,5 +18,7 @@ as.jfs(x, ...)
 an object of class \code{jfs}
 }
 \description{
+Generic function to coerce objects to class 'jfs'.
+
 Coerces an \code{fs_contrasts} object to class \code{jfs}.
 }

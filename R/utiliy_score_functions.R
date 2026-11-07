@@ -220,7 +220,7 @@ socket_compute_flip <- function(scores,flip_param_call){
   #attributes(scores)$Xr
   dispersion=attributes(scores)$dispersion
   for(i in seq(length(results))){
-    nrm2=sum(attributes(scores)$Xr[,i]^2)
+    nrm2=sum(attributes(scores)$Xresid_std[,i]^2)
     results[[i]]$Tspace=results[[i]]$Tspace/sqrt(dispersion*nrm2)
   }
   results

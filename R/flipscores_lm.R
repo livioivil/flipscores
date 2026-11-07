@@ -175,20 +175,6 @@ formula_to_matrices <- function(formula, data) {
 
 
 
-# for standardized (see in flipscores):
-.score_std=function(flp,scores_objs) {
-  # scr_eff # un vettore
-
-  numerator=crossprod(flp,scores_objs$scores) #t(scr_eff)%*%flp
-  if (all(sign(flp)==1)|(all(sign(flp)==-1))){
-    denominator = 1
-  } else {
-    denominator = 1 - sum((colSums(attributes(scores)$scale_objects$A[flp==1,,drop=FALSE])
-                          -colSums(attributes(scores)$scale_objects$A[flp==-1,,drop=FALSE]))^2)
-  }
-  as.vector(numerator/((denominator)**0.5))
-}
-
 ######################
 #X solo colonna
 .get_scores<- function(X,Y,Z){
@@ -200,7 +186,13 @@ formula_to_matrices <- function(formula, data) {
   A=Xr[,]*Q/sqrt(m)
   scores=Xr[,]*Yr
 
-  attr(scores,"scale_objects")=list(A=A)
+  df0=nrow(Y)-qr(Z)$rank
+  if(df0<=0L)
+    stop("No residual degrees of freedom under H0.")
+  resid_sd=sqrt(colSums(Yr^2)/df0)
+
+  attr(scores,"scale_objects")=list(A=A,resid_sd=resid_sd)
+  attr(scores,"Xnorm2")=m
   scores
 }
 

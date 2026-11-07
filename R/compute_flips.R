@@ -82,5 +82,11 @@ compute_flips<- function(scores,alternative="two.sided",
   if(is.matrix(Tspace)) Tspace=t(Tspace)
   if(is.vector(Tspace)) Tspace=matrix(Tspace)
 
+  score_sd0=sqrt(attr(scores,"Xnorm2"))*
+    attr(scores,"scale_objects")$resid_sd
+  if(any(!is.finite(score_sd0)|score_sd0<=0))
+    stop("The null-model score scale must be finite and positive.")
+  Tspace=sweep(Tspace,2L,score_sd0,FUN="/")
+
   return(Tspace)
 }

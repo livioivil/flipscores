@@ -180,7 +180,12 @@ compute_scores <- function(model0, model1, score_type = "standardized", ...){
 
 
   std_dev=get_std_dev_score(model0,X)
-  attr(scores,"dispersion")=.get_dispersion(model0)
+  dispersion=.get_dispersion(model0)
+  scale_objects=lapply(scale_objects, function(object) {
+    object$resid_sd=sqrt(dispersion)
+    object
+  })
+  attr(scores,"dispersion")=dispersion
   attr(scores,"sd")=std_dev
   attr(scores,"scale_objects")=scale_objects
   attr(scores,"score_type")=score_type

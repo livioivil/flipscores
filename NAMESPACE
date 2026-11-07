@@ -2,10 +2,12 @@
 
 S3method(anova,flipscores)
 S3method(as.data.frame,jfs)
+S3method(as.jfs,fs_contrasts)
 S3method(c,jfs)
 S3method(confint,flipscores)
 S3method(model.matrix,fs_contrasts)
 S3method(model.matrix,fs_lm)
+S3method(plot,jfs)
 S3method(print,custom_contrast_matrix)
 S3method(print,custom_contrasts)
 S3method(print,flipscores)
@@ -20,6 +22,7 @@ S3method(summary,jfs)
 S3method(update,flipscores)
 S3method(update,fs_contrasts)
 export(as.jfs)
+export(as.jfs.fs_contrasts)
 export(combine_contrasts)
 export(combine_tests)
 export(compute_scores)
@@ -30,34 +33,38 @@ export(gcor)
 export(make_flips)
 export(p.adjust)
 importFrom(MASS,glm.nb)
-importFrom(graphics,hist)
-importFrom(graphics,par)
+importFrom(graphics,
+  hist,
+  par
+)
 importFrom(methods,is)
-importFrom(stats,D)
-importFrom(stats,as.formula)
-importFrom(stats,binomial)
-importFrom(stats,coef)
-importFrom(stats,coefficients)
-importFrom(stats,complete.cases)
-importFrom(stats,fitted)
-importFrom(stats,formula)
-importFrom(stats,gaussian)
-importFrom(stats,getCall)
-importFrom(stats,glm)
-importFrom(stats,median)
-importFrom(stats,model.matrix)
-importFrom(stats,p.adjust)
-importFrom(stats,pchisq)
-importFrom(stats,plogis)
-importFrom(stats,pnorm)
-importFrom(stats,predict)
-importFrom(stats,qnorm)
-importFrom(stats,quantile)
-importFrom(stats,rbinom)
-importFrom(stats,reformulate)
-importFrom(stats,rnorm)
-importFrom(stats,sd)
-importFrom(stats,summary.glm)
-importFrom(stats,terms)
-importFrom(stats,update)
-importFrom(stats,update.formula)
+importFrom(stats,
+  D,
+  as.formula,
+  binomial,
+  coef,
+  coefficients,
+  complete.cases,
+  fitted,
+  formula,
+  gaussian,
+  getCall,
+  glm,
+  median,
+  model.matrix,
+  p.adjust,
+  pchisq,
+  plogis,
+  pnorm,
+  predict,
+  qnorm,
+  quantile,
+  rbinom,
+  reformulate,
+  rnorm,
+  sd,
+  summary.glm,
+  terms,
+  update,
+  update.formula
+)
