@@ -13,6 +13,12 @@
 
 - **Andrea Panarotto**. Contributor.
 
+- **Angela Andreella**. Author.
+
+- **Anna Vesely**. Author.
+
+- **Filippo Gambarota**. Contributor.
+
 ## Citation
 
 Hemerik J, Goeman J, Finos L (2020). “Robust testing in generalized

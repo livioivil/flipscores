@@ -121,16 +121,15 @@ mod0 <- flipscores(Y~Z+X,data=dt,family="poisson")
 summary(mod0)
 #> 
 #> Call:
-#> flipscores(formula = Y ~ Z + X, family = "poisson", data = dt)
+#> flipscores(formula = Y ~ Z + X, family = "poisson(link='log')", 
+#>     data = dt)
 #> 
 #> Coefficients:
-#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)   
-#> (Intercept)  -0.3513 -5.4234     4.2404 -1.2790    -0.169   0.1204   
-#> ZB            0.2276  1.8048     2.8140  0.6414     0.079   0.4588   
-#> ZC            0.9034 10.3392     3.4527  2.9945     0.348   0.0216 * 
-#> X             0.6381 33.1168     8.0470  4.1154     0.478   0.0092 **
-#> ---
-#> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#>             estimate    score       se        z     pcor     p
+#> (Intercept) -0.35133 -5.42336  4.24036 -1.27899 -0.16912 0.116
+#> ZB           0.22762  1.80483  2.81403  0.64137  0.07908 0.444
+#> ZC           0.90344 10.33921  3.45268  2.99454  0.34843 0.025
+#> X            0.63808 33.11677  8.04700  4.11542  0.47835 0.009
 #> 
 #> (Dispersion parameter for poisson family taken to be 1)
 #> 
@@ -142,34 +141,16 @@ summary(mod0)
 #> 
 confint(mod0, parm="X")
 #>       2.5 %   97.5 %
-#> X 0.1826524 1.152251
+#> X 0.1038972 1.249294
 
 xx <- rnorm(20)
 zz <- rnorm(20, 0.2 * xx)
 yy <- rnorm(20, 1 + 2 * xx - zz)
 flps <- make_flips(20, 1000)
 mod1 <- flipscores(yy ~ xx + zz)
+#> Error in as.data.frame.default(value): cannot coerce class ‘"function"’ to a data.frame
 summary(mod1)
-#> 
-#> Call:
-#> flipscores(formula = yy ~ xx + zz)
-#> 
-#> Coefficients:
-#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)    
-#> (Intercept)    1.071  21.079      6.848   3.078     0.725   0.0008 ***
-#> xx             2.528  66.413     16.574   4.007     0.944   0.0002 ***
-#> zz            -1.507 -22.699      6.755  -3.360    -0.792   0.0016 ** 
-#> ---
-#> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-#> 
-#> (Dispersion parameter for gaussian family taken to be 1.195032)
-#> 
-#>     Null deviance: 194.047  on 19  degrees of freedom
-#> Residual deviance:  20.316  on 17  degrees of freedom
-#> AIC: 65.071
-#> 
-#> Number of Fisher Scoring iterations: 2
-#> 
+#> Error: object 'mod1' not found
 confint(mod1, flips = flps)
-#> Error in eval(parse(text = .form___)): object 'yy' not found
+#> Error: object 'mod1' not found
 ```

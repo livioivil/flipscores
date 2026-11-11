@@ -139,17 +139,15 @@ mod=flipscores(Y~Z+X,data=dt,family="poisson",n_flips=1000)
 summary(mod)
 #> 
 #> Call:
-#> flipscores(formula = Y ~ Z + X, family = "poisson", data = dt, 
-#>     n_flips = 1000)
+#> flipscores(formula = Y ~ Z + X, family = "poisson(link='log')", 
+#>     data = dt, n_flips = 1000)
 #> 
 #> Coefficients:
-#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)   
-#> (Intercept) -0.14256 -0.91360    2.62144 -0.34851    -0.127    0.725   
-#> ZB          -0.18558 -0.50868    1.65785 -0.30683    -0.108    0.681   
-#> ZC           1.40981  8.55380    2.58950  3.30326     0.765    0.004 **
-#> X           -0.06964 -1.56935    4.70999 -0.33320    -0.117    0.670   
-#> ---
-#> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#>             estimate    score       se        z     pcor     p
+#> (Intercept) -0.14256 -0.91360  2.62144 -0.34851 -0.12658 0.734
+#> ZB          -0.18558 -0.50868  1.65785 -0.30683 -0.10810 0.672
+#> ZC           1.40981  8.55380  2.58950  3.30326  0.76519 0.001
+#> X           -0.06964 -1.56935  4.70999 -0.33320 -0.11745 0.655
 #> 
 #> (Dispersion parameter for poisson family taken to be 1)
 #> 
@@ -193,17 +191,15 @@ mod=flipscores(Y~Z+X,data=dt,family="binomial",n_flips=1000)
 summary(mod)
 #> 
 #> Call:
-#> flipscores(formula = Y ~ Z + X, family = "binomial", data = dt, 
-#>     n_flips = 1000)
+#> flipscores(formula = Y ~ Z + X, family = "binomial(link='logit')", 
+#>     data = dt, n_flips = 1000)
 #> 
 #> Coefficients:
-#>             Estimate    Score Std. Error  z value Part. Cor Pr(>|z|)  
-#> (Intercept)  -0.1486  -0.2102     1.1881  -0.1770    -0.067    0.900  
-#> ZB          -20.4539  -1.4784     0.7466  -1.9802    -0.530    0.065 .
-#> ZC           20.8561   1.8043     0.8180   2.2057     0.615    0.030 *
-#> X            -0.4276  -0.3782     0.9574  -0.3951    -0.149    0.735  
-#> ---
-#> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#>              estimate     score        se         z      pcor     p
+#> (Intercept)  -0.14858  -0.21025   1.18815  -0.17696  -0.06718 0.870
+#> ZB          -20.45393  -1.47837   0.74659  -1.98016  -0.52957 0.059
+#> ZC           20.85614   1.80427   0.81801   2.20568   0.61463 0.033
+#> X            -0.42757  -0.37825   0.95742  -0.39507  -0.14932 0.740
 #> 
 #> (Dispersion parameter for binomial family taken to be 1)
 #> 
@@ -225,4 +221,61 @@ gcor(mod, terms = c("X", "ZC"),normalize=TRUE)
 #> X     ~X -0.1493213 -0.3669599   ~1+ZB+ZC
 #> ZC   ~ZC  0.6146304        NaN    ~1+ZB+X
 
+
+############################
+set.seed(1)
+Z=rnorm(20)
+X=Z+rnorm(20)-10
+Y=rpois(n=20,lambda=exp(Z+.25*X))
+model1=glm(Y~Z+X,family="poisson")
+gcor(model1)
+#>   terms       gcor null_model
+#> 1    ~Z -0.2379952       ~1+X
+#> 2    ~X  0.3139891       ~1+Z
+gcor(model1, normalize=TRUE)
+#>   terms          r        r_n null_model
+#> Z    ~Z -0.2379952 -0.4708683       ~1+X
+#> X    ~X  0.3139891  0.4983668       ~1+Z
+#normalized_gcor_poisson(model1, "X", verbose = TRUE)[1:3]
+model0=glm(Y~Z,family="poisson")
+if (FALSE) sapply(c('v','kl','sse','lr','n'),function(type) rsq.partial(model1,model0,type=type)$partial.rsq) # \dontrun{}
+
+set.seed(1)
+Z=rnorm(20)
+X=Z+rnorm(20)
+Y=rbinom(n=20,1,prob=plogis((-.5*Z+1*X)))
+model1=glm(Y~Z+X,family="binomial")
+gcor(model1)
+#>   terms       gcor null_model
+#> 1    ~Z -0.1852201       ~1+X
+#> 2    ~X  0.3229866       ~1+Z
+gcor(model1, normalize=TRUE)
+#>   terms          r        r_n null_model
+#> Z    ~Z -0.1852201 -0.2467218       ~1+X
+#> X    ~X  0.3229866  0.4340634       ~1+Z
+#normalized_gcor_binomial(model1, "X", verbose = TRUE)[1:3]
+model0=glm(Y~Z,family="binomial")
+if (FALSE) sapply(c('v','kl','sse','lr','n'),function(type) rsq.partial(model1,model0,type=type)$partial.rsq) # \dontrun{}#'
+
+set.seed(1)
+Z=rnorm(20)
+X=10+Z+rnorm(20)
+Y=rnorm(n=20,mean=(Z+2*X))
+model1=glm(Y~Z+X)
+gcor(model1)
+#>   terms      gcor null_model
+#> 1    ~Z 0.7986106       ~1+X
+#> 2    ~X 0.8963620       ~1+Z
+gcor(model1, normalize=TRUE)
+#>   terms         r       r_n null_model
+#> Z    ~Z 0.7986106 0.7986106       ~1+X
+#> X    ~X 0.8963620 0.8963620       ~1+Z
+
+#library(rsq)
+model0x=glm(X~Z)
+model0y=glm(Y~Z)
+#t(.nrmz(resid(model0x)))%*% .nrmz(resid(model0y))
+#library(ppcor)
+#pcor(cbind(X,Z,Y))
+if (FALSE) sapply(c('v','kl','sse','lr','n'),function(type) rsq.partial(model1,model0,type=type)$partial.rsq) # \dontrun{}
 ```

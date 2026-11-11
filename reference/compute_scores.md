@@ -1,12 +1,14 @@
 # compute_scores
 
-Same usage as `anova.glm`. The parameter `id` is used too, if present in
-`model0` (with priority) or in `model1`.
+Computes Score contributions for variables in `model1` (or derived from
+) under the null model `model0`. Same usage as `anova.glm`. The
+parameter `id` is used too, if present in `model0` (with priority) or in
+`model1`.
 
 ## Usage
 
 ``` r
-compute_scores(model0, model1, score_type = "standardized", ...)
+compute_scores(model0, model1, score_type = "standardized", ..., id = NULL)
 ```
 
 ## Arguments
@@ -34,10 +36,14 @@ compute_scores(model0, model1, score_type = "standardized", ...)
 
   other arguments.
 
+- id:
+
+  Cluster identifiers, a column name, or a one-sided formula. The
+  resolved vector is stored in `attr(scores, "id")`, in score-row order.
+
 ## Author
 
-Jesse Hemerik, Riccardo De Santis, Vittorio Giatti, Jelle Goeman and
-Livio Finos
+Jesse Hemerik, Riccardo De Santis, Jelle Goeman and Livio Finos
 
 ## Examples
 

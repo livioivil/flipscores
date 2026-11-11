@@ -14,8 +14,8 @@ anova(object, model1 = NULL, score_type = NULL, n_flips = 5000, id = NULL, ...)
 
 - object:
 
-  (the object) `glm` (or `flipscores`) object with the model under the
-  null hypothesis (i.e. the covariates, the nuisance parameters).
+  `glm` (or `flipscores`) object with the model under the null
+  hypothesis (i.e. the covariates, the nuisance parameters).
 
 - model1:
 
@@ -61,16 +61,15 @@ mod0=flipscores(Y~Z+X,data=dt,family="poisson")
 summary(mod0)
 #> 
 #> Call:
-#> flipscores(formula = Y ~ Z + X, family = "poisson", data = dt)
+#> flipscores(formula = Y ~ Z + X, family = "poisson(link='log')", 
+#>     data = dt)
 #> 
 #> Coefficients:
-#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)   
-#> (Intercept)  -0.3513 -5.4234     4.2404 -1.2790    -0.169   0.1258   
-#> ZB            0.2276  1.8048     2.8140  0.6414     0.079   0.4646   
-#> ZC            0.9034 10.3392     3.4527  2.9945     0.348   0.0252 * 
-#> X             0.6381 33.1168     8.0470  4.1154     0.478   0.0090 **
-#> ---
-#> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#>             estimate    score       se        z     pcor     p
+#> (Intercept) -0.35133 -5.42336  4.24036 -1.27899 -0.16912 0.119
+#> ZB           0.22762  1.80483  2.81403  0.64137  0.07908 0.446
+#> ZC           0.90344 10.33921  3.45268  2.99454  0.34843 0.023
+#> X            0.63808 33.11677  8.04700  4.11542  0.47835 0.013
 #> 
 #> (Dispersion parameter for poisson family taken to be 1)
 #> 
@@ -88,28 +87,25 @@ anova(mod0)
 #> Inference is provided by FlipScores approach (5000 sign flips).
 #> 
 #> Model: Y ~ Z + X
-#>   Df  Score Pr(>Score)   
-#> Z  2 4.5108     0.0964 . 
-#> X  1 0.0346     0.0090 **
-#> ---
-#> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#>   Ncoeff Mahalanobis      p
+#> Z      2      4.5551 0.0934
+#> X      1      0.0342 0.0126
 
 mod1=flipscores(Y~Z*X,data=dt,family="poisson")
 summary(mod1)
 #> 
 #> Call:
-#> flipscores(formula = Y ~ Z * X, family = "poisson", data = dt)
+#> flipscores(formula = Y ~ Z * X, family = "poisson(link='log')", 
+#>     data = dt)
 #> 
 #> Coefficients:
-#>             Estimate   Score Std. Error z value Part. Cor Pr(>|z|)  
-#> (Intercept)  -0.3549 -4.3865     3.8867 -1.1286    -0.189   0.0950 .
-#> ZB            0.3570  2.3488     2.6093  0.9002     0.145   0.3076  
-#> ZC            0.6023  3.3952     2.3099  1.4698     0.235   0.0736 .
-#> X             0.6439  8.1773     3.6816  2.2211     0.331   0.1274  
-#> ZB:X         -0.5979 -3.8933     2.5112 -1.5504    -0.238   0.3474  
-#> ZC:X          0.4856  2.8440     2.4290  1.1709     0.184   0.2360  
-#> ---
-#> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#>             estimate   score      se       z    pcor     p
+#> (Intercept)  -0.3549 -4.3865  3.8867 -1.1286 -0.1888 0.096
+#> ZB            0.3570  2.3488  2.6093  0.9002  0.1452 0.315
+#> ZC            0.6023  3.3952  2.3099  1.4698  0.2347 0.067
+#> X             0.6439  8.1773  3.6816  2.2211  0.3310 0.132
+#> ZB:X         -0.5979 -3.8933  2.5112 -1.5504 -0.2382 0.346
+#> ZC:X          0.4856  2.8440  2.4290  1.1709  0.1836 0.226
 #> 
 #> (Dispersion parameter for poisson family taken to be 1)
 #> 
@@ -128,8 +124,6 @@ anova(mod0,model1 = mod1)
 #> 
 #> Model 1: Y ~ Z + X
 #> Model 2: Y ~ Z * X
-#>                    Df Score Pr(>Score)  
-#> Model 2 vs Model 1  2 4.496     0.0744 .
-#> ---
-#> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#>                    Ncoeff Mahalanobis      p
+#> Model 2 vs Model 1      2      4.6734 0.0596
 ```
