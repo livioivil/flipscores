@@ -32,9 +32,9 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             estimate    score       se        z     pcor     p
-#> (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.937
-#> ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.957
-#> ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.645
+#> (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.929
+#> ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.956
+#> ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.660
 #> X            0.89732 35.59669  6.63014  5.36892  0.72553 0.000
 #> 
 #> (Dispersion parameter for poisson family taken to be 1)
@@ -63,8 +63,8 @@ anova(mod)
 #> 
 #> Model: Y ~ Z + X
 #>   Ncoeff Mahalanobis      p
-#> Z      2    0.247415 0.8968
-#> X      1    0.042301 0.0004
+#> Z      2    0.231747 0.9050
+#> X      1    0.042668 0.0002
 # or
 mod0 <- flipscores(Y~Z,data=dt,family="poisson",x=TRUE)
 anova(mod0,mod)
@@ -77,7 +77,7 @@ anova(mod0,mod)
 #> Model 1: Y ~ Z
 #> Model 2: Y ~ Z + X
 #>                    Ncoeff Mahalanobis     p
-#> Model 2 vs Model 1      1    0.041869 2e-04
+#> Model 2 vs Model 1      1    0.041915 4e-04
 # and
 mod0 <- flipscores(Y~X,data=dt,family="poisson",x=TRUE)
 anova(mod0,mod)
@@ -89,8 +89,8 @@ anova(mod0,mod)
 #> 
 #> Model 1: Y ~ X
 #> Model 2: Y ~ Z + X
-#>                    Ncoeff Mahalanobis      p
-#> Model 2 vs Model 1      2     0.28261 0.8828
+#>                    Ncoeff Mahalanobis     p
+#> Model 2 vs Model 1      2     0.26115 0.894
 ```
 
 Equivalently, one might apply the `flipscores` function to a precomputed
@@ -107,9 +107,9 @@ summary(mod2)
 #> 
 #> Coefficients:
 #>             estimate    score       se        z     pcor     p
-#> (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.936
-#> ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.956
-#> ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.642
+#> (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.930
+#> ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.955
+#> ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.665
 #> X            0.89732 35.59669  6.63014  5.36892  0.72553 0.000
 #> 
 #> (Dispersion parameter for poisson family taken to be 1)
@@ -139,9 +139,9 @@ summary(flipscores(model, flips = flps))
 #> 
 #> Coefficients:
 #>             estimate    score       se        z     pcor     p
-#> (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.938
-#> ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.955
-#> ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.631
+#> (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.943
+#> ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.951
+#> ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.640
 #> X            0.89732 35.59669  6.63014  5.36892  0.72553 0.001
 #> 
 #> (Dispersion parameter for poisson family taken to be 1)
@@ -159,9 +159,9 @@ summary(flipscores(model, flips = flps))
 #> 
 #> Coefficients:
 #>             estimate    score       se        z     pcor     p
-#> (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.938
-#> ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.955
-#> ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.631
+#> (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.943
+#> ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.951
+#> ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.640
 #> X            0.89732 35.59669  6.63014  5.36892  0.72553 0.001
 #> 
 #> (Dispersion parameter for poisson family taken to be 1)
@@ -185,9 +185,9 @@ summary(flipscores(model, alternative = "less"))
 #> 
 #> Coefficients:
 #>             estimate    score       se        z     pcor     p
-#> (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.930
-#> ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.959
-#> ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.641
+#> (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.938
+#> ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.953
+#> ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.655
 #> X            0.89732 35.59669  6.63014  5.36892  0.72553 0.000
 #> 
 #> (Dispersion parameter for poisson family taken to be 1)
@@ -205,9 +205,9 @@ summary(flipscores(model, alternative = "greater"))
 #> 
 #> Coefficients:
 #>             estimate    score       se        z     pcor     p
-#> (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.936
-#> ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.959
-#> ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.665
+#> (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.943
+#> ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.965
+#> ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.662
 #> X            0.89732 35.59669  6.63014  5.36892  0.72553 0.000
 #> 
 #> (Dispersion parameter for poisson family taken to be 1)
@@ -252,7 +252,7 @@ summary(flipscores(model, to_be_tested = c(1, 4), flips = flps))
 #> 
 #> Coefficients:
 #>             estimate    score       se        z     pcor     p
-#> (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.938
+#> (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.943
 #> ZB           0.02318       NA       NA       NA       NA    NA
 #> ZC           0.15946       NA       NA       NA       NA    NA
 #> X            0.89732 35.59669  6.63014  5.36892  0.72553 0.001
@@ -283,7 +283,7 @@ summary(flipscores(model, to_be_tested = "ZB", flips = flps))
 #> Coefficients:
 #>             estimate   score      se       z    pcor     p
 #> (Intercept)  0.02207      NA      NA      NA      NA    NA
-#> ZB           0.02318 0.13383 2.39994 0.05576 0.01165 0.955
+#> ZB           0.02318 0.13383 2.39994 0.05576 0.01165 0.951
 #> ZC           0.15946      NA      NA      NA      NA    NA
 #> X            0.89732      NA      NA      NA      NA    NA
 #> 
@@ -303,7 +303,7 @@ summary(flipscores(model, to_be_tested = 2, flips = flps))
 #> Coefficients:
 #>             estimate   score      se       z    pcor     p
 #> (Intercept)  0.02207      NA      NA      NA      NA    NA
-#> ZB           0.02318 0.13383 2.39994 0.05576 0.01165 0.955
+#> ZB           0.02318 0.13383 2.39994 0.05576 0.01165 0.951
 #> ZC           0.15946      NA      NA      NA      NA    NA
 #> X            0.89732      NA      NA      NA      NA    NA
 #> 
@@ -325,17 +325,17 @@ Negative Binomial family. This, in particular, should be indicated as
 summary(flipscores(Y ~ Z + X, data = dt, family = "negbinom"))
 #> 
 #> Call:
-#> flipscores(formula = Y ~ Z + X, family = "Negative Binomial(20776.65)(link='log')", 
+#> flipscores(formula = Y ~ Z + X, family = "Negative Binomial(20776.66)(link='log')", 
 #>     data = dt)
 #> 
 #> Coefficients:
 #>             estimate    score       se        z     pcor     p
-#> (Intercept)  0.02208  0.26385  3.18354  0.08288  0.01595 0.935
-#> ZB           0.02316  0.13368  2.20995  0.06049  0.01164 0.959
-#> ZC           0.15946  1.36541  2.72310  0.50142  0.09650 0.645
+#> (Intercept)  0.02208  0.26385  3.18354  0.08288  0.01595 0.939
+#> ZB           0.02316  0.13368  2.20995  0.06049  0.01164 0.956
+#> ZC           0.15946  1.36541  2.72310  0.50142  0.09650 0.655
 #> X            0.89733 17.36132  4.68164  3.70839  0.71368 0.000
 #> 
-#> (Dispersion parameter for Negative Binomial(20776.65) family taken to be 0.8801237)
+#> (Dispersion parameter for Negative Binomial(20776.66) family taken to be 0.8801237)
 #> 
 #>     Null deviance: 60.815  on 29  degrees of freedom
 #> Residual deviance: 26.636  on 26  degrees of freedom
@@ -355,10 +355,10 @@ confint(mod, n_flips = 1000)
 #> Warning in FUN(X[[i]], ...): A confidence bound was not found in the search
 #> interval -- returning Inf
 #>                  2.5 %    97.5 %
-#> (Intercept) -1.0782344 0.6344857
-#> ZB                -Inf 0.9538402
-#> ZC          -0.8221180 1.0590446
-#> X            0.5996654 1.4233455
+#> (Intercept) -1.0555876 0.5450911
+#> ZB                -Inf 1.0271845
+#> ZC          -0.8599954 1.0963035
+#> X            0.6129726 1.4230358
 ```
 
 As before, various options are allowed, including the possibility to
@@ -368,16 +368,16 @@ generate symmetric confidence intervals.
 
 confint(mod, parm = 4, flips = flps) # parm == to_be_tested!
 #>       2.5 %   97.5 %
-#> X 0.5780193 1.446592
+#> X 0.5880275 1.404361
 confint(mod, parm = 4, level = 0.99, flips = flps)
-#>       0.5 %   99.5 %
-#> X 0.4604931 1.766795
+#>      0.5 %   99.5 %
+#> X 0.467007 1.619172
 confint(mod, parm = 4, alternative = "greater", flips = flps)
-#>        Est.    95 %
-#> X 0.8973217 1.31611
+#>        Est.     95 %
+#> X 0.8973217 1.308084
 confint(mod, parm = 4, type = "symmetric", flips = flps)
 #>       2.5 %   97.5 %
-#> X 0.4586757 1.335968
+#> X 0.4702724 1.324371
 ```
 
 ## Other examples
@@ -570,9 +570,9 @@ summary(res)
 #> 
 #> Coefficients:
 #>             estimate    score       se        z     pcor     p
-#> (Intercept)  0.10358  5.15889  5.96233  0.86525  0.12489 0.393
-#> x1          -0.04491 -2.41629  6.15867 -0.39234 -0.05663 0.699
-#> x2           0.02313  1.20293  6.04796  0.19890  0.02871 0.819
+#> (Intercept)  0.10358  5.15889  5.96233  0.86525  0.12489 0.383
+#> x1          -0.04491 -2.41629  6.15867 -0.39234 -0.05663 0.704
+#> x2           0.02313  1.20293  6.04796  0.19890  0.02871 0.818
 #> 
 #> (Dispersion parameter for gaussian family taken to be 0.7175968)
 #> 
@@ -591,7 +591,7 @@ summary(res_lm)
 #> score_type = Standardized, n_flips = , alternative = two.sided
 #> 
 #>  response coefficient score p.values
-#>        y1          x2 1.203   0.8272
+#>        y1          x2 1.203   0.8192
 
 models <- list(
   glm(y1 ~ x1 + x2, data = df, family = gaussian()),
@@ -620,20 +620,20 @@ summary(res)
 #> 13  mod4        y sexM:age_groupYoung -1.42334 -0.7735 0.7440 -1.0396 -0.13456
 #> 14  mod5       y1                <NA>       NA  1.2029     NA      NA       NA
 #>         p p.values
-#> 1  0.3852       NA
-#> 2  0.7062       NA
-#> 3  0.8228       NA
-#> 4  0.7170       NA
-#> 5  0.3020       NA
-#> 6  0.1332       NA
-#> 7  0.3020       NA
-#> 8  0.1550       NA
-#> 9  0.6206       NA
-#> 10 0.3524       NA
-#> 11 0.6696       NA
-#> 12 0.9202       NA
-#> 13 0.3274       NA
-#> 14     NA   0.8228
+#> 1  0.3922       NA
+#> 2  0.7082       NA
+#> 3  0.8222       NA
+#> 4  0.7096       NA
+#> 5  0.3054       NA
+#> 6  0.1494       NA
+#> 7  0.3054       NA
+#> 8  0.1542       NA
+#> 9  0.6244       NA
+#> 10 0.3652       NA
+#> 11 0.6850       NA
+#> 12 0.9210       NA
+#> 13 0.3232       NA
+#> 14     NA   0.8222
 
 
 flipscores_lm(y1 ~ x1 + x2, data = df)

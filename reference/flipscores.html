@@ -102,7 +102,12 @@ one-sided formula such as <code>~ids</code>. Column names and formulas are
 evaluated in <code>data</code>, or separately in each fitted model's original
 data for a list of models. With <code>NULL</code>, rows are matched by row names.
 Repeated IDs are aligned by occurrence, with the maximum multiplicity
-across models, and all occurrences share the same random sign.</p></dd>
+across models, and all occurrences share the same random sign.
+A supplied vector is applied unchanged to every model and must match each
+model's number of score rows, after <code>subset</code> and missing-value removal.
+A length mismatch is an error; values are never recycled or truncated.
+For models with different fitted row counts, consider <code>id = ~ids</code> or
+<code>id = "ids"</code>, with an ID column present in every model's data.</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
@@ -171,8 +176,8 @@ flipscores engine.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             estimate    score       se        z     pcor     p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  0.10358  5.15889  5.96233  0.86525  0.12489 0.399</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> x1          -0.04491 -2.41629  6.15867 -0.39234 -0.05663 0.700</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  0.10358  5.15889  5.96233  0.86525  0.12489 0.390</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> x1          -0.04491 -2.41629  6.15867 -0.39234 -0.05663 0.709</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> x2           0.02313  1.20293  6.04796  0.19890  0.02871 0.825</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (Dispersion parameter for gaussian family taken to be 0.7175968)</span>
@@ -193,21 +198,40 @@ flipscores engine.</p></dd>
 <span class="r-in"><span><span class="va">res</span><span class="op">=</span><span class="fu">flipscores</span><span class="op">(</span><span class="va">models</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   model response coefficient estimate   score    se       z     pcor      p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  mod1       y1 (Intercept)  0.10358   5.159 5.962  0.8652  0.12489 0.3896</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  mod1       y1          x1 -0.04491  -2.416 6.159 -0.3923 -0.05663 0.6944</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  mod1       y1          x2  0.02313   1.203 6.048  0.1989  0.02871 0.8170</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  mod2       y2 (Intercept)  0.13022   6.486 6.650  0.9752  0.14076 0.3466</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  mod2       y2          x1 -0.22619 -12.171 7.066 -1.7225 -0.24863 0.0346</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  mod2       y2          x2 -0.17934  -9.329 6.862 -1.3594 -0.19621 0.1250</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7  mod3       yb (Intercept) -0.23693  -2.705 3.385 -0.7992 -0.11326 0.4366</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  mod3       yb          x1 -0.47375  -5.801 3.590 -1.6159 -0.22891 0.0924</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  mod3       yb          x2 -0.38289  -4.558 3.490 -1.3058 -0.18499 0.2354</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  mod1       y1 (Intercept)  0.10358   5.159 5.962  0.8652  0.12489 0.3936</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  mod1       y1          x1 -0.04491  -2.416 6.159 -0.3923 -0.05663 0.7040</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  mod1       y1          x2  0.02313   1.203 6.048  0.1989  0.02871 0.8122</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  mod2       y2 (Intercept)  0.13022   6.486 6.650  0.9752  0.14076 0.3394</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  mod2       y2          x1 -0.22619 -12.171 7.066 -1.7225 -0.24863 0.0364</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  mod2       y2          x2 -0.17934  -9.329 6.862 -1.3594 -0.19621 0.1288</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  mod3       yb (Intercept) -0.23693  -2.705 3.385 -0.7992 -0.11326 0.4378</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  mod3       yb          x1 -0.47375  -5.801 3.590 -1.6159 -0.22891 0.0918</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  mod3       yb          x2 -0.38289  -4.558 3.490 -1.3058 -0.18499 0.2236</span>
 <span class="r-in"><span><span class="va">res</span><span class="op">=</span><span class="fu">flipscores</span><span class="op">(</span><span class="va">models</span>, to_be_tested <span class="op">=</span> <span class="st">"x1"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   model response coefficient estimate   score    se       z     pcor      p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  mod1       y1          x1 -0.04491  -2.416 6.159 -0.3923 -0.05663 0.7124</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  mod2       y2          x1 -0.22619 -12.171 7.066 -1.7225 -0.24863 0.0272</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  mod3       yb          x1 -0.47375  -5.801 3.590 -1.6159 -0.22891 0.0900</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  mod1       y1          x1 -0.04491  -2.416 6.159 -0.3923 -0.05663 0.7000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  mod2       y2          x1 -0.22619 -12.171 7.066 -1.7225 -0.24863 0.0342</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  mod3       yb          x1 -0.47375  -5.801 3.590 -1.6159 -0.22891 0.0926</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Different dataset sizes: resolve IDs separately in each model's data</span></span></span>
+<span class="r-in"><span><span class="va">df</span><span class="op">$</span><span class="va">ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">n</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span>, each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">df_short</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">5</span>, <span class="fl">9</span><span class="op">)</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">models_by_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  full <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">y1</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  shorter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">y2</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span>, data <span class="op">=</span> <span class="va">df_short</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># A shared vector of length 50 cannot match the shorter model's 47 rows:</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu">flipscores</span><span class="op">(</span><span class="va">models_by_id</span>, id <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">ids</span>, to_be_tested <span class="op">=</span> <span class="st">"x1"</span>, n_flips <span class="op">=</span> <span class="fl">99</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">conditionMessage</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The supplied 'id' vector has length 50, but model 'shorter' has 47 score rows. A vector must have one value per score row in every model, after subset and missing-value removal. Consider using id = ~ids or id = "ids" to read an ID column from each model's own data.</span>
+<span class="r-in"><span><span class="co"># These forms support different row counts and cluster flips by the same IDs:</span></span></span>
+<span class="r-in"><span><span class="va">res_by_id</span> <span class="op">&lt;-</span> <span class="fu">flipscores</span><span class="op">(</span><span class="va">models_by_id</span>, id <span class="op">=</span> <span class="op">~</span><span class="va">ids</span>, to_be_tested <span class="op">=</span> <span class="st">"x1"</span>,</span></span>
+<span class="r-in"><span>                        n_flips <span class="op">=</span> <span class="fl">99</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">res_by_name</span> <span class="op">&lt;-</span> <span class="fu">flipscores</span><span class="op">(</span><span class="va">models_by_id</span>, id <span class="op">=</span> <span class="st">"ids"</span>, to_be_tested <span class="op">=</span> <span class="st">"x1"</span>,</span></span>
+<span class="r-in"><span>                          n_flips <span class="op">=</span> <span class="fl">99</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Case 3: list of formulas, same family</span></span></span>
 <span class="r-in"><span><span class="va">res</span><span class="op">=</span><span class="fu">flipscores</span><span class="op">(</span></span></span>
@@ -217,34 +241,34 @@ flipscores engine.</p></dd>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   model response coefficient estimate   score    se       z     pcor      p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  mod1       y1 (Intercept)  0.10358   5.159 5.962  0.8652  0.12489 0.3878</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  mod1       y1 (Intercept)  0.10358   5.159 5.962  0.8652  0.12489 0.3904</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2  mod1       y1          x1 -0.04491  -2.416 6.159 -0.3923 -0.05663 0.6980</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  mod1       y1          x2  0.02313   1.203 6.048  0.1989  0.02871 0.8206</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  mod1       y1          x2  0.02313   1.203 6.048  0.1989  0.02871 0.8264</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4  mod2       y2 (Intercept)  0.13022   6.486 6.650  0.9752  0.14076 0.3394</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  mod2       y2          x1 -0.22619 -12.171 7.066 -1.7225 -0.24863 0.0312</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  mod2       y2          x2 -0.17934  -9.329 6.862 -1.3594 -0.19621 0.1302</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  mod2       y2          x1 -0.22619 -12.171 7.066 -1.7225 -0.24863 0.0292</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  mod2       y2          x2 -0.17934  -9.329 6.862 -1.3594 -0.19621 0.1324</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Case 4: matrix response, gaussian</span></span></span>
 <span class="r-in"><span><span class="va">res</span><span class="op">=</span><span class="fu">flipscores</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y1</span>, <span class="va">y2</span><span class="op">)</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian</a></span><span class="op">(</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   model response coefficient estimate   score    se       z     pcor      p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  mod1       y1 (Intercept)  0.10358   5.159 5.962  0.8652  0.12489 0.3886</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  mod1       y1          x1 -0.04491  -2.416 6.159 -0.3923 -0.05663 0.7000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  mod1       y1          x2  0.02313   1.203 6.048  0.1989  0.02871 0.8196</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  mod2       y2 (Intercept)  0.13022   6.486 6.650  0.9752  0.14076 0.3324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  mod2       y2          x1 -0.22619 -12.171 7.066 -1.7225 -0.24863 0.0320</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  mod2       y2          x2 -0.17934  -9.329 6.862 -1.3594 -0.19621 0.1284</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  mod1       y1 (Intercept)  0.10358   5.159 5.962  0.8652  0.12489 0.3884</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  mod1       y1          x1 -0.04491  -2.416 6.159 -0.3923 -0.05663 0.6964</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  mod1       y1          x2  0.02313   1.203 6.048  0.1989  0.02871 0.8140</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  mod2       y2 (Intercept)  0.13022   6.486 6.650  0.9752  0.14076 0.3310</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  mod2       y2          x1 -0.22619 -12.171 7.066 -1.7225 -0.24863 0.0322</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  mod2       y2          x2 -0.17934  -9.329 6.862 -1.3594 -0.19621 0.1350</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Case 4: matrix response, poisson</span></span></span>
 <span class="r-in"><span><span class="va">res</span><span class="op">=</span><span class="fu">flipscores</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y1p</span>, <span class="va">y2p</span><span class="op">)</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   model response coefficient estimate   score     se       z    pcor      p</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1  mod1      y1p (Intercept)  0.88061  69.644  6.967  9.9964  0.6718 0.0002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  mod1      y1p          x1 -0.12451 -16.043 11.393 -1.4082 -0.1930 0.2204</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  mod1      y1p          x2 -0.07236  -9.056 11.132 -0.8135 -0.1136 0.3950</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  mod1      y1p          x1 -0.12451 -16.043 11.393 -1.4082 -0.1930 0.2144</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  mod1      y1p          x2 -0.07236  -9.056 11.132 -0.8135 -0.1136 0.3958</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4  mod2      y2p (Intercept)  1.67965 208.330  6.561 31.7534  0.8422 0.0002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  mod2      y2p          x1  0.08768  25.725 17.094  1.5049  0.1975 0.2470</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  mod2      y2p          x2  0.05057  14.288 16.878  0.8466  0.1140 0.4290</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  mod2      y2p          x1  0.08768  25.725 17.094  1.5049  0.1975 0.2462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  mod2      y2p          x2  0.05057  14.288 16.878  0.8466  0.1140 0.4244</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># more examples</span></span></span>
 <span class="r-in"><span><span class="va">n</span><span class="op">=</span><span class="fl">20</span></span></span>
@@ -259,10 +283,10 @@ flipscores engine.</p></dd>
 <span class="r-in"><span><span class="va">res</span><span class="op">=</span><span class="fu">flipscores</span><span class="op">(</span><span class="va">mods</span>, to_be_tested <span class="op">=</span> <span class="st">"X"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   model response coefficient estimate score    se     z   pcor      p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  mod1        Y           X   0.6746 13.17 5.543 2.376 0.5762 0.0186</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  mod2        Y           X   0.6879 13.35 5.665 2.357 0.5893 0.0250</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  mod3        Y           X   0.6685 10.87 5.152 2.109 0.5447 0.0584</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  mod4        Y           X   0.6526 10.68 5.036 2.121 0.5303 0.0534</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  mod1        Y           X   1.0095 8.567 3.370 2.542 0.6165 0.0248</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  mod2        Y           X   0.9817 8.209 3.370 2.436 0.6090 0.0452</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  mod3        Y           X   0.9732 8.096 3.447 2.348 0.6063 0.0530</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  mod4        Y           X   1.0040 8.492 3.453 2.459 0.6148 0.0278</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
