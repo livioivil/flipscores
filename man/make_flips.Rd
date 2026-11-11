@@ -5,12 +5,16 @@
 \title{It creates a \code{n_flips}x\code{n_obs} matrix of random +1 and -1.
 The first row is made by ones (i.e. the observed test statistic is computed)}
 \usage{
-make_flips(n_obs, n_flips, obs_names = NULL)
+make_flips(n_obs, n_flips, obs_names = NULL, id = NULL)
 }
 \arguments{
 \item{n_obs}{number of observations}
 
 \item{n_flips}{number of flips}
+
+\item{obs_names}{optional observation names for the columns.}
+
+\item{id}{optional cluster identifiers, one per observation.}
 }
 \description{
 It creates a \code{n_flips}x\code{n_obs} matrix of random +1 and -1.

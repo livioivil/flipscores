@@ -5,6 +5,8 @@
 #' @param score_type The type of score that is computed. It is "orthogonalized", "effective" or "basic".
 #' "effective" and "orthogonalized" take into account the nuisance estimation.
 #' @param ... other arguments.
+#' @param id Cluster identifiers, a column name, or a one-sided formula. The
+#'   resolved vector is stored in \code{attr(scores, "id")}, in score-row order.
 #' @description Computes Score contributions for variables in \code{model1} (or derived from ) under the null model \code{model0}.
 #' Same usage as \code{anova.glm}.
 #' The parameter \code{id}  is used too,
@@ -22,16 +24,16 @@
 #' head(scr0)
 #' @export
 
-compute_scores <- function(model0, model1, score_type = "standardized", ...){
+compute_scores <- function(model0, model1, score_type = "standardized", ..., id = NULL){
   score_type=match.arg(score_type,c("standardized","effective","basic","orthogonalized","my_lab"))
   if(missing(score_type))
     stop("test type is not specified or recognized")
   X=get_X(model0,model1)
-  if(!is.null(model0))
-  {id_model1=if(is.list(model1)) eval(model1$flip_param_call$id)
-  else
-    NULL
-  } else id_model1=NULL
+  if (missing(id)) {
+    id <- model0$flip_param_call$id
+    if (is.null(id) && is.list(model1)) id <- model1$flip_param_call$id
+  }
+  resolved_id <- .fs_resolve_id(id, model0)
 
   rm(model1)
 
@@ -68,7 +70,7 @@ compute_scores <- function(model0, model1, score_type = "standardized", ...){
     #BASIC SCORE
     if (score_type == "basic") {
       .get_1score_basic <- function(X){
-        B=t(t(X * D_vect) %*% (diag(sqrtinvV_vect**2, nrow = length(sqrtW))))
+        B=X * D_vect * sqrtinvV_vect**2
         scores = B * (sqrtinvV_vect_times_residuals) #* (1/sum(!is.na(model0$y))^0.5)
         scale_objects=list(nrm=sqrt(sum(B^2)*sum((sqrtinvV_vect_times_residuals)^2)))
         list(scores=scores, scale_objects=scale_objects,Xr=X)
@@ -150,35 +152,6 @@ compute_scores <- function(model0, model1, score_type = "standardized", ...){
 
   rownames(scores)=names(model0$fitted.values)
 
-  if(is.null(list(...)$obs_names)){
-    nobservations=list(...)$nobservations} else
-      nobservations= lenght(list(...)$obs_names)
-  if(!is.null(nobservations))
-    if(nrow(scores)<nobservations){
-      if(score_type=="standardized"){
-        for(i in 1:length(scale_objects)){
-          temp=matrix(0,nobservations,ncol(scale_objects[[i]]$A))
-          temp[as.numeric(rownames(scores)),]=scale_objects[[i]]$A
-          rownames(temp)=1:nobservations
-          scale_objects[[i]]$A=temp
-        }
-      }
-
-      temp=matrix(0,nobservations,ncol(scores))
-      temp[as.numeric(rownames(scores)),]=scores
-      scores=temp
-      if(is.null(list(...)$obs_names))
-        rownames(scores)=list(...)$obs_names else
-          rownames(scores)=1:nobservations
-
-      temp=rep(0,nobservations)
-      names(temp)=rownames(scores)
-      temp[as.numeric(names(sqrtinvV_vect_times_residuals))]=sqrtinvV_vect_times_residuals
-      sqrtinvV_vect_times_residuals=temp
-
-    }
-
-
   std_dev=get_std_dev_score(model0,X)
   dispersion=.get_dispersion(model0)
   scale_objects=lapply(scale_objects, function(object) {
@@ -191,5 +164,6 @@ compute_scores <- function(model0, model1, score_type = "standardized", ...){
   attr(scores,"score_type")=score_type
   attr(scores,"resid_std")=sqrtinvV_vect_times_residuals
   attr(scores,"Xresid_std")=Xr
+  attr(scores,"id")=.fs_validate_id(resolved_id, nrow(scores))
   return(scores)
 }

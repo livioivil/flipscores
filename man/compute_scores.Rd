@@ -4,7 +4,7 @@
 \alias{compute_scores}
 \title{compute_scores}
 \usage{
-compute_scores(model0, model1, score_type = "standardized", ...)
+compute_scores(model0, model1, score_type = "standardized", ..., id = NULL)
 }
 \arguments{
 \item{model0}{a \code{glm} object with the model under the null hypothesis (i.e. the covariates, the nuisance parameters).}
@@ -16,6 +16,9 @@ compute_scores(model0, model1, score_type = "standardized", ...)
 "effective" and "orthogonalized" take into account the nuisance estimation.}
 
 \item{...}{other arguments.}
+
+\item{id}{Cluster identifiers, a column name, or a one-sided formula. The
+resolved vector is stored in \code{attr(scores, "id")}, in score-row order.}
 }
 \description{
 Computes Score contributions for variables in \code{model1} (or derived from ) under the null model \code{model0}.

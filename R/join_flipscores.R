@@ -40,88 +40,124 @@ as.jfs.fs_contrasts <- function(x, ...) {
                              seed          = NULL,
                              output_models = TRUE,
                              id            = NULL,
+                             alternative   = "two.sided",
+                             precompute_flips = TRUE,
                              ...) {
-    if(!is.null(seed)) set.seed(seed)
+  if (!length(mods)) stop("The model list must not be empty.", call. = FALSE)
+  if (!is.null(id) && score_type == "orthogonalized")
+    stop("'id' is not supported for orthogonalized scores.", call. = FALSE)
+  if (!is.null(seed)) set.seed(seed)
+  names(mods) <- .set_mods_names(mods)
+  mods_names <- names(mods)
+  leaves <- .fs_joint_models(mods)
+  rows <- lapply(leaves, .fs_model_rows)
+  # Resolve once on each original model, before constructing any null model.
+  ids <- lapply(leaves, function(model) .fs_resolve_id(id, model))
+  names(ids) <- names(rows) <- names(leaves)
+  alignment <- .fs_score_alignment(rows, ids)
+  cluster_names <- unique(alignment$rows$id)
 
-    for(i in 1:length(mods))
-      mods[[i]]$call$data=eval(mods[[i]]$call$data, parent.frame())
-
-    names(mods) = .set_mods_names(mods)
-    mods_names=names(mods)
-    if (is.null(tested_coeffs)) {
-      tested_coeffs = .get_all_coeff_names_list(mods)
+  if (!is.null(flips)) {
+    if (!is.null(id) && !is.null(colnames(flips)) &&
+        !all(rownames(alignment$rows) %in% colnames(flips)) &&
+        all(cluster_names %in% colnames(flips))) {
+      FLIPS <- .fs_prepare_flips(flips, cluster_names)
+    } else {
+      expanded <- .fs_prepare_flips(flips, rownames(alignment$rows),
+                                    if (!is.null(id)) alignment$rows$id else NULL)
+      FLIPS <- expanded[, match(cluster_names, alignment$rows$id), drop = FALSE]
     }
-    if (!is.list(tested_coeffs)) {
-      temp = .get_all_coeff_names_list(mods)
-
-      tested_coeffs = gsub(" ", "", tested_coeffs)
-      tested_coeffs = lapply(temp, function(nms) intersect(tested_coeffs,
-                                                           gsub(" ", "", nms)))
-    }
-
-    obs_names = lapply(mods, function(mod)
-      if(inherits(mod,c("flipscores","fs_contrasts"))) {
-        rownames(mod$scores)
-      } else if(inherits(mod,c("jfs"))) {
-        unlist(lapply(mod$objects, function(md)rownames(md$scores)))
-      } else if(inherits(mod,c("fs_lm"))) {
-        unlist(lapply(mod$scores,function(md)rownames(md)))
-      } else if(inherits(mod,c("glm"))) {
-        rownames(model.matrix(mod))
-      })
-    obs_names = unique(unlist(obs_names))
-
-    #n_obs=length(obs_names)
-
-    # n_obs_rn = sapply(mods, function(mod) max(as.numeric(rownames(model.matrix(mod)))))
-    # n_obs_rn = max(n_obs_rn)
-    # n_obs=sapply(mods, function(mod) length(mod$y))
-    # n_obs=max(n_obs,n_obs_rn)
-
-
-
-    if(is.null(eval(match.call()$flips,parent.frame()))){
-      FLIPS=make_flips(n_obs=length(obs_names),n_flips=n_flips,obs_names=obs_names)
-    }else{
-      if(length(setdiff(obs_names,colnames(flips)))>0){
-        stop("flip matrix of flips has wrong observation names (i.e. the union of the rownames of the model.matrix of the models).")
-      }
-      FLIPS = flips
-    }
-
-    mods = lapply(1:length(mods), function(i) {
-      if(inherits(mods[[i]], c("glm"))){#,"fs_contrasts","fs_lm"))
-      temp = flipscores(formula = eval(mods[[i]],parent.frame()), score_type = score_type,
-                        flips = eval(FLIPS), to_be_tested = tested_coeffs[[i]],
-                        output_flips=FALSE,obs_names,
-                        id= id,...
-      )
-      temp$summary_table=.get_summary_table_from_flipscores(temp)
-      } else if(inherits(mods[[i]], c("flipscores","fs_contrasts","fs_lm","jfs"))){
-        temp = update( eval(mods[[i]],parent.frame()),flips = eval(FLIPS),...)
-      } else {
-        stop("formula may be a list of objects from the 'glm', 'flipscores', 'fs_contrasts' or 'fs_lm' classes only. ")
-      }
-      temp
-    })
-
-    if(is.null(mods_names)){
-      names(mods)=paste0("mod",1:length(mods))
-    } else
-      names(mods) = mods_names
-
-    out=list(Tspace=.get_all_Tspace(mods),
-             summary_table=do.call(rbind,lapply(mods,function(x)x$summary_table)),
-             objects=mods,
-             call = match.call())
-
-    # TODO check if is correct and make sense
-    mod_index <- sapply(mods, function(x) nrow(x$summary_table))
-    mod_index <- rep(names(mod_index), mod_index)
-    out$summary_table <- cbind(model = mod_index, out$summary_table)
-    class(out) <- unique(c("jfs", class(out)))
-    out
+    colnames(FLIPS) <- cluster_names
+    n_flips <- nrow(FLIPS)
+  } else if (precompute_flips) {
+    FLIPS <- make_flips(length(cluster_names), n_flips, obs_names = cluster_names)
+  } else {
+    FLIPS <- NULL
+    # Each coefficient regenerates the same global sequence of cluster signs.
+    if (is.null(seed)) seed <- sample.int(.Machine$integer.max, 1L)
   }
+
+  if (is.list(tested_coeffs) && length(tested_coeffs) != length(mods))
+    stop("'tested_coeffs' must have one element per model.", call. = FALSE)
+  position <- 0L
+  run <- function(model, tested) {
+    if (inherits(model, "jfs") && !inherits(model, "fs_contrasts")) {
+      children <- lapply(model$objects, run, tested = tested)
+      model$objects <- children
+      model$Tspace <- .get_all_Tspace(children)
+      model$summary_table <- .get_all_summary_table(children)
+      child_leaves <- .fs_joint_models(children)
+      model$alignment <- .fs_score_alignment(
+        lapply(child_leaves, .fs_model_rows),
+        lapply(child_leaves, function(x) attr(x$scores, "id")))
+      return(model)
+    }
+    position <<- position + 1L
+    i <- position
+    cluster_index <- match(if (is.null(id)) rows[[i]] else as.character(ids[[i]]),
+                           cluster_names)
+    local_flips <- if (!is.null(FLIPS)) FLIPS[, cluster_index, drop = FALSE] else NULL
+    if (!is.null(local_flips)) colnames(local_flips) <- rows[[i]]
+    if (inherits(model, "glm")) {
+      if (is.null(tested)) tested <- names(stats::coef(model))
+      if (is.character(tested)) tested <- intersect(tested, names(stats::coef(model)))
+      if (!length(tested)) stop("No requested coefficients are present in model ",
+                                names(leaves)[i], ".", call. = FALSE)
+      result <- flipscores(model, score_type = score_type, n_flips = n_flips,
+                            alternative = alternative, to_be_tested = tested,
+                            flips = local_flips, id = ids[[i]], seed = seed,
+                            precompute_flips = precompute_flips,
+                            cluster_index = cluster_index,
+                            n_clusters = length(cluster_names), ...)
+      # Do not retain calls referencing this temporary frame or generated flip
+      # matrices. Preserve the original ID specification for later updates.
+      result$flipscores_call$id <- id
+      result$flipscores_call$flips <- if (!is.null(flips)) local_flips else NULL
+      result$flipscores_call$to_be_tested <- tested
+      result$flipscores_call$score_type <- score_type
+      result$flipscores_call$n_flips <- n_flips
+      result$flipscores_call$alternative <- alternative
+      result$flipscores_call$seed <- seed
+      result$flipscores_call$precompute_flips <- precompute_flips
+      return(result)
+    }
+    # These engines need a matrix, even when GLM flips are generated on demand.
+    if (is.null(local_flips)) {
+      set.seed(seed)
+      local_flips <- .mk_rnd_flips(length(cluster_names), n_flips)[,
+                                                                 cluster_index, drop = FALSE]
+      colnames(local_flips) <- rows[[i]]
+    }
+    if (inherits(model, "fs_contrasts")) {
+      return(flipscores_contrasts(model$model, linfct = model$linfct,
+                                  score_type = score_type, n_flips = n_flips,
+                                  alternative = alternative, flips = local_flips,
+                                  id = ids[[i]], seed = seed))
+    }
+    if (inherits(model, "fs_lm")) {
+      if (is.null(tested)) tested <- unique(model$summary_table$coefficient)
+      result <- .fs_lm(model$info$D, flips = local_flips,
+                       alternative = alternative, tested_coeffs = tested)
+      result$call <- model$call
+      result$info <- model$info
+      result$n_flips <- n_flips
+      attr(result$scores, "id") <- ids[[i]]
+      class(result) <- class(model)
+      return(result)
+    }
+    stop("Unsupported model class in 'formula'.", call. = FALSE)
+  }
+  mods <- lapply(seq_along(mods), function(i) {
+    tested <- if (is.list(tested_coeffs)) tested_coeffs[[i]] else tested_coeffs
+    run(mods[[i]], tested)
+  })
+  names(mods) <- mods_names
+  out <- list(Tspace = .get_all_Tspace(mods),
+              summary_table = .get_all_summary_table(mods),
+              objects = mods, alignment = alignment, call = match.call())
+  class(out) <- c("jfs", "list")
+  out
+}
 
 #' @title Coerce fs_contrasts to jfs
 #' @name as.jfs

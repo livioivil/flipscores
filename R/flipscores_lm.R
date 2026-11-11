@@ -114,6 +114,7 @@ out=.fs_lm(D, flips=flips,alternative=alternative,
           tested_coeffs=tested_coeffs)
 
 out$call <- original_call
+out$info$formula <- formula
 class(out) <- c("fs_lm", class(out))
 return(out)
 }

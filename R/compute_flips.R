@@ -17,6 +17,8 @@ compute_flips<- function(scores,alternative="two.sided",
                       #output_flips=FALSE,
                       seed=NULL,
                       precompute_flips=TRUE,
+                      cluster_index=NULL,
+                      n_clusters=NULL,
                       ...){
 
 
@@ -25,7 +27,8 @@ compute_flips<- function(scores,alternative="two.sided",
                             .score_fun=.score_fun,
                             #output_flips=output_flips,
                             seed=seed,
-                            precompute_flips=precompute_flips)
+                            precompute_flips=precompute_flips,
+                            cluster_index=cluster_index,n_clusters=n_clusters)
   p.values=.t2p_only_first(ftail(unlist(Tspace)))
   # named vector?
 
@@ -41,6 +44,8 @@ compute_flips<- function(scores,alternative="two.sided",
                               #output_flips=FALSE,
                               seed=NULL,
                               precompute_flips=TRUE,
+                              cluster_index=NULL,
+                              n_clusters=NULL,
                               ...){
 
 
@@ -52,17 +57,26 @@ compute_flips<- function(scores,alternative="two.sided",
   if(!is.null(flips)){
     #  browser()
     n_flips=nrow(flips)
-    flips=flips[,rownames(scores)]
-    Tspace=as.vector(c(sapply(1:(n_flips),
-                              function(i).score_fun(flips[i,],scores)))
-    )
+    flips=flips[,rownames(scores),drop=FALSE]
+    Tspace <- vapply(seq_len(n_flips),
+                     function(i) as.numeric(.score_fun(flips[i,],scores)), numeric(1))
 
   } else {
     n_obs=nrow(scores)
+    if (is.null(cluster_index)) {
+      id <- attr(scores,"id")
+      cluster_index <- if (is.null(id)) seq_len(n_obs) else match(id,unique(id))
+    }
+    if (is.null(n_clusters)) n_clusters <- max(cluster_index)
     set.seed(seed)
-    Tspace=as.vector(c(.score_fun(rep(1,n_obs),scores),replicate(n_flips-1,{
-      .score_fun(sample(c(-1,1),n_obs, replace = T),scores)
-    })))
+    Tspace <- numeric(n_flips)
+    Tspace[1L] <- as.numeric(.score_fun(rep(1,n_obs),scores))
+    if (n_flips > 1L) {
+      for (i in seq.int(2L,n_flips)) {
+        signs <- sample(c(-1L,1L),n_clusters,replace=TRUE)
+        Tspace[i] <- as.numeric(.score_fun(signs[cluster_index],scores))
+      }
+    }
   }
 
   return(Tspace)

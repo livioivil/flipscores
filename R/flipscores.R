@@ -18,20 +18,34 @@
 #'   \code{"orthogonalized"}, \code{"effective"}, \code{"basic"}.
 #' @param n_flips Number of random flips. Default \code{5000}.
 #' @param alternative Alternative hypothesis. Default \code{"two.sided"}.
-#' @param id Optional cluster id vector.
+#' @param id Optional cluster identifiers, also used to align score rows across
+#'   models. Use a vector with one value per score row, a column name, or a
+#'   one-sided formula such as \code{~ids}. Column names and formulas are
+#'   evaluated in \code{data}, or separately in each fitted model's original
+#'   data for a list of models. With \code{NULL}, rows are matched by row names.
+#'   Repeated IDs are aligned by occurrence, with the maximum multiplicity
+#'   across models, and all occurrences share the same random sign.
 #' @param seed Random seed for reproducibility.
 #' @param to_be_tested Character vector or list of coefficient names to test.
 #'   If a character vector, the same terms are intersected with each model's
 #'   coefficients. If a list, each element applies to the corresponding model.
 #'   If \code{NULL} all coefficients are tested.
 #' @param tested_coeffs Alias for \code{to_be_tested} for compatibility.
-#' @param flips Optional matrix of pre-computed flips.
-#' @param precompute_flips Logical, default \code{TRUE}. WARNING: if a \code{jfs-class} object is returned and \code{precompute_flips=FALSE} the merging among scores from different models is solely based on their ordering and not on their rownames.
+#' @param flips Optional matrix of pre-computed flips. Columns may be named by
+#'   observations or, when \code{id} is supplied, by cluster identifiers. All
+#'   observations in the same cluster must receive the same sign.
+#'   For joint tests with \code{id}, observation columns follow the common
+#'   rows in \code{alignment$rows}; alternatively supply columns named by ID.
+#' @param precompute_flips Logical, default \code{TRUE}. If \code{FALSE}, GLM
+#'   flips are generated on demand using the same observation or cluster mapping.
 #' @param ... Additional arguments passed to \code{glm()} or the internal
 #'   flipscores engine.
 #'
 #' @return A \code{flipscores} object (case 1) or a \code{jfs}
-#'   object (cases 2, 3, 4).
+#'   object (cases 2, 3, 4). Joint objects retain local score matrices in
+#'   \code{objects}, with resolved identifiers in \code{attr(scores, "id")},
+#'   and an \code{alignment} list containing the common \code{rows} and local
+#'   row-to-common-row \code{index} maps.
 #'
 #' @examples
 #' set.seed(1)
@@ -115,9 +129,6 @@ flipscores <- function(formula,
   if (is.list(formula) && all(sapply(formula, inherits, c("glm","jfs","flipscores","fs_contrasts","fs_lm")))) {
     #message("flipscores: list of glm objects detected -> joint test")
 
-    for(i in 1:length(formula))
-      formula[[i]]$call$data=eval(formula[[i]]$call$data, parent.frame())
-
     out <- .join_flipscores(
       mods         = formula,
       tested_coeffs = to_be_tested,
@@ -126,6 +137,8 @@ flipscores <- function(formula,
       score_type   = score_type,
       seed         = seed,
       id           = id,
+      alternative  = alternative,
+      precompute_flips = precompute_flips,
       ...
     )
     out$call <- match.call()
@@ -158,6 +171,8 @@ flipscores <- function(formula,
       score_type   = score_type,
       seed         = seed,
       id           = id,
+      alternative  = alternative,
+      precompute_flips = precompute_flips,
       ...
     )
     out$call <- match.call()
@@ -349,6 +364,12 @@ flipscores <- function(formula,
     flip_param_call$parms_DV <- list(...)$parms_DV
     mf$parms_DV <- NULL
   }
+  for (nm in c("cluster_index", "n_clusters")) {
+    value <- list(...)[[nm]]
+    if (!is.null(value)) flip_param_call[[nm]] <- value
+    if (nm %in% names(mf)) mf[[nm]] <- NULL
+  }
+  mf$output_flips <- NULL
 
   # handle to_be_tested
   m2 <- match("to_be_tested", names(mf), 0L)
@@ -387,32 +408,20 @@ flipscores <- function(formula,
       model$call$family <- family
   } else if (inherits(model, "glm")) {
     param_x_ORIGINAL <- TRUE
-    # refit using do.call to avoid any symbol lookup issues
-    # extract all arguments from the existing model
-    # refit_args        <- list(
-    #   formula = formula(model),
-    #   family  = model$family,
-    #   data    = model$model,  # use stored model frame directly
-    #   x       = TRUE
-    # )
-    # # preserve any extra arguments (offset, weights, subset etc)
-    # extra_args <- model$call[!names(model$call) %in%
-    #                            c("", "formula", "family", "data", "x")]
-    # extra_args[[1]] <- NULL  # remove function name
-    # if (length(extra_args) > 0) {
-    #   for (nm in names(extra_args))
-    #     refit_args[[nm]] <- eval(extra_args[[nm]],
-    #                              envir = model$model)
-    # }
-    # model <- do.call(stats::glm, refit_args)
-    # model$call$family <- model$family
-    model <- update(model,x=TRUE)
+    # Keep the fitted rows and their order; no refit of the full model is needed.
+    if (is.null(model[["x"]])) model$x <- stats::model.matrix(model)
 
   } else {
     stop("'formula' must be a formula or a glm object.")
   }
 
   if (is.null(model$y)) model$y <- model$model[, 1]
+  resolved_id <- .fs_resolve_id(id, model,
+                                if (inherits(original_formula, "formula")) data else NULL)
+  flip_param_call$id <- resolved_id
+  # Do not pad local score objects to the union of observations across models.
+  flip_param_call$nobservations <- NULL
+  flip_param_call$obs_names <- NULL
 
   # resolve to_be_tested
   if (is.null(to_be_tested))
@@ -425,29 +434,24 @@ flipscores <- function(formula,
 
   # handle flips
   if (!is.null(flips)) {
-    if(!is.null(colnames(flips)))
-    if(length(setdiff(rownames(model.matrix(model)),colnames(flips)))>0){
-      stop("flip matrix of flips has wrong observation names (i.e. the union of the rownames of the model.matrix of the models).")
-    }
+    flip_param_call$flips <- .fs_prepare_flips(flips, rownames(model$x), resolved_id)
     flip_param_call$precompute_flips <- FALSE
     flip_param_call$n_flips <- nrow(flip_param_call$flips)
 
   } else if (flip_param_call$precompute_flips) {
     set.seed(seed)
     flip_param_call$flips <- .make_flips(
-      max(nrow(model$model),
-          ifelse(is.null(flip_param_call$nobservations),
-                 0L,
-                 flip_param_call$nobservations)),
+      nrow(model$x),
       flip_param_call$n_flips,
       flip_param_call$id
     )
   }
 
-  if(is.null(colnames(flip_param_call$flips)))
-    if(exists("obs_names"))
-    colnames(flip_param_call$flips)=obs_names else
-      colnames(flip_param_call$flips)=1:ncol(flip_param_call$flips)
+  if (!is.null(flip_param_call$flips)) {
+    colnames(flip_param_call$flips) <- rownames(model$x)
+  } else if (is.null(seed)) {
+    flip_param_call$seed <- sample.int(.Machine$integer.max, 1L)
+  }
 
   # compute scores for each tested coefficient
   results <- lapply(to_be_tested,
@@ -467,6 +471,7 @@ flipscores <- function(formula,
 
   attr(model$scores, "nrm")       <- nrm
   attr(model$scores, "sd")        <- std_dev
+  attr(model$scores, "id")        <- resolved_id
   attr(model$scores, "resid_std") <- data.frame(
     lapply(results, function(x) attr(x[[1]]$scores, "resid_std"))
   )
@@ -479,13 +484,13 @@ flipscores <- function(formula,
     names(model$p.values) <- to_be_tested
 
   # build a clean glm call for update() - only valid glm() arguments
-  glm_call          <- call("glm")
-  glm_call$formula  <- original_formula
-  glm_call$family   <- family
-  glm_call$data     <- original_data      # actual data frame
-  if (!is.null(mf$offset))  glm_call$offset  <- mf$offset
-  if (!is.null(mf$weights)) glm_call$weights <- mf$weights
-  if (!is.null(mf$subset))  glm_call$subset  <- mf$subset
+  glm_call <- model$call
+  glm_call$formula <- stats::formula(model)
+  if (!is.character(family) || family != "negbinom")
+    glm_call$family <- model$family
+  model_data <- .fs_model_data(model,
+                               if (inherits(original_formula, "formula")) original_data else NULL)
+  if (!is.null(model_data)) glm_call$data <- model_data
 
   # build the user-facing flipscores call for print/summary/update
   fs_call[[1L]]         <- quote(flipscores)
@@ -493,6 +498,17 @@ flipscores <- function(formula,
   fs_call$data          <- original_data_call
   fs_call$nobservations <- NULL
   fs_call$parms_DV      <- NULL
+  fs_call$cluster_index <- NULL
+  fs_call$n_clusters <- NULL
+  if (inherits(original_formula, "glm") && !is.null(model_data)) {
+    # Calls created while joining models must remain usable after this frame exits.
+    fs_call$formula <- stats::formula(model)
+    fs_call$data <- model_data
+    fs_call$family <- model$family
+    fs_call$id <- id
+    for (nm in setdiff(names(glm_call), c("", "formula", "data", "family")))
+      if (!nm %in% names(fs_call)) fs_call[[nm]] <- glm_call[[nm]]
+  }
 
   model$call            <- glm_call
   model$flipscores_call <- fs_call

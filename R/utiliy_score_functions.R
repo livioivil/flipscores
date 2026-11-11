@@ -120,7 +120,8 @@ mahalanobis_npc_multi <- function(ids_list,permT){
 
 
 # i and exclude are indices of the columns of model.frame x
-socket_compute_scores <- function(i,model,score_type,nobservations=NULL,parms_DV=NULL){
+socket_compute_scores <- function(i,model,score_type,nobservations=NULL,parms_DV=NULL,
+                                  id=NULL){
   if(is.numeric(i)) {
     i=colnames(model$x)[i]
   }
@@ -140,6 +141,11 @@ socket_compute_scores <- function(i,model,score_type,nobservations=NULL,parms_DV
     colnames(model[["x"]])=paste0("V",1:ncol(model$x))
 
   model$call$data=data.frame(model[["y"]],model[["x"]][,-i_id,drop=FALSE])
+  # The reconstructed data already contain exactly the fitted observations.
+  # Reapplying the full model's subset would select or remove rows a second time.
+  model$call$subset <- NULL
+  model$call$weights <- model$prior.weights
+  model$call$na.action <- stats::na.pass
   yname=all.vars( model$call$formula)[[1]]
   names(model$call$data)[1]=yname
 
@@ -168,7 +174,8 @@ socket_compute_scores <- function(i,model,score_type,nobservations=NULL,parms_DV
   model_i <-update(model)
   # print(flip_param_call$score_type)
   # browser()
-  scores=compute_scores(model0 = model_i,model1 = tested_X,score_type=score_type,nobservations=nobservations,parms_DV=parms_DV)
+  scores=compute_scores(model0 = model_i,model1 = tested_X,score_type=score_type,
+                       parms_DV=parms_DV,id=id)
 }
 
 
@@ -177,8 +184,8 @@ socket_compute_scores <- function(i,model,score_type,nobservations=NULL,parms_DV
 socket_compute_flip <- function(scores,flip_param_call){
 
   #  flip_param_call$score_type=attributes(scores)$score_type
-  flip_param_call$flip=flip_param_call$flip[,rownames(scores)]
-  colnames(flip_param_call$flip)=NULL
+  if (!is.null(flip_param_call$flips))
+    flip_param_call$flips <- flip_param_call$flips[, rownames(scores), drop=FALSE]
 
   # scores=as.matrix(unlist(scores[,]))
   if(is.null(flip_param_call$alternative)) flip_param_call$alternative = "two.sided"
@@ -202,6 +209,7 @@ socket_compute_flip <- function(scores,flip_param_call){
     attributes(score1)$score_type=attributes(scores)$score_type
     attributes(score1)$sd=attributes(scores)$sd
     attributes(score1)$resid_std=attributes(scores)$resid_std
+    attr(score1,"id")=attr(scores,"id")
     flip_param_call$scores=score1
     res=eval(flip_param_call, parent.frame())
     res$scores=score1
@@ -231,7 +239,7 @@ socket_compute_flip <- function(scores,flip_param_call){
 socket_compute_scores_and_flip <- function(i,model,exclude=NULL,
                                            flip_param_call){
   scores  <- socket_compute_scores(i,model,score_type=flip_param_call$score_type,
-                                   nobservations=flip_param_call$nobservations,
+                                   id=flip_param_call$id,
                                    parms_DV = flip_param_call$parms_DV)
   results <- socket_compute_flip (scores,flip_param_call)
 }

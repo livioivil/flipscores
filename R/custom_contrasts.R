@@ -162,6 +162,9 @@ flipscores_contrasts <- function(model, specs = NULL,
   }
 
   model <- .fs_model_with_x(model)
+  resolved_id <- .fs_resolve_id(id, model)
+  if (!is.null(resolved_id) && score_type == "orthogonalized")
+    stop("'id' is not supported for orthogonalized scores.", call. = FALSE)
   resolved <- .fs_resolve_linfct(model, specs = specs, linfct = linfct,
                                  ref = ref)
 
@@ -176,30 +179,15 @@ flipscores_contrasts <- function(model, specs = NULL,
     resolved$coef_linfct <- resolved$coef_linfct[, active, drop = FALSE]
   }
 
-  #  TODO GESTIRE I FLIPS. da flipscores:
-  # handle flips
+  # The original model data are still available here, before glm.fit builds
+  # the null models for the contrasts.
   if (!is.null(flips)) {
-    if(!is.null(colnames(flips)))
-      if(length(setdiff(rownames(model.matrix(model)),colnames(flips)))>0){
-        stop("flip matrix of flips has wrong observation names (i.e. the union of the rownames of the model.matrix of the models).")
-      }
-    user_call$n_flips <- nrow(user_call$flips)
-
+    flips <- .fs_prepare_flips(flips, rownames(model$x), resolved_id)
+    n_flips <- nrow(flips)
   } else {
     set.seed(seed)
-    nobservations=max(nrow(model$model),
-                      ifelse(is.null(user_call$nobservations),
-                             0L,
-                             user_call$nobservations))
-
-    user_call$flips <- .make_flips(
-      nobservations,
-      n_flips,
-      id
-    )
-    if(exists("obs_names"))
-      colnames(user_call$flips)=obs_names else
-        colnames(user_call$flips)=1:ncol(user_call$flips)
+    flips <- make_flips(nrow(model$x), n_flips,
+                        obs_names = rownames(model$x), id = resolved_id)
   }
 
   tests <- vector("list", nrow(resolved$coef_linfct))
@@ -218,6 +206,7 @@ flipscores_contrasts <- function(model, specs = NULL,
       n_flips = n_flips,
       alternative = alternative,
       seed = seed,
+      id = resolved_id,
       flips = flips)
   }
 
@@ -232,6 +221,7 @@ flipscores_contrasts <- function(model, specs = NULL,
 
   Tspace = do.call(cbind, lapply(tests, `[[`, "Tspace"))
   scores=do.call(cbind, lapply(tests, `[[`, "scores"))
+  attr(scores,"id") <- resolved_id
   user_call$flips=NULL
   out <- list(
     call = user_call,
@@ -564,7 +554,7 @@ print.summary.fs_contrasts <- function(x, digits = 4, ...) {
 }
 
 .fs_one_contrast_test <- function(model, coef_contrast, score_type, n_flips,
-                                  alternative, seed, flips) {
+                                  alternative, seed, flips, id = NULL) {
   if (all(abs(coef_contrast) < .Machine$double.eps)) {
     stop("A contrast maps to a zero coefficient contrast.", call. = FALSE)
   }
@@ -598,7 +588,7 @@ print.summary.fs_contrasts <- function(x, digits = 4, ...) {
   model0$offset <- offset
   class(model0) <- c("glm", "lm")
 
-  scores <- compute_scores(model0, z1, score_type = score_type)
+  scores <- compute_scores(model0, z1, score_type = score_type, id = id)
   flip_call <- as.call(list(
     .flip_test,
     n_flips = n_flips,
@@ -682,7 +672,7 @@ print.summary.fs_contrasts <- function(x, digits = 4, ...) {
 
 .fs_model_with_x <- function(model) {
   if (is.null(model[["x"]])) {
-    model <- stats::update(model, x = TRUE)
+    model$x <- stats::model.matrix(model)
   }
   if (is.null(model[["y"]])) {
     model$y <- stats::model.response(stats::model.frame(model))

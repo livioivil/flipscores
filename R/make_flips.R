@@ -3,14 +3,16 @@
 #' The first row is made by ones (i.e. the observed test statistic is computed)
 #' @param n_obs number of observations
 #' @param n_flips number of flips
+#' @param obs_names optional observation names for the columns.
+#' @param id optional cluster identifiers, one per observation.
 #' @examples
 #' # example code
 #' make_flips(n_obs=10,n_flips=20)
 #'
 #' @export
 #'
-make_flips <- function(n_obs,n_flips,obs_names=NULL){
-  FL=.make_flips(n_obs,n_flips)
+make_flips <- function(n_obs,n_flips,obs_names=NULL,id=NULL){
+  FL=.make_flips(n_obs,n_flips,id=id)
   if(is.null(obs_names)) obs_names=1:n_obs
   colnames(FL)=obs_names
 
@@ -19,18 +21,13 @@ make_flips <- function(n_obs,n_flips,obs_names=NULL){
 
 
 .make_flips <- function(n_obs,n_flips,id=NULL){
+  id <- .fs_validate_id(id, n_obs)
   if(is.null(id)){
     flips = .mk_rnd_flips(n_obs,n_flips)
   } else {
     unique_id=unique(id)
-    n_id=length(unique_id)
-    temp = .mk_rnd_flips(n_id,n_flips)
-    flips=matrix(NA,n_flips,n_obs)
-    for(i in 1:n_id)
-      flips[,id==unique_id[i]]=temp[,i]
-    # for(i in unique(id))
-    #   for(j in which(id==i))
-    #     flips[,j]=temp[,i]
+    temp = .mk_rnd_flips(length(unique_id),n_flips)
+    flips=temp[,match(id,unique_id),drop=FALSE]
   }
   flips
 }

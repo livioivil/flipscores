@@ -41,7 +41,13 @@ flipscores(
 
 \item{alternative}{Alternative hypothesis. Default \code{"two.sided"}.}
 
-\item{id}{Optional cluster id vector.}
+\item{id}{Optional cluster identifiers, also used to align score rows across
+models. Use a vector with one value per score row, a column name, or a
+one-sided formula such as \code{~ids}. Column names and formulas are
+evaluated in \code{data}, or separately in each fitted model's original
+data for a list of models. With \code{NULL}, rows are matched by row names.
+Repeated IDs are aligned by occurrence, with the maximum multiplicity
+across models, and all occurrences share the same random sign.}
 
 \item{seed}{Random seed for reproducibility.}
 
@@ -52,16 +58,24 @@ If \code{NULL} all coefficients are tested.}
 
 \item{tested_coeffs}{Alias for \code{to_be_tested} for compatibility.}
 
-\item{flips}{Optional matrix of pre-computed flips.}
+\item{flips}{Optional matrix of pre-computed flips. Columns may be named by
+observations or, when \code{id} is supplied, by cluster identifiers. All
+observations in the same cluster must receive the same sign.
+For joint tests with \code{id}, observation columns follow the common
+rows in \code{alignment$rows}; alternatively supply columns named by ID.}
 
-\item{precompute_flips}{Logical, default \code{TRUE}. WARNING: if a \code{jfs-class} object is returned and \code{precompute_flips=FALSE} the merging among scores from different models is solely based on their ordering and not on their rownames.}
+\item{precompute_flips}{Logical, default \code{TRUE}. If \code{FALSE}, GLM
+flips are generated on demand using the same observation or cluster mapping.}
 
 \item{...}{Additional arguments passed to \code{glm()} or the internal
 flipscores engine.}
 }
 \value{
 A \code{flipscores} object (case 1) or a \code{jfs}
-  object (cases 2, 3, 4).
+  object (cases 2, 3, 4). Joint objects retain local score matrices in
+  \code{objects}, with resolved identifiers in \code{attr(scores, "id")},
+  and an \code{alignment} list containing the common \code{rows} and local
+  row-to-common-row \code{index} maps.
 }
 \description{
 Extended version of \code{flipscores()} supporting joint testing when
