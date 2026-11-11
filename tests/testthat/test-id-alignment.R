@@ -153,6 +153,26 @@ test_that("invalid IDs and inconsistent supplied cluster flips fail clearly", {
                 "not supported")
 })
 
+test_that("a shared ID vector reports the incompatible model and suggests model-local IDs", {
+  models <- id_models()
+  error <- tryCatch(flipscores(models, id = 1:8, n_flips = 5), error = identity)
+  expect_s3_class(error, "error")
+  message <- conditionMessage(error)
+  expect_match(message, "'id' vector has length 8", fixed = TRUE)
+  expect_match(message, "model 'right' has 7 score rows", fixed = TRUE)
+  expect_match(message, "id = ~ids", fixed = TRUE)
+  expect_match(message, 'id = "ids"', fixed = TRUE)
+  expect_match(message, "each model's own data", fixed = TRUE)
+
+  # Equal raw dataset sizes can still produce different fitted row counts.
+  data <- .fs_model_data(models[[1]])
+  data$y[2] <- NA
+  omitted <- glm(y ~ x + z, data = data)
+  expect_error(flipscores(list(full = models[[1]], omitted = omitted),
+                           id = 1:8, n_flips = 5),
+                "model 'omitted' has 7 score rows", fixed = TRUE)
+})
+
 test_that("compute_scores stores resolved IDs without padding score metadata", {
   models <- id_models()
   d <- .fs_model_data(models[[1]])

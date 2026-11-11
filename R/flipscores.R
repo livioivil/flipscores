@@ -25,6 +25,11 @@
 #'   data for a list of models. With \code{NULL}, rows are matched by row names.
 #'   Repeated IDs are aligned by occurrence, with the maximum multiplicity
 #'   across models, and all occurrences share the same random sign.
+#'   A supplied vector is applied unchanged to every model and must match each
+#'   model's number of score rows, after \code{subset} and missing-value removal.
+#'   A length mismatch is an error; values are never recycled or truncated.
+#'   For models with different fitted row counts, consider \code{id = ~ids} or
+#'   \code{id = "ids"}, with an ID column present in every model's data.
 #' @param seed Random seed for reproducibility.
 #' @param to_be_tested Character vector or list of coefficient names to test.
 #'   If a character vector, the same terms are intersected with each model's
@@ -74,6 +79,24 @@
 #' summary(res)
 #' res=flipscores(models, to_be_tested = "x1")
 #' summary(res)
+#'
+#' # Different dataset sizes: resolve IDs separately in each model's data
+#' df$ids <- rep(seq_len(n / 2), each = 2)
+#' df_short <- df[-c(2, 5, 9), ]
+#' models_by_id <- list(
+#'   full = glm(y1 ~ x1 + x2, data = df),
+#'   shorter = glm(y2 ~ x1 + x2, data = df_short)
+#' )
+#' # A shared vector of length 50 cannot match the shorter model's 47 rows:
+#' tryCatch(
+#'   flipscores(models_by_id, id = df$ids, to_be_tested = "x1", n_flips = 99),
+#'   error = function(e) message(conditionMessage(e))
+#' )
+#' # These forms support different row counts and cluster flips by the same IDs:
+#' res_by_id <- flipscores(models_by_id, id = ~ids, to_be_tested = "x1",
+#'                         n_flips = 99, seed = 1)
+#' res_by_name <- flipscores(models_by_id, id = "ids", to_be_tested = "x1",
+#'                           n_flips = 99, seed = 1)
 #'
 #' # Case 3: list of formulas, same family
 #' res=flipscores(

@@ -51,6 +51,22 @@ as.jfs.fs_contrasts <- function(x, ...) {
   mods_names <- names(mods)
   leaves <- .fs_joint_models(mods)
   rows <- lapply(leaves, .fs_model_rows)
+  # A common vector cannot identify models with different fitted row counts.
+  # Check before resolving IDs or computing scores, and explain the alternative.
+  if (!is.null(id) && is.atomic(id) && is.null(dim(id)) &&
+      !inherits(id, "formula") && !(is.character(id) && length(id) == 1L)) {
+    row_counts <- lengths(rows)
+    incompatible <- which(row_counts != length(id))
+    if (length(incompatible)) {
+      i <- incompatible[1L]
+      stop("The supplied 'id' vector has length ", length(id),
+           ", but model '", names(leaves)[i], "' has ", row_counts[i],
+           " score rows. A vector must have one value per score row in every model, ",
+           "after subset and missing-value removal. Consider using id = ~ids or ",
+           "id = \"ids\" to read an ID column from each model's own data.",
+           call. = FALSE)
+    }
+  }
   # Resolve once on each original model, before constructing any null model.
   ids <- lapply(leaves, function(model) .fs_resolve_id(id, model))
   names(ids) <- names(rows) <- names(leaves)
