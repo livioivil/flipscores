@@ -63,7 +63,7 @@ compute_scores <- function(model0, model1, score_type = "standardized", ..., id 
       parms_DV<-get_par_expo_fam(model0) else parms_DV=list(...)$parms_DV
     D_vect<-parms_DV$D
     V_vect<-parms_DV$V
-    if(is.null(model0$weights))  sqrtW=rep(1,length(residuals)) else sqrtW=(D_vect*V_vect^-0.5)
+    sqrtW=(D_vect*V_vect^-0.5)
     sqrtinvV_vect<-V_vect**(-0.5)
     sqrtinvV_vect_times_residuals=sqrtinvV_vect*residuals
 
