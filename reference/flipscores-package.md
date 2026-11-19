@@ -62,10 +62,10 @@ summary(mod)
 #> 
 #> Coefficients:
 #>             estimate    score       se        z     pcor     p
-#> (Intercept) -0.10259 -0.72287  2.71274 -0.26647 -0.08824 0.755
-#> ZB          -0.15010 -0.71249  2.17890 -0.32699 -0.10415 0.652
-#> ZC           0.16332  0.81062  2.22317  0.36462  0.11735 0.685
-#> X            0.94385 16.20584  4.72718  3.42823  0.67119 0.012
+#> (Intercept) -0.10259 -0.72287  2.71274 -0.26647 -0.08824 0.749
+#> ZB          -0.15010 -0.71249  2.17890 -0.32699 -0.10415 0.656
+#> ZC           0.16332  0.81062  2.22317  0.36462  0.11735 0.693
+#> X            0.94385 16.20584  4.72718  3.42823  0.67119 0.010
 #> 
 #> (Dispersion parameter for poisson family taken to be 1)
 #> 
@@ -86,8 +86,8 @@ anova(mod)
 #> 
 #> Model: Y ~ Z + X
 #>   Ncoeff Mahalanobis      p
-#> Z      2     0.73055 0.7022
-#> X      1     0.02946 0.0120
+#> Z      2     0.74866 0.7076
+#> X      1     0.02926 0.0102
 # or
 mod0=flipscores(Y~Z,data=dt,family="poisson",x=TRUE)
 anova(mod0,mod)
@@ -100,7 +100,7 @@ anova(mod0,mod)
 #> Model 1: Y ~ Z
 #> Model 2: Y ~ Z + X
 #>                    Ncoeff Mahalanobis      p
-#> Model 2 vs Model 1      1    0.029505 0.0122
+#> Model 2 vs Model 1      1    0.029217 0.0128
 # and
 mod0=flipscores(Y~X,data=dt,family="poisson")
 anova(mod0,mod)
@@ -113,5 +113,5 @@ anova(mod0,mod)
 #> Model 1: Y ~ X
 #> Model 2: Y ~ Z + X
 #>                    Ncoeff Mahalanobis      p
-#> Model 2 vs Model 1      2      1.4501 0.5094
+#> Model 2 vs Model 1      2      1.3909 0.5272
 ```
