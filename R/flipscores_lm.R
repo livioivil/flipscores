@@ -115,6 +115,8 @@ out=.fs_lm(D, flips=flips,alternative=alternative,
 
 out$call <- original_call
 out$info$formula <- formula
+# Keep the data so that `id` columns can be resolved when results are joined.
+if (is.data.frame(data)) out$info$data <- data
 class(out) <- c("fs_lm", class(out))
 return(out)
 }
