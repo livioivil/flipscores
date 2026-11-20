@@ -92,9 +92,9 @@ of the arguments.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             estimate    score       se        z     pcor     p</span></span>
-<span><span class="co">#&gt; (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.938</span></span>
+<span><span class="co">#&gt; (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.934</span></span>
 <span><span class="co">#&gt; ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.953</span></span>
-<span><span class="co">#&gt; ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.660</span></span>
+<span><span class="co">#&gt; ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.646</span></span>
 <span><span class="co">#&gt; X            0.89732 35.59669  6.63014  5.36892  0.72553 0.000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; (Dispersion parameter for poisson family taken to be 1)</span></span>
@@ -120,8 +120,8 @@ scores.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model: Y ~ Z + X</span></span>
 <span><span class="co">#&gt;   Ncoeff Mahalanobis      p</span></span>
-<span><span class="co">#&gt; Z      2    0.236308 0.9098</span></span>
-<span><span class="co">#&gt; X      1    0.042358 0.0002</span></span>
+<span><span class="co">#&gt; Z      2    0.239167 0.8948</span></span>
+<span><span class="co">#&gt; X      1    0.042289 0.0002</span></span>
 <span><span class="co"># or</span></span>
 <span><span class="va">mod0</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/flipscores.html">flipscores</a></span><span class="op">(</span><span class="va">Y</span><span class="op">~</span><span class="va">Z</span>,data<span class="op">=</span><span class="va">dt</span>,family<span class="op">=</span><span class="st">"poisson"</span>,x<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova</a></span><span class="op">(</span><span class="va">mod0</span>,<span class="va">mod</span><span class="op">)</span></span>
@@ -134,7 +134,7 @@ scores.</p>
 <span><span class="co">#&gt; Model 1: Y ~ Z</span></span>
 <span><span class="co">#&gt; Model 2: Y ~ Z + X</span></span>
 <span><span class="co">#&gt;                    Ncoeff Mahalanobis     p</span></span>
-<span><span class="co">#&gt; Model 2 vs Model 1      1    0.042437 2e-04</span></span>
+<span><span class="co">#&gt; Model 2 vs Model 1      1    0.041449 2e-04</span></span>
 <span><span class="co"># and</span></span>
 <span><span class="va">mod0</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/flipscores.html">flipscores</a></span><span class="op">(</span><span class="va">Y</span><span class="op">~</span><span class="va">X</span>,data<span class="op">=</span><span class="va">dt</span>,family<span class="op">=</span><span class="st">"poisson"</span>,x<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova</a></span><span class="op">(</span><span class="va">mod0</span>,<span class="va">mod</span><span class="op">)</span></span>
@@ -146,8 +146,8 @@ scores.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model 1: Y ~ X</span></span>
 <span><span class="co">#&gt; Model 2: Y ~ Z + X</span></span>
-<span><span class="co">#&gt;                    Ncoeff Mahalanobis     p</span></span>
-<span><span class="co">#&gt; Model 2 vs Model 1      2     0.28004 0.893</span></span></code></pre></div>
+<span><span class="co">#&gt;                    Ncoeff Mahalanobis      p</span></span>
+<span><span class="co">#&gt; Model 2 vs Model 1      2     0.27817 0.8896</span></span></code></pre></div>
 <p>Equivalently, one might apply the <code>flipscores</code> function to
 a precomputed <code>glm</code> model.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -160,9 +160,9 @@ a precomputed <code>glm</code> model.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             estimate    score       se        z     pcor     p</span></span>
-<span><span class="co">#&gt; (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.933</span></span>
-<span><span class="co">#&gt; ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.956</span></span>
-<span><span class="co">#&gt; ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.659</span></span>
+<span><span class="co">#&gt; (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.935</span></span>
+<span><span class="co">#&gt; ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.954</span></span>
+<span><span class="co">#&gt; ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.654</span></span>
 <span><span class="co">#&gt; X            0.89732 35.59669  6.63014  5.36892  0.72553 0.000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; (Dispersion parameter for poisson family taken to be 1)</span></span>
@@ -189,9 +189,9 @@ precomputing flips with the function <code>make_flips</code>.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             estimate    score       se        z     pcor     p</span></span>
-<span><span class="co">#&gt; (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.921</span></span>
-<span><span class="co">#&gt; ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.960</span></span>
-<span><span class="co">#&gt; ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.662</span></span>
+<span><span class="co">#&gt; (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.941</span></span>
+<span><span class="co">#&gt; ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.945</span></span>
+<span><span class="co">#&gt; ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.647</span></span>
 <span><span class="co">#&gt; X            0.89732 35.59669  6.63014  5.36892  0.72553 0.001</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; (Dispersion parameter for poisson family taken to be 1)</span></span>
@@ -209,9 +209,9 @@ precomputing flips with the function <code>make_flips</code>.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             estimate    score       se        z     pcor     p</span></span>
-<span><span class="co">#&gt; (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.921</span></span>
-<span><span class="co">#&gt; ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.960</span></span>
-<span><span class="co">#&gt; ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.662</span></span>
+<span><span class="co">#&gt; (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.941</span></span>
+<span><span class="co">#&gt; ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.945</span></span>
+<span><span class="co">#&gt; ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.647</span></span>
 <span><span class="co">#&gt; X            0.89732 35.59669  6.63014  5.36892  0.72553 0.001</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; (Dispersion parameter for poisson family taken to be 1)</span></span>
@@ -231,9 +231,9 @@ precomputing flips with the function <code>make_flips</code>.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             estimate    score       se        z     pcor     p</span></span>
-<span><span class="co">#&gt; (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.931</span></span>
-<span><span class="co">#&gt; ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.955</span></span>
-<span><span class="co">#&gt; ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.659</span></span>
+<span><span class="co">#&gt; (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.937</span></span>
+<span><span class="co">#&gt; ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.958</span></span>
+<span><span class="co">#&gt; ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.655</span></span>
 <span><span class="co">#&gt; X            0.89732 35.59669  6.63014  5.36892  0.72553 0.000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; (Dispersion parameter for poisson family taken to be 1)</span></span>
@@ -251,9 +251,9 @@ precomputing flips with the function <code>make_flips</code>.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             estimate    score       se        z     pcor     p</span></span>
-<span><span class="co">#&gt; (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.935</span></span>
-<span><span class="co">#&gt; ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.955</span></span>
-<span><span class="co">#&gt; ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.653</span></span>
+<span><span class="co">#&gt; (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.932</span></span>
+<span><span class="co">#&gt; ZB           0.02318  0.13383  2.39994  0.05576  0.01165 0.956</span></span>
+<span><span class="co">#&gt; ZC           0.15946  1.36568  2.93906  0.46467  0.09651 0.665</span></span>
 <span><span class="co">#&gt; X            0.89732 35.59669  6.63014  5.36892  0.72553 0.000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; (Dispersion parameter for poisson family taken to be 1)</span></span>
@@ -295,7 +295,7 @@ p-values for all the others</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             estimate    score       se        z     pcor     p</span></span>
-<span><span class="co">#&gt; (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.921</span></span>
+<span><span class="co">#&gt; (Intercept)  0.02207  0.26383  3.44133  0.07666  0.01595 0.941</span></span>
 <span><span class="co">#&gt; ZB           0.02318       NA       NA       NA       NA    NA</span></span>
 <span><span class="co">#&gt; ZC           0.15946       NA       NA       NA       NA    NA</span></span>
 <span><span class="co">#&gt; X            0.89732 35.59669  6.63014  5.36892  0.72553 0.001</span></span>
@@ -320,11 +320,11 @@ paid if <code>factor/character</code> variables are involved.</p>
 <span><span class="co">#&gt;     data = data.frame_30x3, family = "poisson(link='log')")</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt;             estimate   score      se       z    pcor    p</span></span>
-<span><span class="co">#&gt; (Intercept)  0.02207      NA      NA      NA      NA   NA</span></span>
-<span><span class="co">#&gt; ZB           0.02318 0.13383 2.39994 0.05576 0.01165 0.96</span></span>
-<span><span class="co">#&gt; ZC           0.15946      NA      NA      NA      NA   NA</span></span>
-<span><span class="co">#&gt; X            0.89732      NA      NA      NA      NA   NA</span></span>
+<span><span class="co">#&gt;             estimate   score      se       z    pcor     p</span></span>
+<span><span class="co">#&gt; (Intercept)  0.02207      NA      NA      NA      NA    NA</span></span>
+<span><span class="co">#&gt; ZB           0.02318 0.13383 2.39994 0.05576 0.01165 0.945</span></span>
+<span><span class="co">#&gt; ZC           0.15946      NA      NA      NA      NA    NA</span></span>
+<span><span class="co">#&gt; X            0.89732      NA      NA      NA      NA    NA</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; (Dispersion parameter for poisson family taken to be 1)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -340,11 +340,11 @@ paid if <code>factor/character</code> variables are involved.</p>
 <span><span class="co">#&gt;     data = data.frame_30x3, family = "poisson(link='log')")</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt;             estimate   score      se       z    pcor    p</span></span>
-<span><span class="co">#&gt; (Intercept)  0.02207      NA      NA      NA      NA   NA</span></span>
-<span><span class="co">#&gt; ZB           0.02318 0.13383 2.39994 0.05576 0.01165 0.96</span></span>
-<span><span class="co">#&gt; ZC           0.15946      NA      NA      NA      NA   NA</span></span>
-<span><span class="co">#&gt; X            0.89732      NA      NA      NA      NA   NA</span></span>
+<span><span class="co">#&gt;             estimate   score      se       z    pcor     p</span></span>
+<span><span class="co">#&gt; (Intercept)  0.02207      NA      NA      NA      NA    NA</span></span>
+<span><span class="co">#&gt; ZB           0.02318 0.13383 2.39994 0.05576 0.01165 0.945</span></span>
+<span><span class="co">#&gt; ZC           0.15946      NA      NA      NA      NA    NA</span></span>
+<span><span class="co">#&gt; X            0.89732      NA      NA      NA      NA    NA</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; (Dispersion parameter for poisson family taken to be 1)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -366,9 +366,9 @@ quotes.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             estimate    score       se        z     pcor     p</span></span>
-<span><span class="co">#&gt; (Intercept)  0.02208  0.26385  3.18354  0.08288  0.01595 0.934</span></span>
-<span><span class="co">#&gt; ZB           0.02316  0.13368  2.20995  0.06049  0.01164 0.952</span></span>
-<span><span class="co">#&gt; ZC           0.15946  1.36541  2.72310  0.50142  0.09650 0.656</span></span>
+<span><span class="co">#&gt; (Intercept)  0.02208  0.26385  3.18354  0.08288  0.01595 0.937</span></span>
+<span><span class="co">#&gt; ZB           0.02316  0.13368  2.20995  0.06049  0.01164 0.954</span></span>
+<span><span class="co">#&gt; ZC           0.15946  1.36541  2.72310  0.50142  0.09650 0.661</span></span>
 <span><span class="co">#&gt; X            0.89733 17.36132  4.68164  3.70839  0.71368 0.000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; (Dispersion parameter for Negative Binomial(20776.66) family taken to be 0.8801237)</span></span>
@@ -387,25 +387,25 @@ misspecification of the test.</p>
 <span><span class="co">#&gt; Warning in FUN(X[[i]], ...): A confidence bound was not found in the search</span></span>
 <span><span class="co">#&gt; interval -- returning Inf</span></span>
 <span><span class="co">#&gt;                  2.5 %    97.5 %</span></span>
-<span><span class="co">#&gt; (Intercept) -1.1302782 0.5918806</span></span>
-<span><span class="co">#&gt; ZB                -Inf 1.0323930</span></span>
-<span><span class="co">#&gt; ZC          -0.8902936 1.1154610</span></span>
-<span><span class="co">#&gt; X            0.5721294 1.3635570</span></span></code></pre></div>
+<span><span class="co">#&gt; (Intercept) -1.1595126 0.5261235</span></span>
+<span><span class="co">#&gt; ZB                -Inf 1.1675956</span></span>
+<span><span class="co">#&gt; ZC          -0.7995090 1.2807057</span></span>
+<span><span class="co">#&gt; X            0.5579769 1.4274212</span></span></code></pre></div>
 <p>As before, various options are allowed, including the possibility to
 generate symmetric confidence intervals.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">mod</span>, parm <span class="op">=</span> <span class="fl">4</span>, flips <span class="op">=</span> <span class="va">flps</span><span class="op">)</span> <span class="co"># parm == to_be_tested!</span></span>
-<span><span class="co">#&gt;       2.5 %  97.5 %</span></span>
-<span><span class="co">#&gt; X 0.5957729 1.39682</span></span>
+<span><span class="co">#&gt;       2.5 %   97.5 %</span></span>
+<span><span class="co">#&gt; X 0.6138759 1.433631</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">mod</span>, parm <span class="op">=</span> <span class="fl">4</span>, level <span class="op">=</span> <span class="fl">0.99</span>, flips <span class="op">=</span> <span class="va">flps</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       0.5 %   99.5 %</span></span>
-<span><span class="co">#&gt; X 0.5058361 1.577874</span></span>
+<span><span class="co">#&gt; X 0.5219799 1.642276</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">mod</span>, parm <span class="op">=</span> <span class="fl">4</span>, alternative <span class="op">=</span> <span class="st">"greater"</span>, flips <span class="op">=</span> <span class="va">flps</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        Est.     95 %</span></span>
-<span><span class="co">#&gt; X 0.8973217 1.309689</span></span>
+<span><span class="co">#&gt; X 0.8973217 1.292329</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">mod</span>, parm <span class="op">=</span> <span class="fl">4</span>, type <span class="op">=</span> <span class="st">"symmetric"</span>, flips <span class="op">=</span> <span class="va">flps</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       2.5 %   97.5 %</span></span>
-<span><span class="co">#&gt; X 0.4683666 1.326277</span></span></code></pre></div>
+<span><span class="co">#&gt; X 0.4960628 1.298581</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="other-examples">Other examples<a class="anchor" aria-label="anchor" href="#other-examples"></a>
@@ -598,8 +598,8 @@ generate symmetric confidence intervals.</p>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             estimate    score       se        z     pcor     p</span></span>
 <span><span class="co">#&gt; (Intercept)  0.10358  5.15889  5.96233  0.86525  0.12489 0.394</span></span>
-<span><span class="co">#&gt; x1          -0.04491 -2.41629  6.15867 -0.39234 -0.05663 0.697</span></span>
-<span><span class="co">#&gt; x2           0.02313  1.20293  6.04796  0.19890  0.02871 0.822</span></span>
+<span><span class="co">#&gt; x1          -0.04491 -2.41629  6.15867 -0.39234 -0.05663 0.700</span></span>
+<span><span class="co">#&gt; x2           0.02313  1.20293  6.04796  0.19890  0.02871 0.814</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; (Dispersion parameter for gaussian family taken to be 0.7175968)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -618,7 +618,7 @@ generate symmetric confidence intervals.</p>
 <span><span class="co">#&gt; score_type = Standardized, n_flips = , alternative = two.sided</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  response coefficient score p.values</span></span>
-<span><span class="co">#&gt;        y1          x2 1.203    0.815</span></span>
+<span><span class="co">#&gt;        y1          x2 1.203   0.8226</span></span>
 <span></span>
 <span><span class="va">models</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">y1</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span>, data <span class="op">=</span> <span class="va">df</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -647,20 +647,20 @@ generate symmetric confidence intervals.</p>
 <span><span class="co">#&gt; 13  mod4        y sexM:age_groupYoung -1.42334 -0.7735 0.7440 -1.0396 -0.13456</span></span>
 <span><span class="co">#&gt; 14  mod5       y1                &lt;NA&gt;       NA  1.2029     NA      NA       NA</span></span>
 <span><span class="co">#&gt;         p p.values</span></span>
-<span><span class="co">#&gt; 1  0.4010       NA</span></span>
-<span><span class="co">#&gt; 2  0.7180       NA</span></span>
-<span><span class="co">#&gt; 3  0.8156       NA</span></span>
-<span><span class="co">#&gt; 4  0.7022       NA</span></span>
-<span><span class="co">#&gt; 5  0.2966       NA</span></span>
-<span><span class="co">#&gt; 6  0.1370       NA</span></span>
-<span><span class="co">#&gt; 7  0.2966       NA</span></span>
-<span><span class="co">#&gt; 8  0.1522       NA</span></span>
-<span><span class="co">#&gt; 9  0.6346       NA</span></span>
-<span><span class="co">#&gt; 10 0.3600       NA</span></span>
-<span><span class="co">#&gt; 11 0.6698       NA</span></span>
-<span><span class="co">#&gt; 12 0.9204       NA</span></span>
-<span><span class="co">#&gt; 13 0.3312       NA</span></span>
-<span><span class="co">#&gt; 14     NA   0.8156</span></span>
+<span><span class="co">#&gt; 1  0.3950       NA</span></span>
+<span><span class="co">#&gt; 2  0.6986       NA</span></span>
+<span><span class="co">#&gt; 3  0.8220       NA</span></span>
+<span><span class="co">#&gt; 4  0.7142       NA</span></span>
+<span><span class="co">#&gt; 5  0.3016       NA</span></span>
+<span><span class="co">#&gt; 6  0.1358       NA</span></span>
+<span><span class="co">#&gt; 7  0.3016       NA</span></span>
+<span><span class="co">#&gt; 8  0.1582       NA</span></span>
+<span><span class="co">#&gt; 9  0.6328       NA</span></span>
+<span><span class="co">#&gt; 10 0.3536       NA</span></span>
+<span><span class="co">#&gt; 11 0.6660       NA</span></span>
+<span><span class="co">#&gt; 12 0.9092       NA</span></span>
+<span><span class="co">#&gt; 13 0.3270       NA</span></span>
+<span><span class="co">#&gt; 14     NA    0.822</span></span>
 <span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/flipscores_lm.html">flipscores_lm</a></span><span class="op">(</span><span class="va">y1</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span>

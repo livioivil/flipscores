@@ -67,14 +67,18 @@ flipscores(
   one-sided formula such as `~ids`. Column names and formulas are
   evaluated in `data`, or separately in each fitted model's original
   data for a list of models. With `NULL`, rows are matched by row names.
-  Repeated IDs are aligned by occurrence, with the maximum multiplicity
-  across models, and all occurrences share the same random sign. A
-  supplied vector is applied unchanged to every model and must match
-  each model's number of score rows, after `subset` and missing-value
-  removal. A length mismatch is an error; values are never recycled or
-  truncated. For models with different fitted row counts, consider
-  `id = ~ids` or `id = "ids"`, with an ID column present in every
-  model's data.
+  For fitted models, column names and formulas are evaluated only in the
+  data stored in the model object (`model$data`), never by re-reading
+  the object named in `data =`, which may have changed since fitting.
+  Models fitted without a data frame in `data =` therefore give an
+  error; supply `id` as a vector in that case. Repeated IDs are aligned
+  by occurrence, with the maximum multiplicity across models, and all
+  occurrences share the same random sign. A supplied vector is applied
+  unchanged to every model and must match each model's number of score
+  rows, after `subset` and missing-value removal. A length mismatch is
+  an error; values are never recycled or truncated. For models with
+  different fitted row counts, consider `id = ~ids` or `id = "ids"`,
+  with an ID column present in every model's data.
 
 - seed:
 
@@ -142,9 +146,9 @@ summary(res)
 #> 
 #> Coefficients:
 #>             estimate    score       se        z     pcor     p
-#> (Intercept)  0.10358  5.15889  5.96233  0.86525  0.12489 0.385
-#> x1          -0.04491 -2.41629  6.15867 -0.39234 -0.05663 0.705
-#> x2           0.02313  1.20293  6.04796  0.19890  0.02871 0.814
+#> (Intercept)  0.10358  5.15889  5.96233  0.86525  0.12489 0.390
+#> x1          -0.04491 -2.41629  6.15867 -0.39234 -0.05663 0.702
+#> x2           0.02313  1.20293  6.04796  0.19890  0.02871 0.819
 #> 
 #> (Dispersion parameter for gaussian family taken to be 0.7175968)
 #> 
@@ -164,21 +168,21 @@ models <- list(
 res=flipscores(models)
 summary(res)
 #>   model response coefficient estimate   score    se       z     pcor      p
-#> 1  mod1       y1 (Intercept)  0.10358   5.159 5.962  0.8652  0.12489 0.3958
-#> 2  mod1       y1          x1 -0.04491  -2.416 6.159 -0.3923 -0.05663 0.7106
-#> 3  mod1       y1          x2  0.02313   1.203 6.048  0.1989  0.02871 0.8266
-#> 4  mod2       y2 (Intercept)  0.13022   6.486 6.650  0.9752  0.14076 0.3450
-#> 5  mod2       y2          x1 -0.22619 -12.171 7.066 -1.7225 -0.24863 0.0370
-#> 6  mod2       y2          x2 -0.17934  -9.329 6.862 -1.3594 -0.19621 0.1338
-#> 7  mod3       yb (Intercept) -0.23693  -2.705 3.385 -0.7992 -0.11326 0.4436
-#> 8  mod3       yb          x1 -0.47375  -5.801 3.590 -1.6159 -0.22891 0.0992
-#> 9  mod3       yb          x2 -0.38289  -4.558 3.490 -1.3058 -0.18499 0.2342
+#> 1  mod1       y1 (Intercept)  0.10358   5.159 5.962  0.8652  0.12489 0.3934
+#> 2  mod1       y1          x1 -0.04491  -2.416 6.159 -0.3923 -0.05663 0.6996
+#> 3  mod1       y1          x2  0.02313   1.203 6.048  0.1989  0.02871 0.8122
+#> 4  mod2       y2 (Intercept)  0.13022   6.486 6.650  0.9752  0.14076 0.3428
+#> 5  mod2       y2          x1 -0.22619 -12.171 7.066 -1.7225 -0.24863 0.0320
+#> 6  mod2       y2          x2 -0.17934  -9.329 6.862 -1.3594 -0.19621 0.1378
+#> 7  mod3       yb (Intercept) -0.23693  -2.705 3.385 -0.7992 -0.11326 0.4338
+#> 8  mod3       yb          x1 -0.47375  -5.801 3.590 -1.6159 -0.22891 0.0898
+#> 9  mod3       yb          x2 -0.38289  -4.558 3.490 -1.3058 -0.18499 0.2388
 res=flipscores(models, to_be_tested = "x1")
 summary(res)
 #>   model response coefficient estimate   score    se       z     pcor      p
-#> 1  mod1       y1          x1 -0.04491  -2.416 6.159 -0.3923 -0.05663 0.6968
-#> 2  mod2       y2          x1 -0.22619 -12.171 7.066 -1.7225 -0.24863 0.0336
-#> 3  mod3       yb          x1 -0.47375  -5.801 3.590 -1.6159 -0.22891 0.0958
+#> 1  mod1       y1          x1 -0.04491  -2.416 6.159 -0.3923 -0.05663 0.7180
+#> 2  mod2       y2          x1 -0.22619 -12.171 7.066 -1.7225 -0.24863 0.0328
+#> 3  mod3       yb          x1 -0.47375  -5.801 3.590 -1.6159 -0.22891 0.0962
 
 # Different dataset sizes: resolve IDs separately in each model's data
 df$ids <- rep(seq_len(n / 2), each = 2)
