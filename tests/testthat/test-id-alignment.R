@@ -245,3 +245,60 @@ test_that("cluster IDs are preserved when joining contrast and nested results", 
   expect_equal(unname(as.matrix(mixed$objects$coef$Tspace)),
                unname(mixed$objects$contrast$Tspace))
 })
+
+test_that("IDs come from the data stored in each model, not the current object (#5)", {
+  d <- iris
+  d$id <- seq_len(nrow(d))
+  mods <- list()
+  for (sp in levels(d$Species)) {
+    dat <- subset(d, Species != sp)
+    rownames(dat) <- NULL
+    mods[[sp]] <- glm(Sepal.Length ~ Sepal.Width, data = dat)
+  }
+  res <- flipscores(mods, id = "id", n_flips = 9, seed = 1)
+  for (i in seq_along(mods)) {
+    used <- as.integer(res$alignment$rows$id)[res$alignment$index[[i]]]
+    expect_identical(used, d$id[d$Species != names(mods)[i]])
+  }
+
+  # a formula defined outside lapply() no longer breaks the lookup
+  f <- Sepal.Length ~ Sepal.Width
+  fits <- lapply(split(d, d$Species), function(dat) glm(f, data = dat))
+  res2 <- flipscores(fits, id = ~id, n_flips = 9, seed = 1)
+  for (i in seq_along(fits))
+    expect_identical(attr(res2$objects[[i]]$scores, "id"),
+                     split(d$id, d$Species)[[i]])
+})
+
+test_that("column-name IDs need a model fitted on a data frame", {
+  set.seed(1)
+  ids <- rep(1:5, each = 2)
+  x <- rnorm(10)
+  y <- rnorm(10)
+  model <- glm(y ~ x)
+  expect_error(flipscores(model, id = "ids", to_be_tested = "x", n_flips = 9),
+               "does not store the data")
+  expect_error(flipscores(list(model, model), id = ~ids, to_be_tested = "x",
+                          n_flips = 9), "does not store the data")
+  out <- flipscores(model, id = ids, to_be_tested = "x", n_flips = 9, seed = 1)
+  expect_identical(attr(out$scores, "id"), ids)
+
+  d <- data.frame(ids = ids, x = x, y = y)
+  linear <- flipscores_lm(y ~ x, tested_coeffs = "x", n_flips = 9, seed = 1)
+  expect_error(flipscores(list(linear, glm(y ~ x, data = d)), id = ~ids,
+                          to_be_tested = "x", n_flips = 9),
+               "does not store the data")
+})
+
+test_that("fs_lm results keep their data for ID resolution after the object changes", {
+  d <- data.frame(ids = rep(LETTERS[1:4], each = 2), x = 1:8,
+                  y = c(2, 1, 4, 3, 6, 5, 8, 9))
+  linear <- flipscores_lm(y ~ x, data = d, tested_coeffs = "x", n_flips = 7, seed = 3)
+  model <- glm(y ~ x, data = d)
+  expected <- d$ids
+  d$ids <- rev(d$ids)
+  joint <- flipscores(list(linear = linear, glm = model), id = ~ids,
+                      to_be_tested = "x", n_flips = 7, seed = 3)
+  expect_identical(attr(joint$objects$linear$scores, "id"), expected)
+  expect_identical(attr(joint$objects$glm$scores, "id"), expected)
+})

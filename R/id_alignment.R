@@ -1,6 +1,9 @@
 # Resolve identifiers before the score engine replaces the original model data.
 .fs_model_data <- function(model, data = NULL, envir = parent.frame()) {
   if (!is.null(data)) return(as.data.frame(data))
+  # glm objects store the data frame they were fitted on; prefer it to
+  # re-evaluating `call$data`, which may now point to a different object.
+  if (is.data.frame(model$data)) return(as.data.frame(model$data))
   model_env <- environment(stats::formula(model))
   if (is.null(model_env)) model_env <- envir
   value <- tryCatch(eval(model$call$data, model_env), error = function(e) NULL)
@@ -29,6 +32,20 @@
   rownames(model$scores)
 }
 
+# Data used to evaluate a column-name or formula `id`. Only the data stored in
+# the fitted object (or supplied explicitly) are used: re-evaluating
+# `model$call$data` could silently pick up an object that has changed since
+# fitting (e.g. a name reused in a loop) and misalign the IDs (issue #5).
+.fs_id_data <- function(model, data = NULL) {
+  if (!is.null(data)) return(as.data.frame(data))
+  stored <- if (inherits(model, "fs_lm")) model$info$data else model$data
+  if (is.data.frame(stored)) return(as.data.frame(stored))
+  stop("'id' is a column name or formula, but the model does not store the ",
+       "data it was fitted on. Fit the model with 'data =' set to a data ",
+       "frame, or give 'id' as a vector with one value per score row.",
+       call. = FALSE)
+}
+
 .fs_resolve_id <- function(id, model, data = NULL, envir = parent.frame()) {
   if (is.null(id)) return(NULL)
   rows <- .fs_model_rows(model)
@@ -36,18 +53,7 @@
     return(.fs_validate_id(id, length(rows)))
 
   if (inherits(model, "fs_contrasts")) model <- model$model
-  if (inherits(model, "fs_lm")) {
-    if (is.null(data)) {
-      model_env <- environment(model$info$formula)
-      if (is.null(model_env)) model_env <- envir
-      data <- tryCatch(eval(model$call$data, model_env), error = function(e) NULL)
-    }
-  } else {
-    data <- .fs_model_data(model, data, envir)
-  }
-  if (is.null(data))
-    stop("The model's original data are required to evaluate 'id'.", call. = FALSE)
-  data <- as.data.frame(data)
+  data <- .fs_id_data(model, data)
 
   if (inherits(id, "formula")) {
     if (length(id) != 2L)

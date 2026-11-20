@@ -23,6 +23,11 @@
 #'   one-sided formula such as \code{~ids}. Column names and formulas are
 #'   evaluated in \code{data}, or separately in each fitted model's original
 #'   data for a list of models. With \code{NULL}, rows are matched by row names.
+#'   For fitted models, column names and formulas are evaluated only in the
+#'   data stored in the model object (\code{model$data}), never by re-reading
+#'   the object named in \code{data =}, which may have changed since fitting.
+#'   Models fitted without a data frame in \code{data =} therefore give an
+#'   error; supply \code{id} as a vector in that case.
 #'   Repeated IDs are aligned by occurrence, with the maximum multiplicity
 #'   across models, and all occurrences share the same random sign.
 #'   A supplied vector is applied unchanged to every model and must match each
